@@ -23,6 +23,15 @@
                 {% endfor %}
             </ul>
         {% endif %}
+    {% with msgs = get_flashed_messages() %}
+    {% if msgs %}
+    <ul>
+        {% for msg in msgs %}
+        <li>{{ msg }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
         <input type="submit" value="go">
     </form>
 {% endblock %}
