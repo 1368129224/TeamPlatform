@@ -59,3 +59,10 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('account.login'))
+
+@bp.route('/<stu_num>')
+@login_required
+def profie(stu_num):
+    user = User.query.filter(User.stu_num == stu_num).first_or_404()
+
+

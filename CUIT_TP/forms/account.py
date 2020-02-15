@@ -23,7 +23,7 @@ class RegisterForm(FlaskForm):
             raise ValidationError('此邮箱已注册。')
 
     def validate_stu_num(self, stu_num):
-        user = User.query.filter_by(email=stu_num.data).first()
+        user = User.query.filter_by(stu_num=stu_num.data).first()
         if user is not None:
             raise ValidationError('此学号已注册。')
 
