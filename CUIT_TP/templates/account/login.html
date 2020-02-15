@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block content %}
+    <h1>Register</h1>
+    <form method="post" action="{{ url_for('account.login') }}">
+        {{ form.csrf_token }}
+        <p>
+            {{ form.stu_num_or_email.label }}
+            {{ form.stu_num_or_email(size=20) }}
+        </p>
+        <p>
+            {{ form.password.label }}
+            {{ form.password(size=20) }}
+        </p>
+        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+        {% if form.errors %}
+            <ul>
+                {% for error in form.errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% with msgs = get_flashed_messages() %}
+            {% if msgs %}
+                <ul>
+                    {% for msg in msgs %}
+                        <li>{{ msg }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <input type="submit" value="go">
+    </form>
+{% endblock %}

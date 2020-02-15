@@ -7,31 +7,62 @@
 {% block content %}
     <h1>Register</h1>
     <form method="post" action="{{ url_for('account.register') }}">
-        {{ form.csrf_token }}
-        {{ form.username.label }}
-        {{ form.username(size=20) }}
-        {{ form.email.label }}
-        {{ form.email(size=20) }}
-        {{ form.password.label }}
-        {{ form.password(size=20) }}
-        {{ form.confirm.label }}
-        {{ form.confirm(size=20) }}
-        {% if form.errors %}
-            <ul>
-                {% for error in form.errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    {% with msgs = get_flashed_messages() %}
-    {% if msgs %}
-    <ul>
-        {% for msg in msgs %}
-        <li>{{ msg }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.username.label }}<br>
+            {{ form.username(size=20) }}<br>
+            {% for error in form.username.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+
+        <p>
+            {{ form.stu_num.label }}<br>
+            {{ form.stu_num(size=20) }}<br>
+            {% for error in form.stu_num.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+
+        <p>
+            {{ form.email.label }}<br>
+            {{ form.email(size=20) }}<br>
+            {% for error in form.email.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.password.label }}<br>
+            {{ form.password(size=20) }}<br>
+            {% for error in form.password.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.confirm.label }}<br>
+            {{ form.confirm(size=20) }}<br>
+            {% for error in form.confirm.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+
+        <p>
+            {{ form.github_link.label }}<br>
+            {{ form.github_link(size=20) }}<br>
+            {% for error in form.github_link.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+
+        {% with msgs = get_flashed_messages() %}
+            {% if msgs %}
+                <ul>
+                    {% for msg in msgs %}
+                        <li>{{ msg }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
         <input type="submit" value="go">
     </form>
 {% endblock %}
