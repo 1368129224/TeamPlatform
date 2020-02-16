@@ -32,3 +32,10 @@ class LoginForm(FlaskForm):
     stu_num_or_email = StringField('Id', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=10, max=48)])
     remember_me = BooleanField('Remember Me')
+
+class ForgetPasswordForm(FlaskForm):
+    email_or_stu_num = StringField('Id', validators=[DataRequired()])
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=10, max=48)])
+    confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])

@@ -2,9 +2,10 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from werkzeug.urls import url_parse
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import current_user, login_user, logout_user, login_required
-from CUIT_TP.forms.account import RegisterForm, LoginForm
+from CUIT_TP.forms.account import RegisterForm, LoginForm, ForgetPasswordForm, ResetPasswordForm
 from CUIT_TP.models import User
-from .. import db
+from CUIT_TP.utils import send_email
+from CUIT_TP import db, app
 
 bp = Blueprint('account', __name__)
 
@@ -23,7 +24,8 @@ def register():
         if User.query.filter(User.email == email).first():
             flash('此邮箱已注册。', 'error')
             return render_template('account/register.html', form=form)
-        new_user = User(username=username, stu_num=stu_num, email=email, github_link=github, password=generate_password_hash(password))
+        new_user = User(username=username, stu_num=stu_num, email=email, github_link=github,
+                        password=generate_password_hash(password))
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('home.index'))
@@ -55,14 +57,57 @@ def login():
     else:
         return render_template('account/login.html', form=form)
 
+
 @bp.route('/logout', methods=('GET', 'POST'))
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('account.login'))
 
-@bp.route('/<stu_num>')
+
+@bp.route('/<stu_num>', methods=('GET', 'POST'))
 @login_required
 def profie(stu_num):
     user = User.query.filter(User.stu_num == stu_num).first_or_404()
 
 
+@bp.route('/forget_password', methods=('GET', 'POST'))
+def forget_password():
+    if current_user.is_authenticated:
+        return redirect(url_for('home.index'))
+    form = ForgetPasswordForm()
+    if form.validate_on_submit():
+        user = User.query.filter(User.email == form.email_or_stu_num.data).first()
+        if not user:
+            user = User.query.filter(User.stu_num == form.email_or_stu_num.data).first()
+        if user:
+            send_reset_password_email(user)
+        flash('Check your email for the instructions to reset your password')
+        return redirect(url_for('account.login'))
+    return render_template('account/forget_password.html', form=form)
+
+
+def send_reset_password_email(user):
+    token = user.get_reset_password_token()
+    send_email('Reset Your Password',
+               sender=app.config['MAIL_USERNAME'],
+               recipients=[user.email],
+               text_body=render_template('email/reset_password.txt',
+                                         user=user, token=token),
+               html_body=render_template('email/reset_password.html',
+                                         user=user, token=token))
+
+
+@bp.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('home.index'))
+    user = User.verify_reset_password_token(token)
+    if not user:
+        return redirect(url_for('home.index'))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user.password = generate_password_hash(form.password.data)
+        db.session.commit()
+        return redirect(url_for('account.login'))
+    return render_template('account/reset_password.html', form=form)
