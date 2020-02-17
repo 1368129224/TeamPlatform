@@ -2,8 +2,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from werkzeug.urls import url_parse
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import current_user, login_user, logout_user, login_required
-from CUIT_TP.forms.account import RegisterForm, LoginForm, ForgetPasswordForm, ResetPasswordForm
-from CUIT_TP.models import User
+from CUIT_TP.forms.account import RegisterForm, LoginForm, ForgetPasswordForm, ResetPasswordForm, ProfileForm
+from CUIT_TP.models import User, UserProfile
 from CUIT_TP.utils import send_email
 from CUIT_TP import db, app
 
@@ -16,16 +16,15 @@ def register():
         return redirect(url_for('index'))
     form = RegisterForm()
     if form.validate_on_submit():
-        username = form.username.data
-        stu_num = form.stu_num.data
-        email = form.email.data
-        password = form.password.data
-        github = form.github_link.data
-        if User.query.filter(User.email == email).first():
+        if User.query.filter(User.email == form.email.data).first():
             flash('此邮箱已注册。', 'error')
             return render_template('account/register.html', form=form)
-        new_user = User(username=username, stu_num=stu_num, email=email, github_link=github,
-                        password=generate_password_hash(password))
+        new_user = User(
+            username=form.username.data,
+            email=form.email.data,
+            password=generate_password_hash(form.password.data),
+            stu_num=form.stu_num.data
+        )
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('home.index'))
@@ -63,12 +62,6 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('account.login'))
-
-
-@bp.route('/<stu_num>', methods=('GET', 'POST'))
-@login_required
-def profie(stu_num):
-    user = User.query.filter(User.stu_num == stu_num).first_or_404()
 
 
 @bp.route('/forget_password', methods=('GET', 'POST'))
@@ -111,3 +104,41 @@ def reset_password(token):
         db.session.commit()
         return redirect(url_for('account.login'))
     return render_template('account/reset_password.html', form=form)
+
+@bp.route('/<stu_num>/profile')
+@login_required
+def profile(stu_num):
+    user = User.query.filter(User.stu_num==stu_num).first()
+    if not user:
+        abort(404)
+    if not user.profile:
+        profile = UserProfile(
+            github='',
+            college='',
+            grade=0,
+            _class='',
+        )
+        profile.user = user
+        db.session.add(profile)
+        db.session.commit()
+    return render_template('account/profile.html', user=user, profile=user.profile)
+
+@bp.route('/<stu_num>/change_profile', methods=['GET', 'POST'])
+@login_required
+def change_profile(stu_num):
+    user = User.query.filter(User.stu_num == stu_num).first()
+    form = ProfileForm(
+        github=user.profile.github,
+        college=user.profile.college,
+        grade=user.profile.grade,
+        c_lass=user.profile._class
+    )
+    if request.method == 'POST':
+        form = ProfileForm()
+        if form.validate_on_submit():
+            user.profile.github = form.github.data
+            user.profile.college = form.college.data
+            user.profile.grade = form.grade.data
+            user.profile._class = form.c_lass.data
+            db.session.commit()
+    return render_template('account/change_profile.html', user=user, form=form)

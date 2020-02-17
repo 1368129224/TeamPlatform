@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField
+from wtforms import StringField, PasswordField, BooleanField, IntegerField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from CUIT_TP.models import User
 
@@ -7,7 +7,6 @@ from CUIT_TP.models import User
 class RegisterForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=8, max=28)])
     stu_num = StringField('Stu_num', validators=[DataRequired(), Length(min=10, max=10)])
-    github_link = StringField('Github', validators=[Length(max=128)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired(), Length(min=10, max=48)])
     confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
@@ -39,3 +38,9 @@ class ForgetPasswordForm(FlaskForm):
 class ResetPasswordForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=10, max=48)])
     confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
+
+class ProfileForm(FlaskForm):
+    github = StringField('github', validators=[])
+    college = StringField('college', validators=[DataRequired()])
+    grade = IntegerField('grade', validators=[DataRequired()])
+    c_lass = StringField('class', validators=[DataRequired()])

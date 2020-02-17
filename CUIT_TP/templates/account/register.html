@@ -46,14 +46,6 @@
             {% endfor %}
         </p>
 
-        <p>
-            {{ form.github_link.label }}<br>
-            {{ form.github_link(size=20) }}<br>
-            {% for error in form.github_link.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-
         {% with msgs = get_flashed_messages() %}
             {% if msgs %}
                 <ul>
