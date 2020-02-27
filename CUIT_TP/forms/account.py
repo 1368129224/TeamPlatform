@@ -40,7 +40,12 @@ class ResetPasswordForm(FlaskForm):
     confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
 
 class ProfileForm(FlaskForm):
-    github = StringField('github', validators=[])
-    college = StringField('college', validators=[DataRequired()])
-    grade = IntegerField('grade', validators=[DataRequired()])
-    c_lass = StringField('class', validators=[DataRequired()])
+    phone = StringField('Phone', validators=[DataRequired()])
+    college = StringField('College', validators=[DataRequired()])
+    grade = IntegerField('Grade', validators=[DataRequired()])
+    c_lass = StringField('Class', validators=[DataRequired()])
+
+class ChangePasswordForm(FlaskForm):
+    old_password = PasswordField('Old password', validators=[DataRequired()])
+    password = PasswordField('New Password', validators=[DataRequired(), Length(min=10, max=48)])
+    confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])

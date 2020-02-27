@@ -12,9 +12,9 @@
     <form method="post" action="">
         {{ form.hidden_tag() }}
         <p>
-            {{ form.github.label }}<br>
-            {{ form.github(size=20) }}<br>
-            {% for error in form.github.errors %}
+            {{ form.phone.label }}<br>
+            {{ form.phone(size=20) }}<br>
+            {% for error in form.phone.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>

@@ -1,6 +1,5 @@
 import jwt
 from time import time
-from sqlalchemy import Table
 from sqlalchemy.orm import relationship
 from . import db, login, app
 from flask_login import UserMixin
@@ -14,6 +13,8 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), unique=True, nullable=False, comment='邮箱')
     stu_num = db.Column(db.String(32), unique=True, nullable=False, comment='学号')
     password = db.Column(db.String(128), nullable=False, comment='密码')
+    belong_team_id = db.Column(db.Integer, db.ForeignKey('Team.id'))
+    manage_team_id = db.Column(db.Integer, db.ForeignKey('Team.id'))
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -62,6 +63,8 @@ class UserPermission(db.Model):
     publish_lab_activity = db.Column(db.Boolean, default=False, comment='发布实验室活动')
     change_team_info = db.Column(db.Boolean, default=False, comment='修改组信息')
     publish_team_activity = db.Column(db.Boolean, default=False, comment='发布组活动')
+    admin = db.Column(db.Boolean, default=False, comment='管理员')
+    monitor = db.Column(db.Boolean, default=False, comment='班长')
 
     def __repr__(self):
         return '<UserPermission {}>'.format(self.user.username)
@@ -72,12 +75,16 @@ class UserPermission(db.Model):
 class Team(db.Model):
     __tablename__ = 'Team'
     id = db.Column(db.Integer, primary_key=True)
-    team_name = db.Column(db.String(32), unique=True, nullable=False, comment='小组名')
+    leader_id = db.Column(db.Integer, db.ForeignKey('User.id'))
+    leader = relationship('User', backref=db.backref('manage_team', uselist=False), foreign_keys=[leader_id])
+    team_name = db.Column(db.String(32), unique=True, nullable=False,  comment='小组名')
     desc = db.Column(db.String(256), comment='小组简介')
-    leader = relationship('User', backref=db.backref('manage_team', uselist=False))
-    teammate = relationship('Teammate', backref="team")
-    activity = relationship('Activity', backref="belong_team")
-    project = relationship('Project', backref=db.backref('belong_team', uselist=False))
+    teammate_id = db.Column(db.Integer, db.ForeignKey('User.id'))
+    teammate = relationship('User', backref="team", foreign_keys=[teammate_id])
+    activity_id = db.Column(db.Integer, db.ForeignKey('Activity.id'))
+    activity = relationship('Activity', backref="belong_team", foreign_keys=[activity_id])
+    project_id = db.Column(db.Integer, db.ForeignKey('Project.id'))
+    project = relationship('Project', backref=db.backref('belong_team', uselist=False), foreign_keys=[project_id])
 
 class Project(db.Model):
     __tablename__ = 'Project'
@@ -89,11 +96,13 @@ class Project(db.Model):
 class Item(db.Model):
     __tablename__ = 'Item'
     id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('Project.id'))
     item_type = db.Column(db.Enum('需求', 'bug'), server_default='需求', nullable=False, comment='类型')
     desc = db.Column(db.String(256), comment='描述')
     create_time = db.Column(db.DateTime, comment='创建时间')
     status = db.Column(db.Enum('待处理', '开发中', '测试中', '已处理'), server_default='待处理', nullable=False, comment='状态')
     priority = db.Column(db.Enum('低', '普通', '高', '紧急'), server_default='普通', nullable=False, comment='优先级')
+    executor_id = db.Column(db.Integer, db.ForeignKey('User.id'))
     executor = relationship('User', backref=db.backref('task', uselist=False))
     note = relationship('Note', backref='belong_item')
 
@@ -108,6 +117,8 @@ class Activity(db.Model):
 class Note(db.Model):
     __tablename__ = 'Note'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='记录ID')
+    item_id = db.Column(db.Integer, db.ForeignKey('Item.id'))
     content = db.Column(db.String(256), unique=False, comment='记录内容')
     datetime = db.Column(db.DateTime, comment='创建时间')
+    writer_id = db.Column(db.Integer, db.ForeignKey('User.id'))
     writer = relationship('User', backref=db.backref('note', uselist=False))
