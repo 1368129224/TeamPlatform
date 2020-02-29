@@ -1,16 +1,10 @@
-from flask import Blueprint, render_template
-from flask_mail import Message
-from CUIT_TP import mail
+from flask import Blueprint, render_template, redirect, url_for
+from CUIT_TP.models import User
 
 
 bp = Blueprint('home', __name__)
 @bp.route('/')
 def index():
-    # msg = Message(
-    #     subject="Hello World!",
-    #     body="test!",
-    #     sender="zzc1368129224@qq.com",
-    #     recipients=["zooter_z@126.com"]
-    # )
-    # mail.send(msg)
+    if not User.query.filter(User.role=='admin').first():
+        return redirect(url_for('account.register_admin'))
     return render_template('home/index.html')

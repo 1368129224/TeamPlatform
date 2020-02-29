@@ -5,9 +5,5 @@ Member
 {% endblock %}
 
 {% block content %}
-    <p>Hello World</p>
-    {% if current_user.is_authenticated %}
-        <p>hello {{ current_user.username }}</p>
-        <button onclick=window.location.href='{{ url_for("account.profile", stu_num=current_user.stu_num) }}'>my profile</button>
-    {% endif %}
+    <p>管理实验室人员信息 World</p>
 {% endblock %}

@@ -4,11 +4,18 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from CUIT_TP.models import User
 
 
+class AdminRegisterForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=16)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=48)])
+    confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
+
+
 class RegisterForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=8, max=28)])
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=16)])
     stu_num = StringField('Stu_num', validators=[DataRequired(), Length(min=10, max=10)])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=10, max=48)])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=48)])
     confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
 
     def validate_username(self, username):
@@ -32,18 +39,22 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=10, max=48)])
     remember_me = BooleanField('Remember Me')
 
+
 class ForgetPasswordForm(FlaskForm):
     email_or_stu_num = StringField('Id', validators=[DataRequired()])
+
 
 class ResetPasswordForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=10, max=48)])
     confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
+
 
 class ProfileForm(FlaskForm):
     phone = StringField('Phone', validators=[DataRequired()])
     college = StringField('College', validators=[DataRequired()])
     grade = IntegerField('Grade', validators=[DataRequired()])
     c_lass = StringField('Class', validators=[DataRequired()])
+
 
 class ChangePasswordForm(FlaskForm):
     old_password = PasswordField('Old password', validators=[DataRequired()])

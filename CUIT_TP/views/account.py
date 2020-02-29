@@ -1,13 +1,45 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import current_user, login_user, logout_user, login_required
-from CUIT_TP.forms.account import RegisterForm, LoginForm, ForgetPasswordForm, ResetPasswordForm, ProfileForm, ChangePasswordForm
+from CUIT_TP.forms.account import RegisterForm, LoginForm, ForgetPasswordForm, ResetPasswordForm, ProfileForm, ChangePasswordForm, AdminRegisterForm
 from CUIT_TP.models import User, UserProfile, UserPermission
 from CUIT_TP.utils import send_email
-from CUIT_TP import db, app
+from CUIT_TP import db, app, login
 
 bp = Blueprint('account', __name__)
 
+
+# 设置管理员账号
+@bp.route('/register_admin', methods=('GET', 'POST'))
+def register_admin():
+    if current_user.is_authenticated:
+        return redirect(url_for('home.index'))
+    if User.query.filter(User.role=='admin').first():
+        return redirect(url_for('home.index'))
+    form = AdminRegisterForm()
+    if form.validate_on_submit():
+        new_user = User(
+            username=form.username.data,
+            email=form.email.data,
+            stu_num='0000000000',
+            password=generate_password_hash(form.password.data),
+            role='admin'
+        )
+        new_user_permission = UserPermission(
+            manage_lab_task=True,
+            change_set=True,
+            verify_asset=True,
+            change_lab_info=True,
+            publish_lab_activity=True,
+            change_team_info=True,
+            publish_team_activity=True,
+        )
+        new_user.permission = new_user_permission
+        db.session.add(new_user)
+        db.session.commit()
+        return redirect(url_for('account.login'))
+    else:
+        return render_template('account/first_run.html', form=form)
 
 # 注册
 @bp.route('/register', methods=('GET', 'POST'))
@@ -34,6 +66,11 @@ def register():
         return render_template('account/register.html', form=form)
 
 
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+
+
 # 登录
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
@@ -48,9 +85,9 @@ def login():
         if user and check_password_hash(user.password, form.password.data):
             # 登录成功
             login_user(user, remember=form.remember_me.data)
-            if current_user.admin:
+            if current_user.role == 'admin':
                 return redirect(url_for('account.admin'))
-            elif current_user.monitor:
+            elif current_user.role == 'monitor':
                 return redirect(url_for('account.monitor'))
             return redirect(url_for('home.index'))
         else:

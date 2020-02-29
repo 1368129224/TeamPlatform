@@ -1,7 +1,7 @@
 import jwt
 from time import time
 from sqlalchemy.orm import relationship
-from . import db, login, app
+from CUIT_TP import db, login, app
 from flask_login import UserMixin
 
 
@@ -13,8 +13,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), unique=True, nullable=False, comment='邮箱')
     stu_num = db.Column(db.String(32), unique=True, nullable=False, comment='学号')
     password = db.Column(db.String(128), nullable=False, comment='密码')
-    belong_team_id = db.Column(db.Integer, db.ForeignKey('Team.id'))
-    manage_team_id = db.Column(db.Integer, db.ForeignKey('Team.id'))
+    role = db.Column(db.Enum('admin', 'monitor', 'student'), server_default='student')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -32,10 +31,6 @@ class User(UserMixin, db.Model):
         except:
             return
         return User.query.get(id)
-
-@login.user_loader
-def load_user(id):
-    return User.query.get(int(id))
 
 class UserProfile(db.Model):
     __tablename__ = 'UserProfile'
@@ -63,8 +58,6 @@ class UserPermission(db.Model):
     publish_lab_activity = db.Column(db.Boolean, default=False, comment='发布实验室活动')
     change_team_info = db.Column(db.Boolean, default=False, comment='修改组信息')
     publish_team_activity = db.Column(db.Boolean, default=False, comment='发布组活动')
-    admin = db.Column(db.Boolean, default=False, comment='管理员')
-    monitor = db.Column(db.Boolean, default=False, comment='班长')
 
     def __repr__(self):
         return '<UserPermission {}>'.format(self.user.username)
@@ -86,26 +79,34 @@ class Team(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('Project.id'))
     project = relationship('Project', backref=db.backref('belong_team', uselist=False), foreign_keys=[project_id])
 
+    def __repr__(self):
+        return '<Team {}>'.format(self.team_name)
+
 class Project(db.Model):
     __tablename__ = 'Project'
     id = db.Column(db.Integer, primary_key=True)
-    team_id = db.Column(db.ForeignKey("Team.id"))
+    project_name = db.Column(db.String(32), nullable=False, comment='项目名称')
     desc = db.Column(db.String(256), comment='项目简介')
     item = relationship('Item', backref='belong_project')
+
+    def __repr__(self):
+        return '<Project {}>'.format(self.project_name)
 
 class Item(db.Model):
     __tablename__ = 'Item'
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('Project.id'))
-    item_type = db.Column(db.Enum('需求', 'bug'), server_default='需求', nullable=False, comment='类型')
+    item_type = db.Column(db.Enum('backlog', 'bug'), server_default='backlog', nullable=False, comment='类型')
     desc = db.Column(db.String(256), comment='描述')
     create_time = db.Column(db.DateTime, comment='创建时间')
-    status = db.Column(db.Enum('待处理', '开发中', '测试中', '已处理'), server_default='待处理', nullable=False, comment='状态')
-    priority = db.Column(db.Enum('低', '普通', '高', '紧急'), server_default='普通', nullable=False, comment='优先级')
+    status = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='状态')
+    priority = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='优先级')
     executor_id = db.Column(db.Integer, db.ForeignKey('User.id'))
     executor = relationship('User', backref=db.backref('task', uselist=False))
     note = relationship('Note', backref='belong_item')
 
+    def __repr__(self):
+        return '<Item {}>'.format(self.id)
 
 # 其他表
 class Activity(db.Model):
@@ -113,6 +114,9 @@ class Activity(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='活动ID')
     desc = db.Column(db.String(256), nullable=False, comment='活动内容')
     datetime = db.Column(db.DateTime, comment='开始时间')
+
+    def __repr__(self):
+        return '<Activity {}>'.format(self.id)
 
 class Note(db.Model):
     __tablename__ = 'Note'
@@ -122,3 +126,6 @@ class Note(db.Model):
     datetime = db.Column(db.DateTime, comment='创建时间')
     writer_id = db.Column(db.Integer, db.ForeignKey('User.id'))
     writer = relationship('User', backref=db.backref('note', uselist=False))
+
+    def __repr__(self):
+        return '<Note {}>'.format(self.id)
