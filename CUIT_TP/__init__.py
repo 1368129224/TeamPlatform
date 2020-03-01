@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, redirect, url_for
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -15,6 +15,7 @@ login = LoginManager(app)
 login.login_view = 'account.login'
 mail = Mail(app)
 
-from .views import home, account
+from .views import home, account, lab
 app.register_blueprint(home.bp)
 app.register_blueprint(account.bp, url_prefix='/account')
+app.register_blueprint(lab.bp, url_prefix='/lab')

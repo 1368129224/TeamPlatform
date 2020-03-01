@@ -1,7 +1,10 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import current_user, login_user, logout_user, login_required
-from CUIT_TP.forms.account import RegisterForm, LoginForm, ForgetPasswordForm, ResetPasswordForm, ProfileForm, ChangePasswordForm, AdminRegisterForm
+from CUIT_TP.forms.account import (
+    RegisterForm, LoginForm, ForgetPasswordForm,
+    ResetPasswordForm, ProfileForm, ChangePasswordForm,
+    AdminRegisterForm, AdminProfileForm)
 from CUIT_TP.models import User, UserProfile, UserPermission
 from CUIT_TP.utils import send_email
 from CUIT_TP import db, app, login
@@ -26,6 +29,7 @@ def register_admin():
             role='admin'
         )
         new_user_permission = UserPermission(
+            manage_lab_student_profile=True,
             manage_lab_task=True,
             change_set=True,
             verify_asset=True,
@@ -70,7 +74,6 @@ def register():
 def load_user(id):
     return User.query.get(int(id))
 
-
 # 登录
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
@@ -85,11 +88,7 @@ def login():
         if user and check_password_hash(user.password, form.password.data):
             # 登录成功
             login_user(user, remember=form.remember_me.data)
-            if current_user.role == 'admin':
-                return redirect(url_for('account.admin'))
-            elif current_user.role == 'monitor':
-                return redirect(url_for('account.monitor'))
-            return redirect(url_for('home.index'))
+            return redirect(url_for(request.args.get('next', 'home.index')))
         else:
             # 登录失败
             flash('登录失败。', 'error')
@@ -177,7 +176,7 @@ def profile(stu_num):
         abort(404)
     if not user.profile:
         profile = UserProfile(
-            phone='',
+            phone='00000000000',
             college='',
             grade=0,
             _class='',
@@ -189,35 +188,32 @@ def profile(stu_num):
 
 
 # 修改个人信息
-@bp.route('/<stu_num>/change_profile', methods=['GET', 'POST'])
+@bp.route('/change_profile', methods=['GET', 'POST'])
 @login_required
-def change_profile(stu_num):
-    user = User.query.filter(User.stu_num == stu_num).first()
-    form = ProfileForm(
-        phone=user.profile.phone,
-        college=user.profile.college,
-        grade=user.profile.grade,
-        c_lass=user.profile._class
-    )
+def change_profile():
+    if current_user.role == 'admin':
+        form = AdminProfileForm(phone=current_user.profile.phone)
+    else:
+        form = ProfileForm(
+            phone=current_user.profile.phone,
+            college=current_user.profile.college,
+            grade=current_user.profile.grade,
+            c_lass=current_user.profile._class
+        )
     if request.method == 'POST':
-        form = ProfileForm()
+        if current_user.role == 'admin':
+            form = AdminProfileForm()
+        else:
+            form = ProfileForm()
         if form.validate_on_submit():
-            user.profile.phone = form.phone.data
-            user.profile.college = form.college.data
-            user.profile.grade = form.grade.data
-            user.profile._class = form.c_lass.data
-            db.session.commit()
-        return redirect(url_for('account.profile', stu_num=stu_num))
-    return render_template('account/change_profile.html', user=user, form=form)
-
-# admin
-@bp.route('/admin')
-@login_required
-def admin():
-    return render_template('account/admin.html')
-
-# monitor
-@bp.route('/monitor')
-@login_required
-def monitor():
-    return render_template('account/monitor.html')
+            if current_user.role == 'admin':
+                current_user.profile.phone = form.phone.data
+                db.session.commit()
+            else:
+                current_user.profile.phone = form.phone.data
+                current_user.profile.college = form.college.data
+                current_user.profile.grade = form.grade.data
+                current_user.profile._class = form.c_lass.data
+                db.session.commit()
+        return redirect(url_for('account.profile', stu_num=current_user.stu_num))
+    return render_template('account/change_profile.html', user=current_user, form=form)

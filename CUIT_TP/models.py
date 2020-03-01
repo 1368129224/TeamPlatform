@@ -35,7 +35,7 @@ class User(UserMixin, db.Model):
 class UserProfile(db.Model):
     __tablename__ = 'UserProfile'
     id = db.Column(db.Integer, primary_key=True)
-    uid = db.Column(db.Integer, db.ForeignKey('User.id'))
+    uid = db.Column(db.Integer, db.ForeignKey('User.id', onupdate='CASCADE', ondelete='CASCADE'))
     user = relationship('User', backref=db.backref('profile', uselist=False))
     # avatar = db.Column(db.Integer, default=1)
     phone = db.Column(db.String(11), unique=True, nullable=False, comment='电话')
@@ -49,8 +49,9 @@ class UserProfile(db.Model):
 class UserPermission(db.Model):
     __tablename__ = 'UserPermission'
     id = db.Column(db.Integer, primary_key=True)
-    uid = db.Column(db.Integer, db.ForeignKey('User.id'))
+    uid = db.Column(db.Integer, db.ForeignKey('User.id', onupdate='CASCADE', ondelete='CASCADE'))
     user = relationship('User', backref=db.backref('permission', uselist=False))
+    manage_lab_student_profile = db.Column(db.Boolean, default=False, comment='管理实验室学生信息')
     manage_lab_task = db.Column(db.Boolean, default=False, comment='管理实验室事务')
     change_set = db.Column(db.Boolean, default=False, comment='修改座位')
     verify_asset = db.Column(db.Boolean, default=False, comment='资产审核')

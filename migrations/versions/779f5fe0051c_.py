@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 3ae199331039
+Revision ID: 779f5fe0051c
 Revises: 
-Create Date: 2020-02-29 20:59:15.240244
+Create Date: 2020-03-01 14:59:28.765811
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '3ae199331039'
+revision = '779f5fe0051c'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -30,30 +30,6 @@ def upgrade():
                     sa.UniqueConstraint('stu_num'),
                     sa.UniqueConstraint('username')
                     )
-    op.create_table('UserPermission',
-                    sa.Column('id', sa.Integer(), nullable=False),
-                    sa.Column('uid', sa.Integer(), nullable=True),
-                    sa.Column('manage_lab_task', sa.Boolean(), nullable=True, comment='管理实验室事务'),
-                    sa.Column('change_set', sa.Boolean(), nullable=True, comment='修改座位'),
-                    sa.Column('verify_asset', sa.Boolean(), nullable=True, comment='资产审核'),
-                    sa.Column('change_lab_info', sa.Boolean(), nullable=True, comment='修改实验室信息'),
-                    sa.Column('publish_lab_activity', sa.Boolean(), nullable=True, comment='发布实验室活动'),
-                    sa.Column('change_team_info', sa.Boolean(), nullable=True, comment='修改组信息'),
-                    sa.Column('publish_team_activity', sa.Boolean(), nullable=True, comment='发布组活动'),
-                    sa.ForeignKeyConstraint(['uid'], ['User.id'], ),
-                    sa.PrimaryKeyConstraint('id')
-                    )
-    op.create_table('UserProfile',
-                    sa.Column('id', sa.Integer(), nullable=False),
-                    sa.Column('uid', sa.Integer(), nullable=True),
-                    sa.Column('phone', sa.String(length=11), nullable=False, comment='电话'),
-                    sa.Column('college', sa.String(length=32), nullable=False, comment='专业'),
-                    sa.Column('grade', sa.String(length=4), nullable=False, comment='年级'),
-                    sa.Column('_class', sa.String(length=2), nullable=False, comment='班级'),
-                    sa.ForeignKeyConstraint(['uid'], ['User.id'], ),
-                    sa.PrimaryKeyConstraint('id'),
-                    sa.UniqueConstraint('phone')
-                    )
     op.create_table('Activity',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False, comment='活动ID'),
     sa.Column('desc', sa.String(length=256), nullable=False, comment='活动内容'),
@@ -67,20 +43,20 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('Team',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('leader_id', sa.Integer(), nullable=True),
-    sa.Column('team_name', sa.String(length=32), nullable=False, comment='小组名'),
-    sa.Column('desc', sa.String(length=256), nullable=True, comment='小组简介'),
-    sa.Column('teammate_id', sa.Integer(), nullable=True),
-    sa.Column('activity_id', sa.Integer(), nullable=True),
-    sa.Column('project_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['activity_id'], ['Activity.id'], ),
-    sa.ForeignKeyConstraint(['leader_id'], ['User.id'], ),
-    sa.ForeignKeyConstraint(['project_id'], ['Project.id'], ),
-    sa.ForeignKeyConstraint(['teammate_id'], ['User.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('team_name')
-    )
+                    sa.Column('id', sa.Integer(), nullable=False),
+                    sa.Column('leader_id', sa.Integer(), nullable=True),
+                    sa.Column('team_name', sa.String(length=32), nullable=False, comment='小组名'),
+                    sa.Column('desc', sa.String(length=256), nullable=True, comment='小组简介'),
+                    sa.Column('teammate_id', sa.Integer(), nullable=True),
+                    sa.Column('activity_id', sa.Integer(), nullable=True),
+                    sa.Column('project_id', sa.Integer(), nullable=True),
+                    sa.ForeignKeyConstraint(['activity_id'], ['Activity.id'], ),
+                    sa.ForeignKeyConstraint(['leader_id'], ['User.id'], ),
+                    sa.ForeignKeyConstraint(['project_id'], ['Project.id'], ),
+                    sa.ForeignKeyConstraint(['teammate_id'], ['User.id'], ),
+                    sa.PrimaryKeyConstraint('id'),
+                    sa.UniqueConstraint('team_name')
+                    )
 
 
     op.create_table('Item',
@@ -96,6 +72,32 @@ def upgrade():
     sa.ForeignKeyConstraint(['project_id'], ['Project.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+
+    op.create_table('UserPermission',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('uid', sa.Integer(), nullable=True),
+    sa.Column('manage_lab_student_profile', sa.Boolean(), nullable=True, comment='管理实验室学生信息'),
+    sa.Column('manage_lab_task', sa.Boolean(), nullable=True, comment='管理实验室事务'),
+    sa.Column('change_set', sa.Boolean(), nullable=True, comment='修改座位'),
+    sa.Column('verify_asset', sa.Boolean(), nullable=True, comment='资产审核'),
+    sa.Column('change_lab_info', sa.Boolean(), nullable=True, comment='修改实验室信息'),
+    sa.Column('publish_lab_activity', sa.Boolean(), nullable=True, comment='发布实验室活动'),
+    sa.Column('change_team_info', sa.Boolean(), nullable=True, comment='修改组信息'),
+    sa.Column('publish_team_activity', sa.Boolean(), nullable=True, comment='发布组活动'),
+    sa.ForeignKeyConstraint(['uid'], ['User.id'], onupdate='CASCADE', ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('UserProfile',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('uid', sa.Integer(), nullable=True),
+    sa.Column('phone', sa.String(length=11), nullable=False, comment='电话'),
+    sa.Column('college', sa.String(length=32), nullable=False, comment='专业'),
+    sa.Column('grade', sa.String(length=4), nullable=False, comment='年级'),
+    sa.Column('_class', sa.String(length=2), nullable=False, comment='班级'),
+    sa.ForeignKeyConstraint(['uid'], ['User.id'], onupdate='CASCADE', ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('phone')
+    )
     op.create_table('Note',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False, comment='记录ID'),
     sa.Column('item_id', sa.Integer(), nullable=True),
@@ -106,19 +108,17 @@ def upgrade():
     sa.ForeignKeyConstraint(['writer_id'], ['User.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-
-
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_table('Note')
     op.drop_table('UserProfile')
     op.drop_table('UserPermission')
-    op.drop_table('User')
     op.drop_table('Team')
-    op.drop_table('Project')
-    op.drop_table('Note')
     op.drop_table('Item')
+    op.drop_table('User')
+    op.drop_table('Project')
     op.drop_table('Activity')
     # ### end Alembic commands ###

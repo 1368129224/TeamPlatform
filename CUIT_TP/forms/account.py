@@ -36,7 +36,7 @@ class RegisterForm(FlaskForm):
 
 class LoginForm(FlaskForm):
     stu_num_or_email = StringField('Id', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=10, max=48)])
+    password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
 
 
@@ -50,10 +50,13 @@ class ResetPasswordForm(FlaskForm):
 
 
 class ProfileForm(FlaskForm):
-    phone = StringField('Phone', validators=[DataRequired()])
+    phone = StringField('Phone', validators=[DataRequired(), Length(min=11, max=11)])
     college = StringField('College', validators=[DataRequired()])
     grade = IntegerField('Grade', validators=[DataRequired()])
     c_lass = StringField('Class', validators=[DataRequired()])
+
+class AdminProfileForm(FlaskForm):
+    phone = StringField('Phone', validators=[DataRequired(),  Length(min=11, max=11)])
 
 
 class ChangePasswordForm(FlaskForm):

@@ -7,7 +7,9 @@
 {% block content %}
     <h1>{{ user.username }}</h1>
     <p>{{ user.email }}</p>
+    {% if current_user.role != 'admin' %}
     <p>{{ user.stu_num }}</p>
+    {% endif %}
 
     <form method="post" action="">
         {{ form.hidden_tag() }}
@@ -19,29 +21,31 @@
             {% endfor %}
         </p>
 
-        <p>
-            {{ form.college.label }}<br>
-            {{ form.college(size=20) }}<br>
-            {% for error in form.college.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
+        {% if current_user.role != 'admin' %}
+            <p>
+                {{ form.college.label }}<br>
+                {{ form.college(size=20) }}<br>
+                {% for error in form.college.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
 
-        <p>
-            {{ form.grade.label }}<br>
-            {{ form.grade(size=20) }}<br>
-            {% for error in form.grade.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
+            <p>
+                {{ form.grade.label }}<br>
+                {{ form.grade(size=20) }}<br>
+                {% for error in form.grade.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
 
-        <p>
-            {{ form.c_lass.label }}<br>
-            {{ form.c_lass(size=20) }}<br>
-            {% for error in form.c_lass.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
+            <p>
+                {{ form.c_lass.label }}<br>
+                {{ form.c_lass(size=20) }}<br>
+                {% for error in form.c_lass.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+        {% endif %}
         <input type="submit" value="go">
     </form>
 {% endblock %}

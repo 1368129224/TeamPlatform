@@ -7,11 +7,15 @@
 {% block content %}
     <h1>{{ user.username }}</h1>
     <p>{{ user.email }}</p>
-    <p>{{ user.stu_num }}</p>
-    <p>{{ user.profile.phone }}</p>
-    <p>{{ user.profile.college }}</p>
-    <p>{{ user.profile.grade }}</p>
-    <p>{{ user.profile._class }}</p>
-    <button onclick=window.location.href='{{ url_for("account.change_profile", stu_num=user.stu_num) }}'>修改</button>
+    <p>{{ '未设置' if user.profile.phone == '00000000000' else user.profile.phone }}</p>
+    {% if current_user.role != 'admin' %}
+    <p>{{ '未设置' if user.stu_num == '0000000000' else user.stu_num }}</p>
+    <p>{{ '未设置' if not user.profile.college else user.profile.college}}</p>
+    <p>{{ '未设置' if user.profile.grade == '0' else user.profile.grade }}</p>
+    <p>{{ '未设置' if not user.profile._class else user.profile._class }}</p>
+    {% endif %}
+    {% if current_user.stu_num == user.stu_num %}
+    <button onclick=window.location.href='{{ url_for("account.change_profile") }}'>修改</button>
     <button onclick=window.location.href='{{ url_for("account.change_password") }}'>修改密码</button>
+    {% endif %}
 {% endblock %}
