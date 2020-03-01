@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, g
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import current_user, login_user, logout_user, login_required
 from CUIT_TP.forms.account import (
@@ -65,7 +65,7 @@ def register():
         new_user.permission = new_user_permission
         db.session.add(new_user)
         db.session.commit()
-        return redirect(url_for('home.index'))
+        return redirect(url_for('account.login'))
     else:
         return render_template('account/register.html', form=form)
 

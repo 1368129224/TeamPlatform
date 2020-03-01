@@ -6,10 +6,12 @@ from CUIT_TP.models import User
 bp = Blueprint('lab', __name__)
 
 @bp.route('/member')
+@bp.route('/member/<int:page>')
 @login_required
-def member():
+def member(page=1):
     if current_user.permission.manage_lab_student_profile:
-        return render_template('lab/member.html')
+        users = User.query.order_by(User.id).paginate(page, 2, False)
+        return render_template('lab/member.html', users=users)
     else:
         abort(403)
 

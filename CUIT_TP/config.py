@@ -1,10 +1,13 @@
 import os
-
+from datetime import timedelta
 
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
 class Config(object):
+    CSRF_ENABLED = True
     SECRET_KEY = 'A__VERY__LONG__KEY'
+    # flask-login
+    REMEMBER_COOKIE_DURATION = timedelta(days=7)
     # database
     SQLALCHEMY_DATABASE_URI = os.environ.get('MySql_URL') or 'mysql+pymysql://root:zzc()1214@www.zooter.com.cn/TeamPlatform'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
