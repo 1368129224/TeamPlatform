@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from flask_login import current_user, login_user, logout_user, login_required
-from CUIT_TP.forms.lab import ChangeProfileForm
-from CUIT_TP.models import db, User
+from CUIT_TP.forms.lab import ChangeProfileForm, CreateLabTaskForm
+from CUIT_TP.models import db, User, LabTask
 from CUIT_TP import login
 
 bp = Blueprint('lab', __name__)
@@ -71,15 +71,48 @@ def change_profile(stu_num):
                 db.session.commit()
                 return redirect(url_for('lab.change_profile', stu_num=stu_num))
             else:
-                return render_template('/lab/change_profile.html', user=user, form=form)
+                return render_template('lab/change_profile.html', user=user, form=form)
         else:
-            return render_template('/lab/change_profile.html', user=user, form=form)
+            return render_template('lab/change_profile.html', user=user, form=form)
 
 @bp.route('/task/')
+@bp.route('/task/<int:page>/')
 @login_required
-def task():
+def task(page=1):
     if current_user.permission.manage_lab_task:
-        return render_template('lab/member.html')
+        tasks = LabTask.query.order_by(LabTask.id).paginate(page, 5, False)
+        return render_template('lab/task.html', tasks=tasks)
+    else:
+        abort(403)
+
+
+@bp.route('/create_task/', methods=('GET', 'POST'))
+@login_required
+def create_task():
+    if current_user.permission.manage_lab_task:
+        form = CreateLabTaskForm()
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                new_lab_task = LabTask(
+                    task_name=form.task_name.data,
+                    desc=form.desc.data,
+                    executor=form.executor.data,
+                    execute_datetime=form.execute_time.data
+                )
+                db.session.add(new_lab_task)
+                db.session.commit()
+                return redirect(url_for('lab.task'))
+            else:
+                return render_template('lab/create_task.html', form=form)
+        return render_template('lab/create_task.html', form=form)
+    else:
+        abort(403)
+
+@bp.route('/delete_task/', methods=('POST', ))
+@login_required
+def delete_task():
+    if current_user.permission.manage_lab_task:
+        task = LabTask.query.filter(LabTask.id)
     else:
         abort(403)
 

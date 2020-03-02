@@ -4,7 +4,7 @@ from CUIT_TP.models import User
 
 bp = Blueprint('home', __name__)
 @bp.route('/')
-@bp.route('/home')
+@bp.route('/home/')
 def index():
     if not User.query.filter(User.role=='admin').first():
         return redirect(url_for('account.register_admin'))

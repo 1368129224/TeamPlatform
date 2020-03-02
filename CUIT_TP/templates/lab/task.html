@@ -6,4 +6,15 @@
 
 {% block content %}
     <p>管理实验室事务</p>
+    <table>
+    {% for task in tasks.items %}
+    <tr>
+        <td>{{ task.task_name }} | {{ task.executor.username }} | {{ task.execute_datetime }} | <button>完成</button> | <button onclick=>删除</button></td>
+    </tr>
+    {% endfor %}
+    </table>
+    {% if tasks.has_prev %}<a href="{{ url_for('lab.task', page = tasks.prev_num) }}">上一页</a>{% else %}上一页{% endif %} |
+    {% if tasks.has_next %}<a href="{{ url_for('lab.task', page = tasks.next_num) }}">下一页</a>{% else %}下一页{% endif %}
+    <br/>
+    <button onclick=window.location.href="{{ url_for('lab.create_task') }}">创建事务</button>
 {% endblock %}

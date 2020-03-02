@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, IntegerField, SelectField
+from wtforms import StringField, PasswordField, BooleanField, IntegerField, SelectField, DateTimeField
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from CUIT_TP.models import User
+from CUIT_TP.models import db, User
 
 
 class ChangeProfileForm(FlaskForm):
@@ -22,3 +23,14 @@ class ChangeProfileForm(FlaskForm):
     publish_lab_activity = BooleanField('发布实验室活动')
     change_team_info = BooleanField('修改组信息')
     publish_team_activity = BooleanField('发布组活动')
+
+
+
+def query_factory():
+    return User.query.filter(User.stu_num!='0000000000')
+
+class CreateLabTaskForm(FlaskForm):
+    task_name = StringField('Task name', validators=[DataRequired(), Length(max=32)])
+    desc = StringField('Task description', validators=[DataRequired(), Length(max=256)])
+    executor = QuerySelectField('Executor', validators=[DataRequired()], query_factory=query_factory, get_label='username')
+    execute_time = DateTimeField('Execute time', validators=[DataRequired()], format='%Y-%m-%d %H:%M')

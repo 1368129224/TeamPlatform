@@ -1,5 +1,6 @@
 import jwt
 from time import time
+from datetime import datetime
 from sqlalchemy.orm import relationship
 from CUIT_TP import db, login, app
 from flask_login import UserMixin
@@ -114,7 +115,8 @@ class Activity(db.Model):
     __tablename__ = 'Activity'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='活动ID')
     desc = db.Column(db.String(256), nullable=False, comment='活动内容')
-    datetime = db.Column(db.DateTime, comment='开始时间')
+    create_time = db.Column(db.DateTime, default=datetime.now())
+    execute_datetime = db.Column(db.DateTime, comment='开始时间')
 
     def __repr__(self):
         return '<Activity {}>'.format(self.id)
@@ -124,9 +126,19 @@ class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='记录ID')
     item_id = db.Column(db.Integer, db.ForeignKey('Item.id'))
     content = db.Column(db.String(256), unique=False, comment='记录内容')
-    datetime = db.Column(db.DateTime, comment='创建时间')
+    create_datetime = db.Column(db.DateTime, default=datetime.now(), comment='创建时间')
     writer_id = db.Column(db.Integer, db.ForeignKey('User.id'))
     writer = relationship('User', backref=db.backref('note', uselist=False))
 
     def __repr__(self):
         return '<Note {}>'.format(self.id)
+
+class LabTask(db.Model):
+    __tablename__ = 'LabTask'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='事务ID')
+    uid = db.Column(db.Integer, db.ForeignKey('User.id', onupdate='CASCADE', ondelete='CASCADE'))
+    task_name = db.Column(db.String(32), nullable=False, comment='事务')
+    desc = db.Column(db.String(256), nullable=False, comment='事务详情')
+    executor = relationship('User', backref=db.backref('lab_task', uselist=False))
+    create_time = db.Column(db.DateTime, default=datetime.now(), comment='创建时间')
+    execute_datetime =  db.Column(db.DateTime, comment='开始时间')

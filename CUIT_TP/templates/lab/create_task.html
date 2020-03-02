@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>创建事务</title>
+</head>
+<body>
+<form method="post" action="">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.task_name.label }}<br>
+            {{ form.task_name(size=20) }}<br>
+            {% for error in form.task_name.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.desc.label }}<br>
+            {{ form.desc(size=20) }}<br>
+            {% for error in form.desc.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.executor.label }}<br>
+            {{ form.executor }}<br>
+            {% for error in form.executor.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.execute_time.label }}<br>
+            {{ form.execute_time }}<br>
+            {% for error in form.execute_time.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <input type="submit" value="go">
+    </form>
+</body>
+</html>
