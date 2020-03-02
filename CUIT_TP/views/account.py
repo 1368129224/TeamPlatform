@@ -13,7 +13,7 @@ bp = Blueprint('account', __name__)
 
 
 # 设置管理员账号
-@bp.route('/register_admin', methods=('GET', 'POST'))
+@bp.route('/register_admin/', methods=('GET', 'POST'))
 def register_admin():
     if current_user.is_authenticated:
         return redirect(url_for('home.index'))
@@ -46,7 +46,7 @@ def register_admin():
         return render_template('account/first_run.html', form=form)
 
 # 注册
-@bp.route('/register', methods=('GET', 'POST'))
+@bp.route('/register/', methods=('GET', 'POST'))
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('home.index'))
@@ -75,7 +75,7 @@ def load_user(id):
     return User.query.get(int(id))
 
 # 登录
-@bp.route('/login', methods=('GET', 'POST'))
+@bp.route('/login/', methods=('GET', 'POST'))
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('home.index'))
@@ -98,7 +98,7 @@ def login():
 
 
 # 登出
-@bp.route('/logout', methods=('GET', 'POST'))
+@bp.route('/logout/', methods=('GET', 'POST'))
 @login_required
 def logout():
     logout_user()
@@ -106,7 +106,7 @@ def logout():
 
 
 # 修改密码
-@bp.route('/change_password', methods=('GET', 'POST'))
+@bp.route('/change_password/', methods=('GET', 'POST'))
 @login_required
 def change_password():
     form = ChangePasswordForm()
@@ -124,7 +124,7 @@ def change_password():
 
 
 #忘记密码
-@bp.route('/forget_password', methods=('GET', 'POST'))
+@bp.route('/forget_password/', methods=('GET', 'POST'))
 def forget_password():
     if current_user.is_authenticated:
         return redirect(url_for('home.index'))
@@ -152,7 +152,7 @@ def send_reset_password_email(user):
 
 
 # 重置密码
-@bp.route('/reset_password/<token>', methods=['GET', 'POST'])
+@bp.route('/reset_password/<token>/', methods=['GET', 'POST'])
 def reset_password(token):
     if current_user.is_authenticated:
         return redirect(url_for('home.index'))
@@ -168,7 +168,7 @@ def reset_password(token):
 
 
 # 个人信息
-@bp.route('/<stu_num>/profile')
+@bp.route('/<stu_num>/profile/')
 @login_required
 def profile(stu_num):
     user = User.query.filter(User.stu_num==stu_num).first()
@@ -188,7 +188,7 @@ def profile(stu_num):
 
 
 # 修改个人信息
-@bp.route('/change_profile', methods=['GET', 'POST'])
+@bp.route('/change_profile/', methods=['GET', 'POST'])
 @login_required
 def change_profile():
     if current_user.role == 'admin':
@@ -215,5 +215,7 @@ def change_profile():
                 current_user.profile.grade = form.grade.data
                 current_user.profile._class = form.c_lass.data
                 db.session.commit()
-        return redirect(url_for('account.profile', stu_num=current_user.stu_num))
+            return redirect(url_for('account.profile', stu_num=current_user.stu_num))
+        else:
+            return render_template('account/change_profile.html', user=current_user, form=form)
     return render_template('account/change_profile.html', user=current_user, form=form)

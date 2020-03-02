@@ -10,7 +10,7 @@
     <table>
     {% for user in users.items %}
         <tr>
-            <td>{{ user.username }}</td><td>修改信息</td>
+            <td>{{ user.username }}</td><td><a href="{{ url_for('lab.change_profile', stu_num=user.stu_num) }}">修改信息</a></td>
         </tr>
     {% endfor %}
     </table>
