@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, IntegerField
+from wtforms import StringField, PasswordField, BooleanField, IntegerField, DateTimeField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from CUIT_TP.models import User
 
@@ -50,12 +50,16 @@ class ResetPasswordForm(FlaskForm):
 
 
 class ProfileForm(FlaskForm):
+    QQ = StringField('QQ', validators=[Length(max=11)])
+    wechat = StringField('wechat', validators=[Length(max=64)])
     phone = StringField('Phone', validators=[DataRequired(), Length(min=11, max=11)])
-    college = StringField('College', validators=[DataRequired()])
-    grade = IntegerField('Grade', validators=[DataRequired()])
-    c_lass = StringField('Class', validators=[DataRequired()])
+    college = StringField('College', validators=[DataRequired(), Length(max=32)])
+    grade = IntegerField('Grade', validators=[DataRequired(), Length(max=4)])
+    c_lass = StringField('Class', validators=[DataRequired(), Length(max=4)])
 
 class AdminProfileForm(FlaskForm):
+    QQ = StringField('QQ', validators=[Length(max=11)])
+    wechat = StringField('wechat', validators=[Length(max=64)])
     phone = StringField('Phone', validators=[DataRequired(),  Length(min=11, max=11)])
 
 
@@ -63,3 +67,9 @@ class ChangePasswordForm(FlaskForm):
     old_password = PasswordField('Old password', validators=[DataRequired()])
     password = PasswordField('New Password', validators=[DataRequired(), Length(min=10, max=48)])
     confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
+
+class ApplyAssetForm(FlaskForm):
+    asset_name = StringField('资产名称', validators=[DataRequired(), Length(max=32)])
+    desc = StringField('详细信息', validators=[DataRequired(), Length(max=256)])
+    start_time = DateTimeField('开始时间', validators=[DataRequired()], format='%Y-%m-%d %H:%M')
+    end_time = DateTimeField('结束时间', validators=[DataRequired()], format='%Y-%m-%d %H:%M')

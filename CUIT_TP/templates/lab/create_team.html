@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    创建事务
+    创建小组
 {% endblock %}
 
 {% block content %}
 <form method="post" action="">
         {{ form.hidden_tag() }}
         <p>
-            {{ form.task_name.label }}<br>
-            {{ form.task_name(size=20) }}<br>
-            {% for error in form.task_name.errors %}
+            {{ form.team_name.label }}<br>
+            {{ form.team_name(size=20) }}<br>
+            {% for error in form.team_name.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
@@ -22,16 +22,9 @@
             {% endfor %}
         </p>
         <p>
-            {{ form.executor.label }}<br>
-            {{ form.executor }}<br>
-            {% for error in form.executor.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.execute_time.label }}<br>
-            {{ form.execute_time }}<br>
-            {% for error in form.execute_time.errors %}
+            {{ form.leader.label }}<br>
+            {{ form.leader }}<br>
+            {% for error in form.leader.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>

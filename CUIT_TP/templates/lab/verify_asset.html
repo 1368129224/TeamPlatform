@@ -1,9 +1,26 @@
 {% extends 'base.html' %}
 
 {% block title %}
-资产审核
+    资产审核
 {% endblock %}
 
 {% block content %}
     <p>资产审核</p>
+    <table>
+        {% for asset in assets.items %}
+            <tr>
+                <td>{{ asset.asset_name }} | {{ asset.user.username }} |
+                    {% if asset.status == '0' %}
+                        待审核
+                    {% elif asset.status == '1' %}
+                        已审核
+                    {% else %}
+                        已结束
+                    {% endif %}
+                    | <button>通过</button> | <button onclick=>删除</button></td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% if assets.has_prev %}<a href="{{ url_for('lab.verify_asset', page=assets.prev_num) }}">上一页</a>{% else %}上一页{% endif %} |
+    {% if assets.has_next %}<a href="{{ url_for('lab.verify_asset', page=assets.next_num) }}">下一页</a>{% else %}下一页{% endif %}
 {% endblock %}

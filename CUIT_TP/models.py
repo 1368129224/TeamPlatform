@@ -15,6 +15,11 @@ class User(UserMixin, db.Model):
     stu_num = db.Column(db.String(32), unique=True, nullable=False, comment='学号')
     password = db.Column(db.String(128), nullable=False, comment='密码')
     role = db.Column(db.Enum('admin', 'monitor', 'student'), server_default='student')
+    set_num = db.Column(db.Integer, default=0, comment='座位号')
+
+    belong_team_id = db.Column(db.Integer, db.ForeignKey('Team.id'))
+    belong_team = relationship('Team', back_populates='teammates', foreign_keys=[belong_team_id])
+    manage_team_id = db.Column(db.Integer, db.ForeignKey('Team.id'))
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -39,10 +44,12 @@ class UserProfile(db.Model):
     uid = db.Column(db.Integer, db.ForeignKey('User.id', onupdate='CASCADE', ondelete='CASCADE'))
     user = relationship('User', backref=db.backref('profile', uselist=False))
     # avatar = db.Column(db.Integer, default=1)
+    QQ = db.Column(db.String(11), unique=True, comment='QQ')
+    wechat = db.Column(db.String(64), unique=True, comment='微信')
     phone = db.Column(db.String(11), unique=True, nullable=False, comment='电话')
     college = db.Column(db.String(32), nullable=False, comment='专业')
     grade = db.Column(db.String(4), nullable=False, comment='年级')
-    _class = db.Column(db.String(2), nullable=False, comment='班级')
+    _class = db.Column(db.String(4), nullable=False, comment='班级')
 
     def __repr__(self):
         return '<UserProfile {}>'.format(self.user.username)
@@ -58,6 +65,7 @@ class UserPermission(db.Model):
     verify_asset = db.Column(db.Boolean, default=False, comment='资产审核')
     change_lab_info = db.Column(db.Boolean, default=False, comment='修改实验室信息')
     publish_lab_activity = db.Column(db.Boolean, default=False, comment='发布实验室活动')
+    manage_lab_teams = db.Column(db.Boolean, default=False, comment='管理小组')
     change_team_info = db.Column(db.Boolean, default=False, comment='修改组信息')
     publish_team_activity = db.Column(db.Boolean, default=False, comment='发布组活动')
 
@@ -71,11 +79,10 @@ class Team(db.Model):
     __tablename__ = 'Team'
     id = db.Column(db.Integer, primary_key=True)
     leader_id = db.Column(db.Integer, db.ForeignKey('User.id'))
-    leader = relationship('User', backref=db.backref('manage_team', uselist=False), foreign_keys=[leader_id])
+    leader = relationship("User", backref="manage_team", uselist=False, foreign_keys=[leader_id])
     team_name = db.Column(db.String(32), unique=True, nullable=False,  comment='小组名')
     desc = db.Column(db.String(256), comment='小组简介')
-    teammate_id = db.Column(db.Integer, db.ForeignKey('User.id'))
-    teammate = relationship('User', backref="team", foreign_keys=[teammate_id])
+    teammates = relationship("User", back_populates='belong_team', foreign_keys=[User.belong_team_id])
     activity_id = db.Column(db.Integer, db.ForeignKey('Activity.id'))
     activity = relationship('Activity', backref="belong_team", foreign_keys=[activity_id])
     project_id = db.Column(db.Integer, db.ForeignKey('Project.id'))
@@ -90,6 +97,9 @@ class Project(db.Model):
     project_name = db.Column(db.String(32), nullable=False, comment='项目名称')
     desc = db.Column(db.String(256), comment='项目简介')
     item = relationship('Item', backref='belong_project')
+    start_time = db.Column(db.DateTime, default=datetime.now(), comment='开始时间')
+    end_time = db.Column(db.DateTime, comment='终止时间')
+    status = db.Column(db.Enum('0', '1'), server_default='0', nullable=False, comment='状态')
 
     def __repr__(self):
         return '<Project {}>'.format(self.project_name)
@@ -142,3 +152,14 @@ class LabTask(db.Model):
     executor = relationship('User', backref=db.backref('lab_task', uselist=False))
     create_time = db.Column(db.DateTime, default=datetime.now(), comment='创建时间')
     execute_datetime =  db.Column(db.DateTime, comment='开始时间')
+
+class Asset(db.Model):
+    __tablename__ = 'Asset'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='资产ID')
+    uid = db.Column(db.Integer, db.ForeignKey('User.id', onupdate='CASCADE', ondelete='CASCADE'))
+    user = relationship('User', backref=db.backref('asset', uselist=False))
+    asset_name = db.Column(db.String(32), nullable=False, comment='资产名称')
+    desc = db.Column(db.String(256), nullable=False, comment='详细信息')
+    start_time = db.Column(db.DateTime, default=datetime.now(), comment='开始时间')
+    end_time = db.Column(db.DateTime, comment='终止时间')
+    status = db.Column(db.Enum('0', '1', '2'), server_default='0', nullable=False, comment='状态')

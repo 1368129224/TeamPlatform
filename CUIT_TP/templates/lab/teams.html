@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}
+管理小组
+{% endblock %}
+
+{% block content %}
+    <p>管理小组</p>
+    <table>
+        {% for team in teams.items %}
+            <tr>
+                <td>{{ team.team_name }} | {{ team.leader.username }} | <button>详细信息</button></td>
+            </tr>
+        {% endfor %}
+    </table>
+    <button onclick=window.location.href="{{ url_for('lab.create_team') }}">新建小组</button>
+    {% if teams.has_prev %}<a href="{{ url_for('lab.teams', page=teams.prev_num) }}">上一页</a>{% else %}上一页{% endif %} |
+    {% if teams.has_next %}<a href="{{ url_for('lab.teams', page=teams.next_num) }}">下一页</a>{% else %}下一页{% endif %}
+{% endblock %}

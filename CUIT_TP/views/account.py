@@ -1,11 +1,11 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, g
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import current_user, login_user, logout_user, login_required
 from CUIT_TP.forms.account import (
     RegisterForm, LoginForm, ForgetPasswordForm,
     ResetPasswordForm, ProfileForm, ChangePasswordForm,
-    AdminRegisterForm, AdminProfileForm)
-from CUIT_TP.models import User, UserProfile, UserPermission
+    AdminRegisterForm, AdminProfileForm, ApplyAssetForm)
+from CUIT_TP.models import User, UserProfile, UserPermission, Asset
 from CUIT_TP.utils import send_email
 from CUIT_TP import db, app, login
 
@@ -26,7 +26,7 @@ def register_admin():
             email=form.email.data,
             stu_num='0000000000',
             password=generate_password_hash(form.password.data),
-            role='admin'
+            role='admin',
         )
         new_user_permission = UserPermission(
             manage_lab_student_profile=True,
@@ -35,6 +35,7 @@ def register_admin():
             verify_asset=True,
             change_lab_info=True,
             publish_lab_activity=True,
+            manage_lab_teams=True,
             change_team_info=True,
             publish_team_activity=True,
         )
@@ -59,7 +60,7 @@ def register():
             username=form.username.data,
             email=form.email.data,
             password=generate_password_hash(form.password.data),
-            stu_num=form.stu_num.data
+            stu_num=form.stu_num.data,
         )
         new_user_permission = UserPermission()
         new_user.permission = new_user_permission
@@ -192,9 +193,15 @@ def profile(stu_num):
 @login_required
 def change_profile():
     if current_user.role == 'admin':
-        form = AdminProfileForm(phone=current_user.profile.phone)
+        form = AdminProfileForm(
+            QQ=current_user.profile.QQ,
+            wechat=current_user.profile.wechat,
+            phone=current_user.profile.phone
+        )
     else:
         form = ProfileForm(
+            QQ=current_user.profile.QQ,
+            wechat=current_user.profile.wechat,
             phone=current_user.profile.phone,
             college=current_user.profile.college,
             grade=current_user.profile.grade,
@@ -207,9 +214,13 @@ def change_profile():
             form = ProfileForm()
         if form.validate_on_submit():
             if current_user.role == 'admin':
+                current_user.profile.QQ = form.QQ.data
+                current_user.profile.wechat = form.wechat.data
                 current_user.profile.phone = form.phone.data
                 db.session.commit()
             else:
+                current_user.profile.QQ = form.QQ.data
+                current_user.profile.wechat = form.wechat.data
                 current_user.profile.phone = form.phone.data
                 current_user.profile.college = form.college.data
                 current_user.profile.grade = form.grade.data
@@ -219,3 +230,26 @@ def change_profile():
         else:
             return render_template('account/change_profile.html', user=current_user, form=form)
     return render_template('account/change_profile.html', user=current_user, form=form)
+
+# 申请资产
+@bp.route('/apply_asset/', methods=('GET', 'POST'))
+@login_required
+def apply_asset():
+    form = ApplyAssetForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            new_asset = Asset(
+                user=current_user,
+                asset_name=form.asset_name.data,
+                desc=form.desc.data,
+                start_time=form.start_time.data,
+                end_time=form.end_time.data,
+                status='0'
+            )
+            db.session.add(new_asset)
+            db.session.commit()
+            return redirect(url_for('home.index'))
+        else:
+            return render_template('account/apply_asset.html', form=form)
+    else:
+        return render_template('account/apply_asset.html', form=form)

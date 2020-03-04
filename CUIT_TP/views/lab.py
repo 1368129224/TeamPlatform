@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
-from flask_login import current_user, login_user, logout_user, login_required
-from CUIT_TP.forms.lab import ChangeProfileForm, CreateLabTaskForm
-from CUIT_TP.models import db, User, LabTask
+from flask_login import current_user, login_required
+from CUIT_TP.forms.lab import ChangeProfileForm, CreateLabTaskForm, CreateTeamForm
+from CUIT_TP.models import db, User, LabTask, Asset, Team
 from CUIT_TP import login
 
 bp = Blueprint('lab', __name__)
@@ -11,6 +11,7 @@ bp = Blueprint('lab', __name__)
 def load_user(id):
     return User.query.get(int(id))
 
+# 展示学生信息
 @bp.route('/member/')
 @bp.route('/member/<int:page>/')
 @login_required
@@ -21,7 +22,7 @@ def member(page=1):
     else:
         abort(403)
 
-
+# 修改学生信息
 @bp.route('/change_profile/<int:stu_num>/', methods=('GET', 'POST'))
 @login_required
 def change_profile(stu_num):
@@ -75,6 +76,7 @@ def change_profile(stu_num):
         else:
             return render_template('lab/change_profile.html', user=user, form=form)
 
+# 日常事务
 @bp.route('/task/')
 @bp.route('/task/<int:page>/')
 @login_required
@@ -85,7 +87,7 @@ def task(page=1):
     else:
         abort(403)
 
-
+# 创建事务
 @bp.route('/create_task/', methods=('GET', 'POST'))
 @login_required
 def create_task():
@@ -108,28 +110,72 @@ def create_task():
     else:
         abort(403)
 
+# 删除事务
 @bp.route('/delete_task/', methods=('POST', ))
 @login_required
 def delete_task():
     if current_user.permission.manage_lab_task:
         task = LabTask.query.filter(LabTask.id)
+        # TODO 删除事务
     else:
         abort(403)
 
-
+# 修改座位
 @bp.route('/change_set/')
+@bp.route('/change_set/<int:page>')
 @login_required
-def change_set():
+def change_set(page=1):
     if current_user.permission.change_set:
-        return render_template('lab/change_set.html')
+        users = User.query.order_by(User.id).paginate(page, 5, False)
+        return render_template('lab/change_set.html', users=users)
     else:
         abort(403)
 
-
+# 资产审核
 @bp.route('/verify_asset/')
+@bp.route('/verify_asset/<int:page>/')
 @login_required
-def verify_asset():
+def verify_asset(page=1):
     if current_user.permission.verify_asset:
-        return render_template('lab/verify_asset.html')
+        assets = Asset.query.order_by(Asset.id).paginate(page, 5, False)
+        return render_template('lab/verify_asset.html', assets=assets)
+    else:
+        abort(403)
+
+# 管理小组
+@bp.route('/teams/')
+@bp.route('/teams/<int:page>')
+@login_required
+def teams(page=1):
+    if current_user.permission.manage_lab_teams:
+        teams = Team.query.order_by(Team.id).paginate(page, 5, False)
+        return render_template('lab/teams.html', teams=teams)
+    else:
+        abort(403)
+
+# 新建小组
+@bp.route('/create_team/', methods=('GET', 'POST'))
+@login_required
+def create_team():
+    if current_user.permission.manage_lab_teams:
+        form = CreateTeamForm()
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                new_team = Team(
+                    team_name=form.team_name.data,
+                    desc=form.desc.data,
+                    leader=form.leader.data,
+                )
+                leader = User.query.filter(User.id==form.leader.data.id).first()
+                leader.belong_team.append(new_team)
+                leader.permission.change_team_info = True
+                leader.permission.publish_team_activity = True
+                db.session.add(new_team)
+                db.session.commit()
+                return redirect(url_for('lab.teams'))
+            else:
+                return render_template('lab/create_team.html', form=form)
+        else:
+            return render_template('lab/create_team.html', form=form)
     else:
         abort(403)

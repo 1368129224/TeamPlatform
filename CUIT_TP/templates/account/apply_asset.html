@@ -1,19 +1,21 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    创建事务
+    申请资产
 {% endblock %}
 
 {% block content %}
-<form method="post" action="">
+    <h1>申请资产</h1>
+    <form method="post" action="">
         {{ form.hidden_tag() }}
         <p>
-            {{ form.task_name.label }}<br>
-            {{ form.task_name(size=20) }}<br>
-            {% for error in form.task_name.errors %}
+            {{ form.asset_name.label }}<br>
+            {{ form.asset_name(size=20) }}<br>
+            {% for error in form.asset_name.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
+
         <p>
             {{ form.desc.label }}<br>
             {{ form.desc(size=20) }}<br>
@@ -21,17 +23,18 @@
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
+
         <p>
-            {{ form.executor.label }}<br>
-            {{ form.executor }}<br>
-            {% for error in form.executor.errors %}
+            {{ form.start_time.label }}<br>
+            {{ form.start_time(size=20) }}<br>
+            {% for error in form.start_time.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
         <p>
-            {{ form.execute_time.label }}<br>
-            {{ form.execute_time }}<br>
-            {% for error in form.execute_time.errors %}
+            {{ form.end_time.label }}<br>
+            {{ form.end_time(size=20) }}<br>
+            {% for error in form.end_time.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>

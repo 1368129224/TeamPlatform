@@ -4,6 +4,9 @@ from datetime import timedelta
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
 class Config(object):
+    # 实验室座位数
+    LAB_SET_NUM = 30
+    # flask-WTF
     CSRF_ENABLED = True
     SECRET_KEY = 'A__VERY__LONG__KEY'
     # flask-login

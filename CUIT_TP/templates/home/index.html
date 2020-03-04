@@ -12,6 +12,9 @@
         <p>hello world!</p>
     {% endif %}
     {% if current_user.role == 'admin' %}
-    <button onclick=window.location.href='{{ url_for("lab.member") }}'>管理实验室成员</button>
+        <button onclick=window.location.href='{{ url_for("lab.member") }}'>管理实验室成员</button>
+        <button onclick=window.location.href='{{ url_for("lab.verify_asset") }}'>资产审核</button>
+    {% else %}
+        <button onclick=window.location.href='{{ url_for("account.apply_asset") }}'>资产申请</button>
     {% endif %}
 {% endblock %}

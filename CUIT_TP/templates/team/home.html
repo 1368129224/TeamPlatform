@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ team.team_name }}小组
+{% endblock %}
+
+{% block content %}
+    <h1>管理小组</h1>
+    <p>team name: {{ team.team_name }}</p>
+
+    <p>desc: {{ team.desc }}</p>
+
+    <table>
+        {% for teammate in teammates %}
+            <tr>
+                <td>{{ teammate.username }} | {{ teammate.stu_num }} | {{ teammate.set_num }} | <button>详细信息</button></td>
+            </tr>
+        {% endfor %}
+    </table>
+    <button onclick=window.location.href="{{ url_for('team.home') }}">添加成员</button>
+{% endblock %}
