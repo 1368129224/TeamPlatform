@@ -8,13 +8,14 @@
     {% if current_user.is_authenticated %}
         <p>hello {{ current_user.username }}</p>
         <button onclick=window.location.href='{{ url_for("account.profile", stu_num=current_user.stu_num) }}'>我的资料</button>
+        {% if current_user.role == 'admin' %}
+            <button onclick=window.location.href='{{ url_for("lab.member") }}'>管理实验室成员</button>
+            <button onclick=window.location.href='{{ url_for("lab.verify_asset") }}'>资产审核</button>
+        {% else %}
+            <button onclick=window.location.href='{{ url_for("account.apply_asset") }}'>资产申请</button>
+        {% endif %}
     {% elif current_user.is_anonymous %}
         <p>hello world!</p>
-    {% endif %}
-    {% if current_user.role == 'admin' %}
-        <button onclick=window.location.href='{{ url_for("lab.member") }}'>管理实验室成员</button>
-        <button onclick=window.location.href='{{ url_for("lab.verify_asset") }}'>资产审核</button>
-    {% else %}
-        <button onclick=window.location.href='{{ url_for("account.apply_asset") }}'>资产申请</button>
+        <button onclick=window.location.href="{{ url_for('account.login') }}">登录</button>
     {% endif %}
 {% endblock %}

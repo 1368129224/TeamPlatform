@@ -11,7 +11,9 @@ bp = Blueprint('team', __name__)
 @bp.route('/<int:team_id>')
 @login_required
 def home(team_id):
-    if current_user.manage_team == Team.query.filter(Team.id==team_id) or current_user.role == 'admin':
+    if Team.query.filter(Team.id==team_id).first() == None:
+        abort(403)
+    if current_user.manage_team == Team.query.filter(Team.id==team_id).first() or current_user.role == 'admin':
         team = Team.query.filter(Team.id==team_id).first()
         teammates = team.teammates
         projects = Project.query.filter(Project.belong_team==team)

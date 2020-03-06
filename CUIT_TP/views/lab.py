@@ -167,7 +167,7 @@ def create_team():
                     leader=form.leader.data,
                 )
                 leader = User.query.filter(User.id==form.leader.data.id).first()
-                leader.belong_team.append(new_team)
+                new_team.teammates.append(leader)
                 leader.permission.change_team_info = True
                 leader.permission.publish_team_activity = True
                 db.session.add(new_team)
