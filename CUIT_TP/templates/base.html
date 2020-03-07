@@ -1,17 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="height: 100%">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
     {% block css %}
     {% endblock %}
 </head>
-<body>
+<body style="height: 100%">
 
-{% block content %}
-{% endblock %}
+<nav class="navbar navbar-expand-lg bg-light navbar-light">
+    <ul class="navbar-nav navbar-brand">
+        <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('home.index') }}">{{ config.LAB_NAME }}</a>
+        </li>
+    </ul>
+    <ul class="navbar-nav ml-auto">
+        {% if current_user.is_authenticated %}
+            <li class="nav-item ml-auto">
+            <a class="nav-link" href="{{ url_for('account.manage', stu_num=current_user.stu_num) }}">{{ current_user.username }}</a>
+        </li>
+        <li class="nav-item ml-auto">
+            <a class="nav-link" href="{{ url_for('account.logout') }}">退出</a>
+        </li>
+        {% elif current_user.is_anonymous %}
+        <li class="nav-item ml-auto">
+            <a class="nav-link" href="{{ url_for('account.login') }}">登录</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
 
+<div class="container-fluid" style="height: calc(100vh - 72px);padding-bottom: 20px;padding-top: 20px">
+    {% block content %}
+    {% endblock %}
+</div>
+
+<script src="{{ url_for('static', filename='js/jquery-3.4.1.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}" ></script>
 {% block js %}
 {% endblock %}
 </body>

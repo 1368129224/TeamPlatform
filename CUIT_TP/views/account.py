@@ -167,9 +167,15 @@ def reset_password(token):
         return redirect(url_for('account.login'))
     return render_template('account/reset_password.html', form=form)
 
+# 管理界面
+@bp.route('/manage/')
+@login_required
+def manage():
+    return render_template('account/manage.html')
+
 
 # 个人信息
-@bp.route('/<stu_num>/profile/')
+@bp.route('/<int:stu_num>/profile/')
 @login_required
 def profile(stu_num):
     user = User.query.filter(User.stu_num==stu_num).first()

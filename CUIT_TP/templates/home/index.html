@@ -1,21 +1,33 @@
 {% extends 'base.html' %}
 
 {% block title %}
-    Home
+    {{ config.LAB_NAME }}-TP
 {% endblock %}
 
 {% block content %}
-    {% if current_user.is_authenticated %}
-        <p>hello {{ current_user.username }}</p>
-        <button onclick=window.location.href='{{ url_for("account.profile", stu_num=current_user.stu_num) }}'>我的资料</button>
-        {% if current_user.role == 'admin' %}
-            <button onclick=window.location.href='{{ url_for("lab.member") }}'>管理实验室成员</button>
-            <button onclick=window.location.href='{{ url_for("lab.verify_asset") }}'>资产审核</button>
-        {% else %}
-            <button onclick=window.location.href='{{ url_for("account.apply_asset") }}'>资产申请</button>
-        {% endif %}
-    {% elif current_user.is_anonymous %}
-        <p>hello world!</p>
-        <button onclick=window.location.href="{{ url_for('account.login') }}">登录</button>
-    {% endif %}
+    <div class="row">
+        <div class="col-3">
+            <ul class="list-group">
+                <li class="list-group-item">Cras justo odio</li>
+                <li class="list-group-item">Dapibus ac facilisis in</li>
+                <li class="list-group-item">Morbi leo risus</li>
+                <li class="list-group-item">Porta ac consectetur ac</li>
+                <li class="list-group-item">Vestibulum at eros</li>
+            </ul>
+        </div>
+        <div class="col-9">
+            {% if current_user.is_authenticated %}
+                <p>hello {{ current_user.username }}</p>
+                <button onclick=window.location.href='{{ url_for("account.profile", stu_num=current_user.stu_num) }}'>我的资料</button>
+                {% if current_user.role == 'admin' %}
+                    <button onclick=window.location.href='{{ url_for("lab.member") }}'>管理实验室成员</button>
+                    <button onclick=window.location.href='{{ url_for("lab.verify_asset") }}'>资产审核</button>
+                {% else %}
+                    <button onclick=window.location.href='{{ url_for("account.apply_asset") }}'>资产申请</button>
+                {% endif %}
+            {% elif current_user.is_anonymous %}
+                <p>hello world!</p>
+                <button onclick=window.location.href="{{ url_for('account.login') }}">登录</button>
+            {% endif %}</div>
+    </div>
 {% endblock %}

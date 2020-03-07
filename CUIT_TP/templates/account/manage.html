@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ current_user.username }}
+{% endblock %}
+
+{% block content %}
+
+    {% set aside = [
+        (url_for('account.profile', stu_num=current_user.stu_num), 'profile', '个人资料'),
+        (url_for('team.home', team_id=current_user.belong_team_id), 'team', '小组信息'),
+        (url_for('team.home', team_id=current_user.belong_team_id), 'asset', '我的资产')
+    ] -%}
+    {% set active_page = active_page | default('profile') -%}
+
+    <div class="row" style="height: 100%">
+        <div class="col-3" style="height: fit-content">
+            <div class="card">
+                <div class="card-body">
+                    <div class="list-group list-group-flush" style="text-align: center">
+                        {% for href, id, ch in aside %}
+                            <a {% if id == active_page %}
+                                class="list-group-item list-group-item-light list-group-item-action active"
+                            {% else %}
+                                class="list-group-item list-group-item-light list-group-item-action"
+                            {% endif %}href="{{ href|e }}">{{ ch|e }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-9" style="height: 100%">
+        <iframe src="{{ url_for('account.profile', stu_num=current_user.stu_num) }}" frameborder="0" width="100%" height="100%">
+        </iframe>
+        </div>
+    </div>
+{% endblock %}
