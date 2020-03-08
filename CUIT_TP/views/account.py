@@ -118,8 +118,10 @@ def change_password():
                 db.session.commit()
                 return redirect((url_for('account.profile', stu_num=current_user.stu_num)))
             else:
-                flash('密码错误', 'error')
                 return redirect(url_for('account.change_password'))
+        else:
+            flash('两次密码不同')
+            return render_template('account/change_password.html', form=form)
     else:
         return render_template('account/change_password.html', form=form)
 

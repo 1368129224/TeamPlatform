@@ -7,18 +7,22 @@ from CUIT_TP import login
 
 bp = Blueprint('team', __name__)
 
+@login.user_loader
+def load_user(id):
+    return User.query.get(int(id))
+
 @bp.route('/')
 @bp.route('/<int:team_id>')
 @login_required
 def home(team_id):
-    if Team.query.filter(Team.id==team_id).first() == None:
-        abort(403)
-    if current_user.manage_team == Team.query.filter(Team.id==team_id).first() or current_user.role == 'admin':
-        team = Team.query.filter(Team.id==team_id).first()
-        teammates = team.teammates
-        projects = Project.query.filter(Project.belong_team==team)
-
-        return render_template('team/home.html', team=team, teammates=teammates)
+    team = Team.query.filter(Team.id == team_id).first_or_404()
+    teammates = team.teammates
+    projects = Project.query.filter(Project.belong_team==team)
+    if current_user.manage_team == team or current_user.role == 'admin':
+        normal_user = False
     else:
-        abort(403)
+        normal_user = True
+
+    return render_template('team/home.html', team=team, teammates=teammates, normal_user=normal_user)
+
 

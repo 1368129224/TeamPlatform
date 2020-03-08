@@ -1,10 +1,15 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+</head>
+<body>
 
-{% block title %}
-管理小组
-{% endblock %}
+<div class="container" style="padding-top: 20px;padding-bottom: 20px;">
 
-{% block content %}
     <p>管理小组</p>
     <table>
         {% for team in teams.items %}
@@ -16,4 +21,9 @@
     <button onclick=window.location.href="{{ url_for('lab.create_team') }}">新建小组</button>
     {% if teams.has_prev %}<a href="{{ url_for('lab.teams', page=teams.prev_num) }}">上一页</a>{% else %}上一页{% endif %} |
     {% if teams.has_next %}<a href="{{ url_for('lab.teams', page=teams.next_num) }}">下一页</a>{% else %}下一页{% endif %}
-{% endblock %}
+
+</div>
+
+<script src="{{ url_for('static', filename='js/jquery-3.4.1.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}" ></script>
+</body>
