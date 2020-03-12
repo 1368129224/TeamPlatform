@@ -14,19 +14,47 @@
     <br>
     <p>{{ team.desc }}</p>
     <br>
-    <table>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">用户名</th>
+            <th scope="col">学号</th>
+            <th scope="col">座位号</th>
+            <th scope="col">操作</th>
+        </tr>
+        </thead>
+        <tbody>
         {% for teammate in teammates %}
-            <tr>
-                <td>{{ teammate.username }} | {{ teammate.stu_num }} | {{ teammate.set_num }} | <button class="btn-light btn">详细信息</button></td>
-            </tr>
+            {% if teammate != team.leader %}
+                <tr>
+                    <td><a href="{{ url_for('account.profile', stu_num=teammate.stu_num) }}">{{ teammate.username }}</a></td>
+                    <td>{{ teammate.stu_num }}</td>
+                    <td>{{ teammate.set_num }}</td>
+                    <td><button class="btn-light btn" onclick="del_teammate({{ teammate.stu_num }})">删除</button></td>
+                </tr>
+            {% endif %}
         {% endfor %}
+        </tbody>
     </table>
     {% if not normal_user %}
-    <button class="btn-light btn" onclick=window.location.href="{{ url_for('team.home', team_id=team.id) }}">添加成员</button>
+        <button class="btn-light btn" onclick=window.location.href="{{ url_for('team.home', team_id=team.id) }}">添加成员</button>
     {% endif %}
 
 </div>
 
 <script src="{{ url_for('static', filename='js/jquery-3.4.1.js') }}"></script>
 <script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}" ></script>
+{{ JSGlue.include() }}
+<script>
+    const del_teammate = function (stu_num) {
+        if(confirm('确定要删除吗') === true){
+            $.get(Flask.url_for("team.delete_teammate", {'team_id': {{ team.id }}, 'stu_num': stu_num}), function (data) {
+                if (data === 'true'){
+                    alert('删除成功');
+                    window.location.reload();
+                }
+            });
+        }
+    }
+</script>
 </body>

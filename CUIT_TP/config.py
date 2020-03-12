@@ -5,7 +5,7 @@ BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
 class Config(object):
     # 实验室名称
-    LAB_NAME = '303实验室'
+    LAB_NAME = '404实验室'
     # 实验室座位数
     LAB_SET_NUM = 30
     # flask-WTF

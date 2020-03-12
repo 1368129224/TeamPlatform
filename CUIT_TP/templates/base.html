@@ -19,7 +19,7 @@
     <ul class="navbar-nav ml-auto">
         {% if current_user.is_authenticated %}
             <li class="nav-item ml-auto">
-            <a class="nav-link" href="{{ url_for('account.manage', stu_num=current_user.stu_num) }}">{{ current_user.username }}</a>
+            <a class="nav-link" href="{{ url_for('account.manage') }}">{{ current_user.username }}</a>
         </li>
         <li class="nav-item ml-auto">
             <a class="nav-link" href="{{ url_for('account.logout') }}">退出</a>
