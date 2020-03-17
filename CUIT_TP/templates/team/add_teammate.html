@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+</head>
+<body>
+
+<div class="container" style="padding-top: 20px;padding-bottom: 20px;">
+
+    <h1>添加成员</h1>
+    <br>
+    <form method="post" action="" style="width: 20%;">
+        {{ form.hidden_tag() }}
+        <div class="input-group mb-3">
+            {{ form.new_teammate }}
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submit">添加</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/jquery-3.4.1.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}" ></script>
+</body>

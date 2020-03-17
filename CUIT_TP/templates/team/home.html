@@ -37,7 +37,7 @@
         </tbody>
     </table>
     {% if not normal_user %}
-        <button class="btn-light btn" onclick=window.location.href="{{ url_for('team.home', team_id=team.id) }}">添加成员</button>
+        <button class="btn-light btn" onclick=window.location.href="{{ url_for('team.add_teammate', team_id=team.id) }}">添加成员</button>
     {% endif %}
 
 </div>

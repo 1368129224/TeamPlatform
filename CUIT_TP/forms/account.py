@@ -13,11 +13,21 @@ class AdminRegisterForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=16)])
-    stu_num = StringField('Stu_num', validators=[DataRequired(), Length(min=10, max=10)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=48)])
-    confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=16)], render_kw={
+        'class': 'form-control',
+    })
+    stu_num = StringField('Stu_num', validators=[DataRequired(), Length(min=10, max=10)], render_kw={
+        'class': 'form-control',
+    })
+    email = StringField('Email', validators=[DataRequired(), Email()], render_kw={
+        'class': 'form-control',
+    })
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=48)], render_kw={
+        'class': 'form-control',
+    })
+    confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')], render_kw={
+        'class': 'form-control',
+    })
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
@@ -36,18 +46,28 @@ class RegisterForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    stu_num_or_email = StringField('Id', validators=[DataRequired()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    stu_num_or_email = StringField('Id', validators=[DataRequired()], render_kw={
+        'class': 'form-control',
+    })
+    password = PasswordField('Password', validators=[DataRequired()], render_kw={
+        'class': 'form-control',
+    })
     remember_me = BooleanField('Remember Me')
 
 
 class ForgetPasswordForm(FlaskForm):
-    email_or_stu_num = StringField('Id', validators=[DataRequired()])
+    email_or_stu_num = StringField('Id', validators=[DataRequired()], render_kw={
+        'class': 'form-control',
+    })
 
 
 class ResetPasswordForm(FlaskForm):
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=10, max=48)])
-    confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=10, max=48)], render_kw={
+        'class': 'form-control',
+    })
+    confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')], render_kw={
+        'class': 'form-control',
+    })
 
 
 class ProfileForm(FlaskForm):

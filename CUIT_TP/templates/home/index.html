@@ -5,6 +5,12 @@
 {% endblock %}
 
 {% block content %}
+    {% if current_user.is_anonymous %}
+    <script>
+    alert('请登录后访问');
+    window.location.href='{{ url_for("account.login") }}';
+    </script>
+    {% endif %}
     <div class="row">
         <div class="col-3">
             <ul class="list-group">

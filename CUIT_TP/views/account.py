@@ -173,7 +173,10 @@ def reset_password(token):
 @bp.route('/manage/')
 @login_required
 def manage():
-    return render_template('account/manage.html')
+    if current_user.role == 'admin':
+        return render_template('account/admin_manage.html')
+    else:
+        return render_template('account/manage.html')
 
 
 # 个人信息
@@ -185,7 +188,7 @@ def profile(stu_num):
         abort(404)
     if not user.profile:
         profile = UserProfile(
-            phone='00000000000',
+            phone='0',
             college='',
             grade=0,
             _class='',
