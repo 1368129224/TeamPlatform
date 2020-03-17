@@ -1,0 +1,29 @@
+{% extends 'iframe_base.html' %}
+
+{% block content %}
+    <h1>我的资产</h1>
+    <br>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">资产</th>
+            <th scope="col">开始时间</th>
+            <th scope="col">结束时间</th>
+            <th scope="col">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for asset in assets %}
+            <tr>
+                <td style="vertical-align: middle;">{{ asset.asset_name }}</td>
+                <td style="vertical-align: middle;">{{ asset.start_time }}</td>
+                <td style="vertical-align: middle;">{{ asset.end_time }}</td>
+                <td><button class="btn btn-light">完成</button></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="row justify-content-center" style="width: inherit;margin-left: 0;margin-right: 0;margin-bottom: 10px;">
+        <button class="btn btn-light" onclick=window.location.href="{{ url_for('account.apply_asset') }}">申请资产</button>
+    </div>
+{% endblock %}

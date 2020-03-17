@@ -16,17 +16,15 @@
     <p>电话： {{ '未设置' if user.profile.phone == '00000000000' else user.profile.phone }}</p>
     <p>QQ： {{ '未设置' if not user.profile.QQ else user.profile.phone }}</p>
     <p>微信： {{ '未设置' if not user.profile.wechat else user.profile.phone }}</p>
-    {% if current_user.role != 'admin' %}
-        <p>学号： {{ '未设置' if user.stu_num == '0000000000' else user.stu_num }}</p>
-        <p>专业： {{ '未设置' if not user.profile.college else user.profile.college}}</p>
-        <p>年级： {{ '未设置' if user.profile.grade == '0' else user.profile.grade }}</p>
-        <p>班级： {{ '未设置' if not user.profile._class else user.profile._class }}</p>
-    {% endif %}
+    <p>学号： {{ '未设置' if user.stu_num == '0000000000' else user.stu_num }}</p>
+    <p>专业： {{ '未设置' if not user.profile.college else user.profile.college}}</p>
+    <p>年级： {{ '未设置' if user.profile.grade == '0' else user.profile.grade }}</p>
+    <p>班级： {{ '未设置' if not user.profile._class else user.profile._class }}</p>
     <br>
-    {% if current_user.stu_num == user.stu_num %}
+    {% if current_user.stu_num == user.stu_num or current_user.role == 'admin' %}
         <div class="btn-group">
-            <button type="button" class="btn btn-light" onclick=window.location.href='{{ url_for("account.change_profile") }}'>修改信息</button>
-            <button type="button" class="btn btn-light" onclick=window.location.href='{{ url_for("account.change_password") }}'>修改密码</button>
+            <button type="button" class="btn btn-light" onclick=window.location.href='{{ url_for("account.change_profile", stu_num=user.stu_num) }}'>修改信息</button>
+            <button type="button" class="btn btn-light" onclick=window.location.href='{{ url_for("account.change_password", stu_num=user.stu_num) }}'>修改密码</button>
         </div>
     {% endif %}
 </div>

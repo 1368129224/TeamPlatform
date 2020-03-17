@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, IntegerField, SelectField, DateTimeField
+from wtforms import StringField, TextAreaField, BooleanField, IntegerField, SelectField, DateTimeField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from CUIT_TP.models import db, User
@@ -30,10 +30,14 @@ def lab_task_executor():
     return User.query.filter(User.stu_num!='0000000000')
 
 class CreateLabTaskForm(FlaskForm):
-    task_name = StringField('Task name', validators=[DataRequired(), Length(max=32)])
-    desc = StringField('Task description', validators=[DataRequired(), Length(max=256)])
-    executor = QuerySelectField('Executor', validators=[DataRequired()], query_factory=lab_task_executor, get_label='username')
-    execute_time = DateTimeField('Execute time', validators=[DataRequired()], format='%Y-%m-%d %H:%M')
+    task_name = StringField('事务', validators=[DataRequired(), Length(max=32)])
+    desc = TextAreaField('详情', validators=[DataRequired(), Length(max=256)], render_kw={
+        'style': "resize:none;"
+    })
+    executor = QuerySelectField('执行人', validators=[DataRequired()], query_factory=lab_task_executor, get_label='username')
+    execute_time = DateTimeField('执行时间', validators=[DataRequired()], format='%Y-%m-%d %H:%M', render_kw={
+        'data-target':'#execute_time_datetimepicker',
+    })
 
 
 def team_leader():

@@ -24,10 +24,14 @@
         <tbody>
         {% for user in users.items %}
             <tr>
-                <td><a href="{{ url_for('account.profile', stu_num=user.stu_num) }}">{{ user.username }}</a></td>
-                <td>{{ user.stu_num }}</td>
-                <td>{{ user.set_num }}</td>
-                <td><button class="btn btn-light">禁用</button></td>
+                <td style="vertical-align: middle;"><a href="{{ url_for('account.profile', stu_num=user.stu_num) }}">{{ user.username }}</a></td>
+                <td style="vertical-align: middle;">{{ user.stu_num }}</td>
+                <td style="vertical-align: middle;">{{ user.set_num }}</td>
+                {% if user.role=='admin' %}
+                    <td><button class="btn btn-light disabled" disabled>禁用</button></td>
+                {% else %}
+                    <td><button class="btn btn-light">禁用</button></td>
+                {% endif %}
             </tr>
         {% endfor %}
         </tbody>

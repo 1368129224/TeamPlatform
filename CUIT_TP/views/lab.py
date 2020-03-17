@@ -131,6 +131,8 @@ def change_set(page=1):
     else:
         abort(403)
 
+
+
 # 资产审核
 @bp.route('/verify_asset/')
 @bp.route('/verify_asset/<int:page>/')

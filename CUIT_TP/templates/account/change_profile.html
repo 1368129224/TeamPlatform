@@ -36,28 +36,26 @@
             </div>
             {{ form.wechat(class="form-control") }}
         </div>
-        {% if current_user.role != 'admin' %}
-            <div class="input-group mb-3" style="width: 20%;">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">专业</span>
-                </div>
-                {{ form.college(class="form-control") }}
+        <div class="input-group mb-3" style="width: 20%;">
+            <div class="input-group-prepend">
+                <span class="input-group-text">专业</span>
             </div>
-            <div class="input-group mb-3" style="width: 20%;">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">年级</span>
-                </div>
-                {{ form.grade(class="form-control", id="grade") }}
+            {{ form.college(class="form-control") }}
+        </div>
+        <div class="input-group mb-3" style="width: 20%;">
+            <div class="input-group-prepend">
+                <span class="input-group-text">年级</span>
             </div>
-            <div class="input-group mb-3" style="width: 20%;">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">班级</span>
-                </div>
-                {{ form.c_lass(class="form-control") }}
+            {{ form.grade(class="form-control", id="grade") }}
+        </div>
+        <div class="input-group mb-3" style="width: 20%;">
+            <div class="input-group-prepend">
+                <span class="input-group-text">班级</span>
             </div>
-        {% endif %}
+            {{ form.c_lass(class="form-control") }}
+        </div>
         <div class="btn-group" style="width: 20%">
-            <button type="button" class="btn btn-light float-left" onclick=window.location.href='{{ url_for('account.profile', stu_num=current_user.stu_num) }}'>返回</button>
+            <button type="button" class="btn btn-light float-left" onclick=window.location.href='{{ url_for('account.profile', stu_num=user.stu_num) }}'>返回</button>
             <button type="submit" class="btn btn-light float-right">修改</button>
         </div>
     </form>

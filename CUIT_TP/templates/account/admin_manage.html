@@ -26,6 +26,14 @@
                                 remove_class();
                                 $('#asset_btn').addClass('active');
                                 $('#iframe')[0].src='{{ url_for('lab.verify_asset') }}'">资产审核</button>
+                        <button id="task_btn" type="button" class="list-group-item-light list-group-item list-group-item-action" onclick="
+                                remove_class();
+                                $('#task_btn').addClass('active');
+                                $('#iframe')[0].src='{{ url_for('lab.task') }}'">事务管理</button>
+                        <button id="set_btn" type="button" class="list-group-item-light list-group-item list-group-item-action" onclick="
+                                remove_class();
+                                $('#set_btn').addClass('active');
+                                $('#iframe')[0].src='{{ url_for('lab.task') }}'">座位管理</button>
                     </div>
                 </div>
             </div>

@@ -25,11 +25,18 @@
         </thead>
         <tbody>
         {% for teammate in teammates %}
-            {% if teammate != team.leader %}
+            {% if teammate == team.leader %}
                 <tr>
-                    <td><a href="{{ url_for('account.profile', stu_num=teammate.stu_num) }}">{{ teammate.username }}</a></td>
-                    <td>{{ teammate.stu_num }}</td>
-                    <td>{{ teammate.set_num }}</td>
+                    <td style="vertical-align: middle;"><a href="{{ url_for('account.profile', stu_num=teammate.stu_num) }}">{{ teammate.username }}</a> (组长)</td>
+                    <td style="vertical-align: middle;">{{ teammate.stu_num }}</td>
+                    <td style="vertical-align: middle;">{{ teammate.set_num }}</td>
+                    <td><button class="btn-light btn disabled" onclick="del_teammate({{ teammate.stu_num }})" disabled>删除</button></td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td style="vertical-align: middle;"><a href="{{ url_for('account.profile', stu_num=teammate.stu_num) }}">{{ teammate.username }}</a></td>
+                    <td style="vertical-align: middle;">{{ teammate.stu_num }}</td>
+                    <td style="vertical-align: middle;">{{ teammate.set_num }}</td>
                     <td><button class="btn-light btn" onclick="del_teammate({{ teammate.stu_num }})">删除</button></td>
                 </tr>
             {% endif %}

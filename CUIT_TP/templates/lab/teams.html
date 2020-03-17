@@ -23,8 +23,8 @@
         <tbody>
         {% for team in teams.items %}
             <tr>
-                <td><a href="{{ url_for('team.home', team_id=team.id) }}">{{ team.team_name }}</a></td>
-                <td><a href="{{ url_for('account.profile', stu_num=team.leader.stu_num) }}">{{ team.leader.username }}</a></td>
+                <td style="vertical-align: middle;"><a href="{{ url_for('team.home', team_id=team.id) }}">{{ team.team_name }}</a></td>
+                <td style="vertical-align: middle;"><a href="{{ url_for('account.profile', stu_num=team.leader.stu_num) }}">{{ team.leader.username }}</a></td>
                 <td><button class="btn btn-light">删除</button></td>
             </tr>
         {% endfor %}

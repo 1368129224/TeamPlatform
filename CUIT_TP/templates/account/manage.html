@@ -9,10 +9,22 @@
         <div class="col-3" style="height: fit-content">
             <div class="card">
                 <div class="card-body">
-                    <div class="list-group list-group-flush" style="text-align: center">
-                        <button id="profile_btn" type="button" class="list-group-item-light list-group-item list-group-item-action active">个人资料</button>
-                        <button id="team_btn" type="button" class="list-group-item-light list-group-item list-group-item-action">小组信息</button>
-                        <button id="asset_btn" type="button" class="list-group-item-light list-group-item list-group-item-action">我的资产</button>
+                    <div id="aside" class="list-group list-group-flush" style="text-align: center">
+                        <button id="profile_btn" type="button" class="list-group-item-light list-group-item list-group-item-action active"
+                                onclick="remove_class();
+                                        $('#profile_btn').addClass('active');
+                                        $('#iframe')[0].src='{{ url_for('account.profile', stu_num=current_user.stu_num) }}'
+                                        ">个人资料</button>
+                        <button id="team_btn" type="button" class="list-group-item-light list-group-item list-group-item-action"
+                                onclick="remove_class();
+                                        $('#team_btn').addClass('active');
+                                        $('#iframe')[0].src='{{ url_for('team.home', team_id=current_user.belong_team_id) }}'
+                                        ">小组信息</button>
+                        <button id="asset_btn" type="button" class="list-group-item-light list-group-item list-group-item-action"
+                                onclick="remove_class();
+                                        $('#asset_btn').addClass('active');
+                                        $('#iframe')[0].src='{{ url_for('account.assets') }}'
+                                        ">我的资产</button>
                     </div>
                 </div>
             </div>
@@ -30,23 +42,8 @@
 
 {% block js %}
     <script>
-        $("#profile_btn").click(function(){
-            $("#iframe")[0].src="{{ url_for('account.profile', stu_num=current_user.stu_num) }}";
-            $("#profile_btn").addClass("active");
-            $("#team_btn").removeClass("active");
-            $("#asset_btn").removeClass("active");
-        });
-        $("#team_btn").click(function(){
-            $("#iframe")[0].src="{{ url_for('team.home', team_id=current_user.belong_team_id) }}";
-            $("#team_btn").addClass("active");
-            $("#profile_btn").removeClass("active");
-            $("#asset_btn").removeClass("active");
-        });
-        $("#asset_btn").click(function(){
-            $("#iframe")[0].src="{{ url_for('account.profile', stu_num=current_user.stu_num) }}";
-            $("#asset_btn").addClass("active");
-            $("#team_btn").removeClass("active");
-            $("#profile_btn").removeClass("active");
-        });
+        function remove_class(){
+            $("#aside").children("button").removeClass("active");
+        }
     </script>
 {% endblock %}
