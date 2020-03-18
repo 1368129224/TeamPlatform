@@ -6,22 +6,28 @@
 
 {% block content %}
     {% if current_user.is_anonymous %}
-    <script>
-    alert('请登录后访问');
-    window.location.href='{{ url_for("account.login") }}';
-    </script>
+        <script>
+            alert('请登录后访问');
+            window.location.href='{{ url_for("account.login") }}';
+        </script>
     {% endif %}
     <div class="row">
-        <div class="col-3">
-            <ul class="list-group">
-                <li class="list-group-item">Cras justo odio</li>
+        <div class="col-3 offset-1">
+            <ul class="list-group" style="margin-bottom: 20px;">
+                <li class="list-group-item list-group-item-secondary">实验室活动</li>
                 <li class="list-group-item">Dapibus ac facilisis in</li>
                 <li class="list-group-item">Morbi leo risus</li>
                 <li class="list-group-item">Porta ac consectetur ac</li>
                 <li class="list-group-item">Vestibulum at eros</li>
             </ul>
+            <ul class="list-group" style="margin-bottom: 20px;">
+                <li class="list-group-item list-group-item-secondary">实验室事务</li>
+                {% for task in lab_task %}
+                    <li class="list-group-item">{{ task.task_name }}</li>
+                {% endfor %}
+            </ul>
         </div>
-        <div class="col-9">
+        <div class="col-7">
             {% if current_user.is_authenticated %}
                 <p>hello {{ current_user.username }}</p>
                 <button onclick=window.location.href='{{ url_for("account.profile", stu_num=current_user.stu_num) }}'>我的资料</button>
@@ -34,6 +40,7 @@
             {% elif current_user.is_anonymous %}
                 <p>hello world!</p>
                 <button onclick=window.location.href="{{ url_for('account.login') }}">登录</button>
-            {% endif %}</div>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}
