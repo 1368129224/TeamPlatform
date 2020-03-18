@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
+import json
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, make_response
 from flask_login import current_user, login_required
 from CUIT_TP.forms.lab import ChangeProfileForm, CreateLabTaskForm, CreateTeamForm
 from CUIT_TP.models import db, User, LabTask, Asset, Team
@@ -94,6 +95,10 @@ def create_task():
     if current_user.permission.manage_lab_task:
         form = CreateLabTaskForm()
         if request.method == 'POST':
+            print(form.task_name.data)
+            print(form.desc.data)
+            print(form.executor.data)
+            print(form.execute_time.data)
             if form.validate_on_submit():
                 new_lab_task = LabTask(
                     task_name=form.task_name.data,
@@ -105,6 +110,10 @@ def create_task():
                 db.session.commit()
                 return redirect(url_for('lab.task'))
             else:
+                print(form.task_name.errors)
+                print(form.desc.errors)
+                print(form.executor.errors)
+                print(form.execute_time.errors)
                 return render_template('lab/create_task.html', form=form)
         return render_template('lab/create_task.html', form=form)
     else:
@@ -120,14 +129,33 @@ def delete_task():
     else:
         abort(403)
 
-# 修改座位
-@bp.route('/change_set/')
-@bp.route('/change_set/<int:page>')
+def takeSecond(elem):
+    return elem[1]
+
+# 展示座位
+@bp.route('/set/')
 @login_required
-def change_set(page=1):
+def set():
+    users = User.query.all()
+    set_users, unset_users = [], []
+    for user in users:
+        if user.profile.set_num == 0:
+            unset_users.append((user.username, user.profile.set_num, user.stu_num))
+        else:
+            set_users.append((user.username, user.profile.set_num, user.stu_num))
+    set_users.sort(key=takeSecond)
+    return render_template('lab/set.html', unset_users=unset_users, set_users=set_users)
+
+# 修改座位
+@bp.route('/change_set/', methods=('POST', ))
+@login_required
+def change_set():
     if current_user.permission.change_set:
-        users = User.query.order_by(User.id).paginate(page, 5, False)
-        return render_template('lab/change_set.html', users=users)
+        json_data = json.loads(request.get_data().decode(encoding='utf-8'))
+        user = User.query.filter(User.stu_num==json_data.get('stu_num')).first()
+        user.profile.set_num = json_data.get('set_num')
+        db.session.commit()
+        return make_response('true', 200)
     else:
         abort(403)
 
@@ -151,7 +179,7 @@ def verify_asset(page=1):
 def teams(page=1):
     if current_user.permission.manage_lab_teams:
         teams = Team.query.order_by(Team.id).paginate(page, 5, False)
-        return render_template('lab/teams.html', teams=teams)
+        return render_template('lab/team.html', teams=teams)
     else:
         abort(403)
 

@@ -14,6 +14,7 @@
     <br>
     <p>邮箱： {{ user.email }}</p>
     <p>电话： {{ '未设置' if user.profile.phone == '00000000000' else user.profile.phone }}</p>
+    <p>座位号: {{ '未设置' if user.profile.set_num == 0 else user.profile.set_num }}</p>
     <p>QQ： {{ '未设置' if not user.profile.QQ else user.profile.phone }}</p>
     <p>微信： {{ '未设置' if not user.profile.wechat else user.profile.phone }}</p>
     <p>学号： {{ '未设置' if user.stu_num == '0000000000' else user.stu_num }}</p>

@@ -15,7 +15,6 @@ class User(UserMixin, db.Model):
     stu_num = db.Column(db.String(32), unique=True, nullable=False, comment='学号')
     password = db.Column(db.String(128), nullable=False, comment='密码')
     role = db.Column(db.Enum('admin', 'monitor', 'student'), server_default='student')
-    set_num = db.Column(db.Integer, default=0, comment='座位号')
     enable = db.Column(db.Boolean, default=True, comment='是否启用')
 
     belong_team_id = db.Column(db.Integer, db.ForeignKey('Team.id'))
@@ -49,6 +48,7 @@ class UserProfile(db.Model):
     QQ = db.Column(db.String(11), unique=True, comment='QQ')
     wechat = db.Column(db.String(64), unique=True, comment='微信')
     phone = db.Column(db.String(11), unique=True, nullable=False, comment='电话')
+    set_num = db.Column(db.Integer, default=0, comment='座位号')
     college = db.Column(db.String(32), nullable=False, comment='专业')
     grade = db.Column(db.String(4), nullable=False, comment='年级')
     _class = db.Column(db.String(4), nullable=False, comment='班级')

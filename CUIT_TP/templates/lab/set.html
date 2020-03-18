@@ -1,0 +1,44 @@
+{% extends 'iframe_base.html' %}
+
+{% block content %}
+    <h1>座位管理</h1>
+    <br>
+    {% for unset_user in unset_users %}
+        <div class="card" style="width: 10rem;display: inline-block;text-align: center">
+            <div class="card-header" style="height: fit-content">
+                <p style="margin-bottom: 0;">
+                    <a href="{{ url_for('account.profile', stu_num=unset_user[2]) }}"><strong>{{ unset_user[0] }}</strong></a>
+                </p>
+            </div>
+            <div class="card-body">
+                <button class="btn btn-light" onclick="change_set({{ unset_user[2] }}, {{ unset_user[1] }})">未设置</button>
+            </div>
+        </div>
+    {% endfor %}
+    <hr>
+    {% for set_user in set_users %}
+        <div class="card" style="width: 10rem;display: inline-block;text-align: center">
+            <div class="card-header" style="height: fit-content"><p style="margin-bottom: 0;">
+                <a href="{{ url_for('account.profile', stu_num=set_user[2]) }}"><strong>{{ set_user[0] }}</strong></a>
+            </p></div>
+            <div class="card-body">
+                <button class="btn btn-light" onclick="change_set({{ set_user[2] }}, {{ set_user[1] }})">{{ set_user[1] }} </button>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock %}
+
+{% block js %}
+    {{ JSGlue.include() }}
+    <script>
+        function change_set(stu_num, set_num) {
+            var set = prompt('请输入座位号： ', set_num);
+            $.post(Flask.url_for('lab.change_set'), JSON.stringify({'stu_num': stu_num, 'set_num': set}), function (data) {
+                if (data==='true'){
+                    window.location.reload();
+                }
+            })
+        }
+    </script>
+{% endblock %}
