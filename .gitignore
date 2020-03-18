@@ -1,5 +1,7 @@
 .idea/
 CUIT_TP/config.py
+document/
+migrations/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
