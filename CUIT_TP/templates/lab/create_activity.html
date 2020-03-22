@@ -1,0 +1,57 @@
+{% extends 'iframe_base.html' %}
+
+{% block css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tempusdominus-bootstrap-4.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="container" style="padding-top: 20px;padding-bottom: 20px;">
+
+        <h1>创建活动</h1>
+        <br>
+        <form method="post" action="">
+            {{ form.hidden_tag() }}
+            <div class="input-group mb-3" style="width: 30%;">
+                <div class="input-group-prepend">
+                    <span class="input-group-text justify-content-center" style="width: 74px;">活动</span>
+                </div>
+                {{ form.activity_name(class="form-control") }}
+            </div>
+            <div class="input-group mb-3" style="width: 50%;height: 200px;">
+                <div class="input-group-prepend">
+                    <span class="input-group-text justify-content-center" style="width: 74px;">详情</span>
+                </div>
+                {{ form.desc(class="form-control") }}
+            </div>
+            <div class="input-group mb-3 date" id="start_time_datetimepicker" data-target-input="nearest" style="width: 30%;">
+                <div class="input-group-prepend">
+                    <span class="input-group-text justify-content-center" style="width: 74px;">时间</span>
+                </div>
+                {{ form.start_time(class="form-control datetimepicker-input") }}
+                <div class="input-group-append" data-target="#start_time_datetimepicker" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                </div>
+            </div>
+            <input class="btn btn-light" type="submit" value="go">
+        </form>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="{{ url_for('static', filename='js/all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/moment.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tempusdominus-bootstrap-4.js') }}" ></script>
+    <script>
+        $(document).ready($(function () {
+            $('#start_time_datetimepicker').datetimepicker({
+                format: 'YYYY-MM-DD HH:mm',
+                todayHighlight: true,
+                icons:{
+                    time: 'fa fa-clock',
+                    date: 'fa fa-calendar-alt',
+                },
+            });
+        }));
+    </script>
+{% endblock %}

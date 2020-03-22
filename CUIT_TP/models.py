@@ -78,10 +78,12 @@ class UserPermission(db.Model):
 class Activity(db.Model):
     __tablename__ = 'Activity'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='活动ID')
+    activity_name = db.Column(db.String(64), nullable=False, comment='活动名称')
+    is_lab_activity = db.Column(db.Boolean, nullable=False, comment='是否是实验室活动')
     belong_team_id = db.Column(db.Integer, db.ForeignKey('Team.id'))
     desc = db.Column(db.String(256), nullable=False, comment='活动内容')
     create_time = db.Column(db.DateTime, default=datetime.now())
-    execute_datetime = db.Column(db.DateTime, comment='开始时间')
+    start_time = db.Column(db.DateTime, comment='开始时间')
 
     def __repr__(self):
         return '<Activity {}>'.format(self.id)

@@ -24,8 +24,6 @@ class ChangeProfileForm(FlaskForm):
     change_team_info = BooleanField('修改组信息')
     publish_team_activity = BooleanField('发布组活动')
 
-
-
 def lab_task_executor():
     return User.query.filter(User.stu_num!='0000000000')
 
@@ -45,6 +43,13 @@ def team_leader():
 
 class CreateTeamForm(FlaskForm):
     team_name = StringField('Team name', validators=[DataRequired(), Length(max=32)])
-    desc = StringField('Team description', validators=[DataRequired(), Length(max=256)])
+    desc = TextAreaField('Team description', validators=[DataRequired(), Length(max=256)])
     leader = QuerySelectField('Leader', validators=[DataRequired()], query_factory=team_leader, get_label='username')
+
+class CreateLabActivityForm(FlaskForm):
+    activity_name = StringField('活动名', validators=[DataRequired(), Length(max=64)])
+    desc = TextAreaField('活动详情', validators=[DataRequired(), Length(max=256)])
+    start_time = DateTimeField('活动时间', validators=[DataRequired()], format='%Y-%m-%d %H:%M', render_kw={
+        'data-target':'#start_time_datetimepicker',
+    })
 

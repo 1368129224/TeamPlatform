@@ -35,8 +35,11 @@
         function change_set(stu_num, set_num) {
             var set = prompt('请输入座位号： ', set_num);
             $.post(Flask.url_for('lab.change_set'), JSON.stringify({'stu_num': stu_num, 'set_num': set}), function (data) {
-                if (data==='true'){
-                    window.location.reload();
+                switch (data) {
+                    case ('true'): window.location.reload();break;
+                    case ('valueError'): alert('请输入正确座位号');break;
+                    case ('valueExist'): alert('该座位号以占用');break;
+                    case ('valueOverflow'): alert('座位号无效');break;
                 }
             })
         }

@@ -19,19 +19,21 @@
                 <td style="vertical-align: middle;">{{ asset.user.username }}</td>
                 <td style="vertical-align: middle;">
                     {% if asset.status == '0' %}
-                        待审核
+                        <p style="margin: 0;">待审核</p>
                     {% elif asset.status == '1' %}
-                        已审核
-                    {% else %}
-                        已结束
+                        <p style="margin: 0;{% if asset.end_time < now %}color: red;{% endif %}">已交付</p>
+                    {% elif asset.status == '2' %}
+                        <p style="margin: 0;">已归还</p>
                     {% endif %}
                 </td>
-                <td><button class="btn btn-light">通过</button><button class="btn btn-light">删除</button></td>
+                <td>
+                    <button class="btn btn-light {% if asset.status == '1' %}disabled{% elif asset.status == '2' %}disabled{% endif %}" onclick="change_status({{ asset.id }}, '1')" {% if asset.status == '1' %}disabled{% elif asset.status == '2' %}disabled{% endif %}>通过</button>
+                    <button class="btn btn-light {% if asset.status == '0' %}disabled{% elif asset.status == '2' %}disabled{% endif %}" onclick="change_status({{ asset.id }}, '2')" {% if asset.status == '0' %}disabled{% elif asset.status == '2' %}disabled{% endif %}>结束</button>
+                </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
-
     <nav aria-label="Page navigation">
         <ul class="pagination justify-content-center">
             {% if assets.has_prev %}
@@ -62,6 +64,19 @@
             {% endif %}
         </ul>
     </nav>
+{% endblock %}
 
-
+{% block js %}
+    {{ JSGlue.include() }}
+    <script>
+        function change_status(asset_id, status) {
+            $.post(Flask.url_for('lab.deliver_asset'), JSON.stringify({'asset_id': asset_id, 'status': status}), function (data) {
+                if (data==='true')
+                {
+                    alert('修改成功');
+                    window.location.reload();
+                }
+            })
+        }
+    </script>
 {% endblock %}

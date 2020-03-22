@@ -26,7 +26,7 @@
             <tr>
                 <td style="vertical-align: middle;"><a href="{{ url_for('account.profile', stu_num=user.stu_num) }}">{{ user.username }}</a></td>
                 <td style="vertical-align: middle;">{{ user.stu_num }}</td>
-                <td style="vertical-align: middle;">{{ user.set_num }}</td>
+                <td style="vertical-align: middle;">{{ user.profile.set_num }}</td>
                 {% if user.role=='admin' %}
                     <td><button class="btn btn-light disabled" disabled>禁用</button></td>
                 {% else %}

@@ -1,9 +1,10 @@
 import json
+from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, make_response
 from flask_login import current_user, login_required
-from CUIT_TP.forms.lab import ChangeProfileForm, CreateLabTaskForm, CreateTeamForm
-from CUIT_TP.models import db, User, LabTask, Asset, Team
-from CUIT_TP import login
+from CUIT_TP.forms.lab import ChangeProfileForm, CreateLabTaskForm, CreateTeamForm, CreateLabActivityForm
+from CUIT_TP.models import db, User, LabTask, Asset, Team, UserProfile, Activity
+from CUIT_TP import login, app
 
 bp = Blueprint('lab', __name__)
 
@@ -153,6 +154,14 @@ def change_set():
     if current_user.permission.change_set:
         json_data = json.loads(request.get_data().decode(encoding='utf-8'))
         user = User.query.filter(User.stu_num==json_data.get('stu_num')).first()
+        try:
+            n = int(json_data.get('set_num'))
+        except ValueError:
+            return make_response('valueError', 200)
+        if UserProfile.query.filter(UserProfile.set_num==n).first():
+            return make_response('valueExist', 200)
+        if n > app.config['LAB_SET_NUM']:
+            return make_response('valueOverflow', 200)
         user.profile.set_num = json_data.get('set_num')
         db.session.commit()
         return make_response('true', 200)
@@ -160,15 +169,28 @@ def change_set():
         abort(403)
 
 
-
-# 资产审核
+# 资产展示
 @bp.route('/verify_asset/')
 @bp.route('/verify_asset/<int:page>/')
 @login_required
 def verify_asset(page=1):
     if current_user.permission.verify_asset:
         assets = Asset.query.order_by(Asset.id).paginate(page, 5, False)
-        return render_template('lab/verify_asset.html', assets=assets)
+        return render_template('lab/verify_asset.html', assets=assets, now=datetime.now())
+    else:
+        abort(403)
+
+# 资产审核
+@bp.route('/deliver_asset/', methods=('POST', ))
+@login_required
+def deliver_asset():
+    if current_user.permission.verify_asset:
+        json_data = json.loads(request.get_data().decode(encoding='utf-8'))
+        asset_id = json_data.get('asset_id')
+        asset = Asset.query.filter(Asset.id==asset_id).first()
+        asset.status = json_data.get('status')
+        db.session.commit()
+        return make_response('true', 200)
     else:
         abort(403)
 
@@ -209,3 +231,61 @@ def create_team():
             return render_template('lab/create_team.html', form=form)
     else:
         abort(403)
+
+# 展示活动
+@bp.route('/activity/')
+@bp.route('/activity/<int:page>')
+@login_required
+def activity(page=1):
+    if current_user.permission.publish_lab_activity:
+        activities = Activity.query.filter(Activity.is_lab_activity==True).paginate(page, 5, False)
+        return render_template('lab/activity.html', activities=activities, now=datetime.now())
+    else:
+        abort(403)
+
+    return render_template('lab/activity.html')
+
+# 活动详情
+@bp.route('/activity_detail/<int:activity_id>')
+@login_required
+def activity_detail(activity_id):
+    activity = Activity.query.filter(Activity.id == activity_id).first()
+    if (activity_id == 0 and current_user.permission.publish_lab_activity):
+        return render_template('lab/activity_detail.html', activity=activity)
+    elif activity_id != 0:
+        if activity.belong_team_id != current_user.manage_team_id:
+            abort(403)
+        else:
+            return render_template('lab/activity_detail.html', activity=activity)
+    else:
+        abort(403)
+
+# 创建活动
+@bp.route('/create_activity/', methods=('GET', 'POST'))
+@login_required
+def create_activity():
+    form = CreateLabActivityForm()
+    if request.method == 'POST':
+        if current_user.role == 'admin':
+            if form.validate_on_submit():
+                new_activity = Activity(
+                    activity_name=form.activity_name.data,
+                    desc=form.desc.data,
+                    start_time=form.start_time.data,
+                    is_lab_activity=True,
+                )
+                db.session.add(new_activity)
+                db.session.commit()
+                return redirect(url_for('lab.activity'))
+            else:
+                return render_template('lab/create_activity.html', form=form)
+        if current_user.manage_team_id != None:
+            if form.validate_on_submit():
+                new_activity = Activity(
+                    activity_name=form.activity_name.data,
+                    desc=form.desc.data,
+                    start_time=form.start_time.data,
+                    is_lab_activity=False,
+                )
+    else:
+        return render_template('lab/create_activity.html', form=form)
