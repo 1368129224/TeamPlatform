@@ -37,6 +37,9 @@ class CreateLabTaskForm(FlaskForm):
         'data-target':'#execute_time_datetimepicker',
     })
 
+class ChangeLabTaskForm(CreateLabTaskForm):
+    pass
+
 
 def team_leader():
     return User.query.filter(User.manage_team==None, User.stu_num!=0000000000, User.belong_team==None)
@@ -52,4 +55,7 @@ class CreateLabActivityForm(FlaskForm):
     start_time = DateTimeField('活动时间', validators=[DataRequired()], format='%Y-%m-%d %H:%M', render_kw={
         'data-target':'#start_time_datetimepicker',
     })
+
+class ChangeLabActivityForm(CreateLabActivityForm):
+    pass
 

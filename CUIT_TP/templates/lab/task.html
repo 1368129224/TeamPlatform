@@ -16,10 +16,11 @@
         <tbody>
         {% for task in tasks.items %}
             <tr>
-                <td style="vertical-align: middle;">{{ task.task_name }}</td>
+                {#                <td style="vertical-align: middle;"><a href="{{ url_for('lab.task_detail', task_id=task.id) }}">{{ task.task_name }}</a></td>#}
+                <td style="vertical-align: middle;"><a href="#" onclick="open_detail({{ task.id }})">{{ task.task_name }}</a></td>
                 <td style="vertical-align: middle;">{{ task.executor.username }}</td>
                 <td style="vertical-align: middle;">{{ task.execute_datetime }}</td>
-                <td><button class="btn btn-light">完成</button><button class="btn btn-light">删除</button></td>
+                <td><button class="btn btn-light">完成</button><button class="btn btn-light" onclick="del_task({{ task.id }})">删除</button></td>
             </tr>
         {% endfor %}
         </tbody>
@@ -58,4 +59,32 @@
     <div class="row justify-content-center" style="width: inherit;margin-left: 0;margin-right: 0;margin-bottom: 10px;">
         <button class="btn btn-light" onclick=window.location.href="{{ url_for('lab.create_task') }}">创建事务</button>
     </div>
+{% endblock %}
+
+{% block js %}
+    {{ JSGlue.include() }}
+    <script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
+    <script>
+        const open_detail = function (task_id) {
+            $.get(Flask.url_for('lab.task_detail', {'task_id':task_id}), function (data) {
+                layer.open({
+                    type: 1,
+                    skin: 'layui-layer-rim',
+                    area: ['500px', '400px'],
+                    content: data
+                });
+            })
+        };
+        const del_task = function(task_id){
+            $.post(Flask.url_for('lab.delete_task'), JSON.stringify({'task_id': task_id}), function (data) {
+                if (data==='true'){
+                    alert('删除成功');
+                    window.location.reload();
+                }
+                else{
+                    alert('删除失败，请联系管理员。')
+                }
+            })
+        }
+    </script>
 {% endblock %}

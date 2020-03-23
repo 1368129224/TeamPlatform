@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-    <h1>创建事务</h1>
+    <h1>{{ '新建事务' if is_create else '修改事务' }}</h1>
     <br>
     <form method="post" action="">
         {{ form.hidden_tag() }}

@@ -1,0 +1,13 @@
+{% extends 'iframe_base.html' %}
+
+{% block content %}
+    <div class="container" style="padding-top: 20px;padding-bottom: 20px;">
+        <h1>{{ task.task_name }}</h1>
+        <br>
+        <p>详细信息： {{ task.desc }}</p>
+        <br>
+        <p>执行人： {{ task.executor.username }}</p>
+        <p>开始时间： {{ task.execute_datetime }}</p>
+        <button class="btn btn-light" onclick=window.location.href="{{ url_for('lab.change_task', task_id=task.id) }}">修改</button>
+    </div>
+{% endblock %}

@@ -2,60 +2,11 @@
 
 {% block content %}
     <div class="container" style="padding-top: 20px;padding-bottom: 20px;">
-
-        <h1>活动管理</h1>
+        <h1>{{ activity.activity_name }}</h1>
         <br>
-        <table class="table">
-            <thead>
-            <tr>
-                <th scope="col">名称</th>
-                <th scope="col">时间</th>
-                <th scope="col">操作</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for activity in activities.items %}
-                <tr>
-                    <td style="vertical-align: middle;"><a href="{{ url_for('lab.profile', stu_num=user.stu_num) }}">{{ activity.activity_name }}</a></td>
-                    <td style="vertical-align: middle;">{{ activity.start_time }}</td>
-                    {% if current_user.permission.publish_lab_activity %}
-                        <td><button class="btn btn-light disabled" disabled>禁用</button></td>
-                    {% else %}
-                        <td><button class="btn btn-light">禁用</button></td>
-                    {% endif %}
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        <nav aria-label="Page navigation">
-            <ul class="pagination justify-content-center">
-                {% if users.has_prev %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('lab.member', page=users.prev_num) }}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                {% else %}
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                {% endif %}
-                {% if users.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="{{ url_for('lab.member', page=users.next_num) }}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                {% else %}
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
+        <p>详细信息： {{ activity.desc }}</p>
+        <br>
+        <p>开始时间： {{ activity.start_time }}</p>
+        <button class="btn btn-light" onclick=window.location.href="{{ url_for('lab.change_activity', activity_id=activity.id) }}">修改</button>
     </div>
 {% endblock %}

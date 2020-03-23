@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, make_response
 from flask_login import current_user, login_required
-from CUIT_TP.forms.lab import ChangeProfileForm, CreateLabTaskForm, CreateTeamForm, CreateLabActivityForm
+from CUIT_TP.forms.lab import ChangeProfileForm, CreateLabTaskForm, CreateTeamForm, CreateLabActivityForm, ChangeLabActivityForm, ChangeLabTaskForm
 from CUIT_TP.models import db, User, LabTask, Asset, Team, UserProfile, Activity
 from CUIT_TP import login, app
 
@@ -115,8 +115,8 @@ def create_task():
                 print(form.desc.errors)
                 print(form.executor.errors)
                 print(form.execute_time.errors)
-                return render_template('lab/create_task.html', form=form)
-        return render_template('lab/create_task.html', form=form)
+                return render_template('lab/create_task.html', form=form, is_create=True)
+        return render_template('lab/create_task.html', form=form, is_create=True)
     else:
         abort(403)
 
@@ -125,11 +125,48 @@ def create_task():
 @login_required
 def delete_task():
     if current_user.permission.manage_lab_task:
-        task = LabTask.query.filter(LabTask.id)
-        # TODO 删除事务
+        task_id = json.loads(request.get_data().decode(encoding='utf-8')).get('task_id')
+        task = LabTask.query.filter(LabTask.id==task_id).first_or_404()
+        db.session.delete(task)
+        db.session.commit()
+        return make_response('true', 200)
     else:
         abort(403)
 
+# 事务详情
+@bp.route('/task_detail/')
+@login_required
+def task_detail():
+    task_id = request.args.get('task_id')
+    task = LabTask.query.filter(LabTask.id==task_id).first()
+    return render_template('lab/task_detail.html', task=task)
+
+# 修改事务
+@bp.route('/change_task/<int:task_id>/', methods=('POST', 'GET'))
+@login_required
+def change_task(task_id):
+    if not current_user.permission.publish_lab_activity:
+        abort(403)
+    task = LabTask.query.filter(LabTask.id == task_id).first_or_404()
+    if request.method == 'POST':
+        form = ChangeLabTaskForm()
+        if form.validate_on_submit():
+            task.task_name = form.task_name.data
+            task.desc = form.desc.data
+            task.executor = form.executor.data
+            task.execute_datetime = form.execute_time.data
+            db.session.commit()
+            return redirect(url_for('lab.task_detail', task_id=task_id))
+        else:
+            return render_template('lab/create_task.html', form=form, is_create=False)
+    else:
+        form = ChangeLabTaskForm(
+            task_name=task.task_name,
+            desc=task.desc,
+            executor=task.executor,
+            execute_datetime=task.execute_datetime,
+        )
+        return render_template('lab/create_task.html', form=form, is_create=False)
 def takeSecond(elem):
     return elem[1]
 
@@ -260,6 +297,31 @@ def activity_detail(activity_id):
     else:
         abort(403)
 
+# 修改活动
+@bp.route('/change_activity/<int:activity_id>', methods=('GET', 'POST'))
+@login_required
+def change_activity(activity_id):
+    activity = Activity.query.filter(Activity.id == activity_id).first()
+    if current_user.role != 'admin' or current_user.manage_team_id != activity.belong_team_id:
+        abort(403)
+    if request.method == 'POST':
+        form = ChangeLabActivityForm()
+        if form.validate_on_submit():
+            activity.activity_name = form.activity_name.data
+            activity.desc = form.desc.data
+            activity.start_time = form.start_time.data
+            db.session.commit()
+            return redirect(url_for('lab.activity_detail', activity_id=activity_id))
+        else:
+            return render_template('lab/create_activity.html', form=form, is_create=False)
+    else:
+        form = ChangeLabActivityForm(
+            activity_name=activity.activity_name,
+            desc=activity.desc,
+            start_time=activity.start_time,
+        )
+        return render_template('lab/create_activity.html', form=form, is_create=False)
+
 # 创建活动
 @bp.route('/create_activity/', methods=('GET', 'POST'))
 @login_required
@@ -278,7 +340,7 @@ def create_activity():
                 db.session.commit()
                 return redirect(url_for('lab.activity'))
             else:
-                return render_template('lab/create_activity.html', form=form)
+                return render_template('lab/create_activity.html', form=form, is_create=True)
         if current_user.manage_team_id != None:
             if form.validate_on_submit():
                 new_activity = Activity(
@@ -288,4 +350,4 @@ def create_activity():
                     is_lab_activity=False,
                 )
     else:
-        return render_template('lab/create_activity.html', form=form)
+        return render_template('lab/create_activity.html', form=form, is_create=True)

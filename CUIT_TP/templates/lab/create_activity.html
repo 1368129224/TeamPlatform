@@ -7,8 +7,7 @@
 
 {% block content %}
     <div class="container" style="padding-top: 20px;padding-bottom: 20px;">
-
-        <h1>创建活动</h1>
+        <h1>{{ '新建活动' if is_create else '修改活动' }}</h1>
         <br>
         <form method="post" action="">
             {{ form.hidden_tag() }}
@@ -33,7 +32,7 @@
                     <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                 </div>
             </div>
-            <input class="btn btn-light" type="submit" value="go">
+            <input class="btn btn-light" type="submit" value="保存">
         </form>
     </div>
 {% endblock %}
