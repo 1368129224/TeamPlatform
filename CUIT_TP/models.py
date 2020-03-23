@@ -15,12 +15,13 @@ class User(UserMixin, db.Model):
     stu_num = db.Column(db.String(32), unique=True, nullable=False, comment='学号')
     password = db.Column(db.String(128), nullable=False, comment='密码')
     role = db.Column(db.Enum('admin', 'monitor', 'student'), server_default='student')
-    enable = db.Column(db.Boolean, default=True, comment='是否启用')
 
     belong_team_id = db.Column(db.Integer, db.ForeignKey('Team.id'))
     manage_team_id = db.Column(db.Integer, db.ForeignKey('Team.id'))
-    note_id = db.Column(db.Integer, db.ForeignKey('Note.id'))
-    item_id = db.Column(db.Integer, db.ForeignKey('Item.id'))
+    backlog_note_id = db.Column(db.Integer, db.ForeignKey('BacklogNote.id'))
+    bug_note_id = db.Column(db.Integer, db.ForeignKey('BugNote.id'))
+    backlog_id = db.Column(db.Integer, db.ForeignKey('Backlog.id'))
+    bug_id = db.Column(db.Integer, db.ForeignKey('Bug.id'))
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -39,10 +40,11 @@ class User(UserMixin, db.Model):
             return
         return User.query.get(id)
 
+# 用户信息表
 class UserProfile(db.Model):
     __tablename__ = 'UserProfile'
     id = db.Column(db.Integer, primary_key=True)
-    uid = db.Column(db.Integer, db.ForeignKey('User.id', onupdate='CASCADE', ondelete='CASCADE'))
+    uid = db.Column(db.Integer, db.ForeignKey('User.id', ondelete='CASCADE'))
     user = relationship('User', backref=db.backref('profile', uselist=False))
     # avatar = db.Column(db.Integer, default=1)
     QQ = db.Column(db.String(11), unique=True, comment='QQ')
@@ -56,65 +58,86 @@ class UserProfile(db.Model):
     def __repr__(self):
         return '<UserProfile {}>'.format(self.user.username)
 
-class UserPermission(db.Model):
-    __tablename__ = 'UserPermission'
-    id = db.Column(db.Integer, primary_key=True)
-    uid = db.Column(db.Integer, db.ForeignKey('User.id', onupdate='CASCADE', ondelete='CASCADE'))
-    user = relationship('User', backref=db.backref('permission', uselist=False))
-    manage_lab_student_profile = db.Column(db.Boolean, default=False, comment='管理实验室学生信息')
-    manage_lab_task = db.Column(db.Boolean, default=False, comment='管理实验室事务')
-    change_set = db.Column(db.Boolean, default=False, comment='修改座位')
-    verify_asset = db.Column(db.Boolean, default=False, comment='资产审核')
-    change_lab_info = db.Column(db.Boolean, default=False, comment='修改实验室信息')
-    publish_lab_activity = db.Column(db.Boolean, default=False, comment='发布实验室活动')
-    manage_lab_teams = db.Column(db.Boolean, default=False, comment='管理小组')
-    change_team_info = db.Column(db.Boolean, default=False, comment='修改组信息')
-    publish_team_activity = db.Column(db.Boolean, default=False, comment='发布组活动')
-
-    def __repr__(self):
-        return '<UserPermission {}>'.format(self.user.username)
-
-# 活动表
-class Activity(db.Model):
-    __tablename__ = 'Activity'
+# 实验室活动表
+class LabActivity(db.Model):
+    __tablename__ = 'LabActivity'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='活动ID')
     activity_name = db.Column(db.String(64), nullable=False, comment='活动名称')
-    is_lab_activity = db.Column(db.Boolean, nullable=False, comment='是否是实验室活动')
+    desc = db.Column(db.String(256), nullable=False, comment='活动内容')
+    create_time = db.Column(db.DateTime, default=datetime.now())
+    start_time = db.Column(db.DateTime, comment='开始时间')
+
+    def __repr__(self):
+        return '<LabActivity {}>'.format(self.id)
+
+# 小组活动表
+class TeamActivity(db.Model):
+    __tablename__ = 'TeamActivity'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='活动ID')
+    activity_name = db.Column(db.String(64), nullable=False, comment='活动名称')
     belong_team_id = db.Column(db.Integer, db.ForeignKey('Team.id'))
     desc = db.Column(db.String(256), nullable=False, comment='活动内容')
     create_time = db.Column(db.DateTime, default=datetime.now())
     start_time = db.Column(db.DateTime, comment='开始时间')
 
     def __repr__(self):
-        return '<Activity {}>'.format(self.id)
+        return '<TeamActivity {}>'.format(self.id)
 
-# 笔记表
-class Note(db.Model):
-    __tablename__ = 'Note'
+# 需求记录表
+class BacklogNote(db.Model):
+    __tablename__ = 'BacklogNote'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='记录ID')
-    item_id = db.Column(db.Integer, db.ForeignKey('Item.id'))
+    backlog_id = db.Column(db.Integer, db.ForeignKey('Backlog.id'))
     content = db.Column(db.String(256), unique=False, comment='记录内容')
     create_datetime = db.Column(db.DateTime, default=datetime.now(), comment='创建时间')
-    writer = relationship('User', backref='notes', foreign_keys=[User.note_id])
+    writer = relationship('User', backref='notes', foreign_keys=[User.backlog_note_id])
 
     def __repr__(self):
         return '<Note {}>'.format(self.id)
 
-# 事项表
-class Item(db.Model):
-    __tablename__ = 'Item'
-    id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey('Project.id'))
-    item_type = db.Column(db.Enum('backlog', 'bug'), server_default='backlog', nullable=False, comment='类型')
-    desc = db.Column(db.String(256), comment='描述')
-    create_time = db.Column(db.DateTime, comment='创建时间')
-    status = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='状态')
-    priority = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='优先级')
-    executor = relationship('User', backref='task', uselist=False, foreign_keys=[User.item_id])
-    notes = relationship('Note', backref='belong_item', foreign_keys=[Note.item_id])
+# 缺陷记录表
+class BugNote(db.Model):
+    __tablename__ = 'BugNote'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='记录ID')
+    bug_id = db.Column(db.Integer, db.ForeignKey('Bug.id'))
+    content = db.Column(db.String(256), unique=False, comment='记录内容')
+    create_datetime = db.Column(db.DateTime, default=datetime.now(), comment='创建时间')
+    writer = relationship('User', backref='notes', foreign_keys=[User.bug_note_id])
 
     def __repr__(self):
-        return '<Item {}>'.format(self.id)
+        return '<Note {}>'.format(self.id)
+
+# 需求表
+class Backlog(db.Model):
+    __tablename__ = 'Backlog'
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('Project.id'))
+    backlog_name = db.Column(db.String(16), comment='需求')
+    desc = db.Column(db.String(256), comment='描述')
+    create_time = db.Column(db.DateTime, default=datetime.now(),comment='创建时间')
+    status = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='状态')
+    priority = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='优先级')
+    executor = relationship('User', backref='task', uselist=False, foreign_keys=[User.backlog_id])
+    notes = relationship('BacklogNote', backref='belong_item', foreign_keys=[BacklogNote.backlog_id])
+
+    def __repr__(self):
+        return '<Backlog {}>'.format(self.id)
+
+# 缺陷表
+class Bug(db.Model):
+    __tablename__ = 'Bug'
+    id = db.Column(db.Integer, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('Project.id'))
+    backlog_name = db.Column(db.String(16), comment='缺陷')
+    desc = db.Column(db.String(256), comment='描述')
+    create_time = db.Column(db.DateTime, default=datetime.now(), comment='创建时间')
+    status = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='状态')
+    priority = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='优先级')
+    executor = relationship('User', backref='task', uselist=False, foreign_keys=[User.bug_id])
+    notes = relationship('BugNote', backref='belong_item', foreign_keys=[BugNote.bug_id])
+
+    def __repr__(self):
+        return '<Bug {}>'.format(self.id)
 
 # 项目表
 class Project(db.Model):
@@ -126,7 +149,8 @@ class Project(db.Model):
     start_time = db.Column(db.DateTime, default=datetime.now(), comment='开始时间')
     end_time = db.Column(db.DateTime, comment='终止时间')
     status = db.Column(db.Enum('0', '1'), server_default='0', nullable=False, comment='状态')
-    items = relationship('Item', backref='belong_project', foreign_keys=[Item.project_id])
+    backlogs = relationship('Backlog', backref='belong_project', foreign_keys=[Backlog.project_id])
+    bugs = relationship('Bug', backref='belong_project', foreign_keys=[Bug.project_id])
 
     def __repr__(self):
         return '<Project {}>'.format(self.project_name)
@@ -139,7 +163,7 @@ class Team(db.Model):
     team_name = db.Column(db.String(32), unique=True, nullable=False,  comment='小组名')
     desc = db.Column(db.String(256), comment='小组简介')
     teammates = relationship("User", backref='belong_team', foreign_keys=[User.belong_team_id])
-    activities = relationship('Activity', backref="belong_team", foreign_keys=[Activity.belong_team_id])
+    activities = relationship('Activity', backref="belong_team", foreign_keys=[TeamActivity.belong_team_id])
     projects = relationship('Project', backref='belong_team', foreign_keys=[Project.belong_team_id])
 
     def __repr__(self):
@@ -154,16 +178,30 @@ class LabTask(db.Model):
     desc = db.Column(db.String(256), nullable=False, comment='事务详情')
     executor = relationship('User', backref='lab_task', uselist=False)
     create_time = db.Column(db.DateTime, default=datetime.now(), comment='创建时间')
-    execute_datetime =  db.Column(db.DateTime, comment='开始时间')
+    execute_datetime = db.Column(db.DateTime, comment='开始时间')
 
 # 资产表
 class Asset(db.Model):
     __tablename__ = 'Asset'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='资产ID')
-    uid = db.Column(db.Integer, db.ForeignKey('User.id'))
     user = relationship('User', backref='asset', uselist=False)
     asset_name = db.Column(db.String(32), nullable=False, comment='资产名称')
     desc = db.Column(db.String(256), nullable=False, comment='详细信息')
     start_time = db.Column(db.DateTime, default=datetime.now(), comment='开始时间')
     end_time = db.Column(db.DateTime, comment='终止时间')
     status = db.Column(db.Enum('0', '1', '2'), server_default='0', nullable=False, comment='状态')
+
+# 班长权限表
+class Monitor(db.Model):
+    __tablename__ = 'Monitor'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user = relationship('User', backref=db.backref('monitor_permission', uselist=False))
+    manage_lab_student_profile = db.Column(db.Boolean, default=False, comment='管理实验室学生信息')
+    manage_lab_task = db.Column(db.Boolean, default=False, comment='管理实验室事务')
+    change_set = db.Column(db.Boolean, default=False, comment='修改座位')
+    verify_asset = db.Column(db.Boolean, default=False, comment='资产审核')
+    change_lab_info = db.Column(db.Boolean, default=False, comment='修改实验室信息')
+    publish_lab_activity = db.Column(db.Boolean, default=False, comment='发布实验室活动')
+
+
+

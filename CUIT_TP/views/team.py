@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, make_response
 from flask_login import current_user, login_user, logout_user, login_required
 from CUIT_TP.forms.team import AddTeammateForm, CreateProjectForm
-from CUIT_TP.models import db, User, Team, Project, Activity
+from CUIT_TP.models import db, User, Team, Project, TeamActivity
 from CUIT_TP import login
 
 

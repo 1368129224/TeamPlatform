@@ -3,11 +3,10 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, make_response
 from flask_login import current_user, login_required
 from CUIT_TP.forms.lab import ChangeProfileForm, CreateLabTaskForm, CreateTeamForm, CreateLabActivityForm, ChangeLabActivityForm, ChangeLabTaskForm
-from CUIT_TP.models import db, User, LabTask, Asset, Team, UserProfile, Activity
+from CUIT_TP.models import db, User, LabTask, Asset, Team, UserProfile, LabActivity
 from CUIT_TP import login, app
 
 bp = Blueprint('lab', __name__)
-
 
 @login.user_loader
 def load_user(id):
@@ -28,12 +27,12 @@ def member(page=1):
 @bp.route('/change_profile/<int:stu_num>/', methods=('GET', 'POST'))
 @login_required
 def change_profile(stu_num):
-    user = User.query.filter(User.stu_num==stu_num).first()
-    if not user:
-        abort(404)
-    elif user.stu_num == '0000000000':
+    if current_user.role != 'admin' and stu_num == '0000000000':
+        abort(403)
+    elif not current_user.monitor_permission:
         abort(403)
     else:
+        user = User.query.filter(User.stu_num == stu_num).first_or_404()
         form = ChangeProfileForm(
             username=user.username,
             email=user.email,
@@ -43,14 +42,6 @@ def change_profile(stu_num):
             college=user.profile.college,
             grade=user.profile.grade,
             c_lass=user.profile._class,
-            manage_lab_student_profile=user.permission.manage_lab_student_profile,
-            manage_lab_task=user.permission.manage_lab_task,
-            change_set=user.permission.change_set,
-            verify_asset=user.permission.verify_asset,
-            change_lab_info=user.permission.change_lab_info,
-            publish_lab_activity=user.permission.publish_lab_activity,
-            change_team_info=user.permission.change_team_info,
-            publish_team_activity=user.permission.publish_team_activity,
         )
         if request.method == 'POST':
             form = ChangeProfileForm()
@@ -63,14 +54,6 @@ def change_profile(stu_num):
                 user.profile.college = form.college.data
                 user.profile.grade = form.grade.data
                 user.profile._class = form.c_lass.data
-                user.permission.manage_lab_student_profile = form.manage_lab_student_profile.data
-                user.permission.manage_lab_task = form.manage_lab_task.data
-                user.permission.change_set = form.change_set.data
-                user.permission.verify_asset = form.verify_asset.data
-                user.permission.change_lab_info = form.change_lab_info.data
-                user.permission.publish_lab_activity = form.publish_lab_activity.data
-                user.permission.change_team_info = form.change_team_info.data
-                user.permission.publish_team_activity = form.publish_team_activity.data
                 db.session.commit()
                 return redirect(url_for('lab.change_profile', stu_num=stu_num))
             else:
@@ -83,7 +66,7 @@ def change_profile(stu_num):
 @bp.route('/task/<int:page>/')
 @login_required
 def task(page=1):
-    if current_user.permission.manage_lab_task:
+    if current_user.monitor_permission.manage_lab_task:
         tasks = LabTask.query.order_by(LabTask.id).paginate(page, 5, False)
         return render_template('lab/task.html', tasks=tasks)
     else:
@@ -93,30 +76,20 @@ def task(page=1):
 @bp.route('/create_task/', methods=('GET', 'POST'))
 @login_required
 def create_task():
-    if current_user.permission.manage_lab_task:
+    if current_user.monitor_permission.manage_lab_task:
         form = CreateLabTaskForm()
-        if request.method == 'POST':
-            print(form.task_name.data)
-            print(form.desc.data)
-            print(form.executor.data)
-            print(form.execute_time.data)
-            if form.validate_on_submit():
-                new_lab_task = LabTask(
-                    task_name=form.task_name.data,
-                    desc=form.desc.data,
-                    executor=form.executor.data,
-                    execute_datetime=form.execute_time.data
-                )
-                db.session.add(new_lab_task)
-                db.session.commit()
-                return redirect(url_for('lab.task'))
-            else:
-                print(form.task_name.errors)
-                print(form.desc.errors)
-                print(form.executor.errors)
-                print(form.execute_time.errors)
-                return render_template('lab/create_task.html', form=form, is_create=True)
-        return render_template('lab/create_task.html', form=form, is_create=True)
+        if form.validate_on_submit():
+            new_lab_task = LabTask(
+                task_name=form.task_name.data,
+                desc=form.desc.data,
+                executor=form.executor.data,
+                execute_datetime=form.execute_time.data
+            )
+            db.session.add(new_lab_task)
+            db.session.commit()
+            return redirect(url_for('lab.task'))
+        else:
+            return render_template('lab/create_task.html', form=form, is_create=True)
     else:
         abort(403)
 
@@ -124,7 +97,7 @@ def create_task():
 @bp.route('/delete_task/', methods=('POST', ))
 @login_required
 def delete_task():
-    if current_user.permission.manage_lab_task:
+    if current_user.monitor_permission.manage_lab_task:
         task_id = json.loads(request.get_data().decode(encoding='utf-8')).get('task_id')
         task = LabTask.query.filter(LabTask.id==task_id).first_or_404()
         db.session.delete(task)
@@ -145,7 +118,7 @@ def task_detail():
 @bp.route('/change_task/<int:task_id>/', methods=('POST', 'GET'))
 @login_required
 def change_task(task_id):
-    if not current_user.permission.publish_lab_activity:
+    if not current_user.monitor_permission.publish_lab_activity:
         abort(403)
     task = LabTask.query.filter(LabTask.id == task_id).first_or_404()
     if request.method == 'POST':
@@ -174,6 +147,8 @@ def takeSecond(elem):
 @bp.route('/set/')
 @login_required
 def set():
+    if not current_user.monitor_permission.change_set:
+        abort(403)
     users = User.query.all()
     set_users, unset_users = [], []
     for user in users:
@@ -188,7 +163,7 @@ def set():
 @bp.route('/change_set/', methods=('POST', ))
 @login_required
 def change_set():
-    if current_user.permission.change_set:
+    if current_user.monitor_permission.change_set:
         json_data = json.loads(request.get_data().decode(encoding='utf-8'))
         user = User.query.filter(User.stu_num==json_data.get('stu_num')).first()
         try:
@@ -205,13 +180,12 @@ def change_set():
     else:
         abort(403)
 
-
 # 资产展示
 @bp.route('/verify_asset/')
 @bp.route('/verify_asset/<int:page>/')
 @login_required
 def verify_asset(page=1):
-    if current_user.permission.verify_asset:
+    if current_user.monitor_permission.verify_asset:
         assets = Asset.query.order_by(Asset.id).paginate(page, 5, False)
         return render_template('lab/verify_asset.html', assets=assets, now=datetime.now())
     else:
@@ -221,7 +195,7 @@ def verify_asset(page=1):
 @bp.route('/deliver_asset/', methods=('POST', ))
 @login_required
 def deliver_asset():
-    if current_user.permission.verify_asset:
+    if current_user.monitor_permission.verify_asset:
         json_data = json.loads(request.get_data().decode(encoding='utf-8'))
         asset_id = json_data.get('asset_id')
         asset = Asset.query.filter(Asset.id==asset_id).first()
@@ -236,7 +210,7 @@ def deliver_asset():
 @bp.route('/teams/<int:page>')
 @login_required
 def teams(page=1):
-    if current_user.permission.manage_lab_teams:
+    if current_user.monitor_permission.manage_lab_teams:
         teams = Team.query.order_by(Team.id).paginate(page, 5, False)
         return render_template('lab/team.html', teams=teams)
     else:
@@ -246,26 +220,45 @@ def teams(page=1):
 @bp.route('/create_team/', methods=('GET', 'POST'))
 @login_required
 def create_team():
-    if current_user.permission.manage_lab_teams:
+    if current_user.monitor_permission.manage_lab_teams:
         form = CreateTeamForm()
-        if request.method == 'POST':
-            if form.validate_on_submit():
-                new_team = Team(
-                    team_name=form.team_name.data,
-                    desc=form.desc.data,
-                    leader=form.leader.data,
-                )
-                leader = User.query.filter(User.id==form.leader.data.id).first()
-                new_team.teammates.append(leader)
-                leader.permission.change_team_info = True
-                leader.permission.publish_team_activity = True
-                db.session.add(new_team)
-                db.session.commit()
-                return redirect(url_for('lab.teams'))
-            else:
-                return render_template('lab/create_team.html', form=form)
+        if form.validate_on_submit():
+            new_team = Team(
+                team_name=form.team_name.data,
+                desc=form.desc.data,
+                leader=form.leader.data,
+            )
+            leader = User.query.filter(User.id==form.leader.data.id).first()
+            new_team.teammates.append(leader)
+            leader.permission.change_team_info = True
+            leader.permission.publish_team_activity = True
+            db.session.add(new_team)
+            db.session.commit()
+            return redirect(url_for('lab.teams'))
         else:
             return render_template('lab/create_team.html', form=form)
+    else:
+        abort(403)
+
+
+# 创建活动
+@bp.route('/create_activity/', methods=('GET', 'POST'))
+@login_required
+def create_activity():
+    form = CreateLabActivityForm()
+    if current_user.role == 'admin' or current_user.monitor_permission.publish_lab_activity:
+        if form.validate_on_submit():
+            new_activity = LabActivity(
+                activity_name=form.activity_name.data,
+                desc=form.desc.data,
+                start_time=form.start_time.data,
+                is_lab_activity=True,
+            )
+            db.session.add(new_activity)
+            db.session.commit()
+            return redirect(url_for('lab.activity'))
+        else:
+            return render_template('lab/create_activity.html', form=form, is_create=True)
     else:
         abort(403)
 
@@ -274,80 +267,43 @@ def create_team():
 @bp.route('/activity/<int:page>')
 @login_required
 def activity(page=1):
-    if current_user.permission.publish_lab_activity:
-        activities = Activity.query.filter(Activity.is_lab_activity==True).paginate(page, 5, False)
+    if current_user.role == 'admin' or current_user.monitor_permission.publish_lab_activity:
+        activities = LabActivity.query.order_by(LabActivity.id).paginate(page, 5, False)
         return render_template('lab/activity.html', activities=activities, now=datetime.now())
     else:
         abort(403)
-
-    return render_template('lab/activity.html')
 
 # 活动详情
 @bp.route('/activity_detail/<int:activity_id>')
 @login_required
 def activity_detail(activity_id):
-    activity = Activity.query.filter(Activity.id == activity_id).first()
-    if (activity_id == 0 and current_user.permission.publish_lab_activity):
-        return render_template('lab/activity_detail.html', activity=activity)
-    elif activity_id != 0:
-        if activity.belong_team_id != current_user.manage_team_id:
-            abort(403)
-        else:
-            return render_template('lab/activity_detail.html', activity=activity)
-    else:
-        abort(403)
+    activity = LabActivity.query.filter(LabActivity.id == activity_id).first()
+    return render_template('lab/activity_detail.html', activity=activity)
 
 # 修改活动
 @bp.route('/change_activity/<int:activity_id>', methods=('GET', 'POST'))
 @login_required
 def change_activity(activity_id):
-    activity = Activity.query.filter(Activity.id == activity_id).first()
-    if current_user.role != 'admin' or current_user.manage_team_id != activity.belong_team_id:
-        abort(403)
-    if request.method == 'POST':
-        form = ChangeLabActivityForm()
-        if form.validate_on_submit():
-            activity.activity_name = form.activity_name.data
-            activity.desc = form.desc.data
-            activity.start_time = form.start_time.data
-            db.session.commit()
-            return redirect(url_for('lab.activity_detail', activity_id=activity_id))
+    if current_user.role == 'admin' or current_user.monitor_permission.publish_lab_activity:
+        activity = LabActivity.query.filter(LabActivity.id == activity_id).first()
+        if request.method == 'POST':
+            form = ChangeLabActivityForm()
+            if form.validate_on_submit():
+                activity.activity_name = form.activity_name.data
+                activity.desc = form.desc.data
+                activity.start_time = form.start_time.data
+                db.session.commit()
+                return redirect(url_for('lab.activity_detail', activity_id=activity_id))
+            else:
+                return render_template('lab/create_activity.html', form=form, is_create=False)
         else:
+            form = ChangeLabActivityForm(
+                activity_name=activity.activity_name,
+                desc=activity.desc,
+                start_time=activity.start_time,
+            )
             return render_template('lab/create_activity.html', form=form, is_create=False)
     else:
-        form = ChangeLabActivityForm(
-            activity_name=activity.activity_name,
-            desc=activity.desc,
-            start_time=activity.start_time,
-        )
-        return render_template('lab/create_activity.html', form=form, is_create=False)
+        abort(403)
 
-# 创建活动
-@bp.route('/create_activity/', methods=('GET', 'POST'))
-@login_required
-def create_activity():
-    form = CreateLabActivityForm()
-    if request.method == 'POST':
-        if current_user.role == 'admin':
-            if form.validate_on_submit():
-                new_activity = Activity(
-                    activity_name=form.activity_name.data,
-                    desc=form.desc.data,
-                    start_time=form.start_time.data,
-                    is_lab_activity=True,
-                )
-                db.session.add(new_activity)
-                db.session.commit()
-                return redirect(url_for('lab.activity'))
-            else:
-                return render_template('lab/create_activity.html', form=form, is_create=True)
-        if current_user.manage_team_id != None:
-            if form.validate_on_submit():
-                new_activity = Activity(
-                    activity_name=form.activity_name.data,
-                    desc=form.desc.data,
-                    start_time=form.start_time.data,
-                    is_lab_activity=False,
-                )
-    else:
-        return render_template('lab/create_activity.html', form=form, is_create=True)
+
