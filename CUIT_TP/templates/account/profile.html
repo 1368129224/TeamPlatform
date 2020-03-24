@@ -14,13 +14,15 @@
     <br>
     <p>邮箱： {{ user.email }}</p>
     <p>电话： {{ '未设置' if user.profile.phone == '00000000000' else user.profile.phone }}</p>
-    <p>座位号: {{ '未设置' if user.profile.set_num == 0 else user.profile.set_num }}</p>
-    <p>QQ： {{ '未设置' if not user.profile.QQ else user.profile.phone }}</p>
-    <p>微信： {{ '未设置' if not user.profile.wechat else user.profile.phone }}</p>
-    <p>学号： {{ '未设置' if user.stu_num == '0000000000' else user.stu_num }}</p>
-    <p>专业： {{ '未设置' if not user.profile.college else user.profile.college}}</p>
-    <p>年级： {{ '未设置' if user.profile.grade == '0' else user.profile.grade }}</p>
-    <p>班级： {{ '未设置' if not user.profile._class else user.profile._class }}</p>
+    <p>QQ： {{ '未设置' if not user.profile.QQ else user.profile.QQ }}</p>
+    <p>微信： {{ '未设置' if not user.profile.wechat else user.profile.wechat }}</p>
+    {% if user.role != 'admin' %}
+        <p>座位号: {{ '未设置' if user.profile.set_num == 0 else user.profile.set_num }}</p>
+        <p>学号： {{ '未设置' if user.stu_num == '0000000000' else user.stu_num }}</p>
+        <p>专业： {{ '未设置' if not user.profile.college else user.profile.college}}</p>
+        <p>年级： {{ '未设置' if user.profile.grade == '0' else user.profile.grade }}</p>
+        <p>班级： {{ '未设置' if not user.profile._class else user.profile._class }}</p>
+    {% endif %}
     <br>
     {% if current_user.stu_num == user.stu_num or current_user.role == 'admin' %}
         <div class="btn-group">

@@ -1,0 +1,67 @@
+{% extends 'iframe_base.html' %}
+
+{% block content %}
+    <style>
+    #user {
+        width: 20%;
+    }
+    </style>
+    <div class="container" style="padding-top: 20px;padding-bottom: 20px;">
+
+        {% if user %}
+            <h4>{{ user.username }}</h4>
+        {% else %}
+            <h1>请设置班长</h1>
+        {% endif %}
+        <form method="post" action="">
+            {{ form.hidden_tag() }}
+            <div class="input-group mb-3" id="selector" style="width: 30%;visibility: hidden;">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">班长</span>
+                </div>
+                {{ form.user(class="form-control permission") }}
+                <input type="submit" class="btn btn-light" id="submit" value="确定" style="visibility: hidden;margin-left: 40px;">
+            </div>
+            <h5 id="title">班长权限</h5>
+            <div class="form-check">
+                {{ form.manage_lab_student_profile(class="form-check-input permission", id='manage_lab_student_profile') }}
+                <label class="form-check-label" for="manage_lab_student_profile">管理学生信息</label>
+            </div>
+            <div class="form-check">
+                {{ form.manage_lab_task(class="form-check-input permission", id='manage_lab_task') }}
+                <label class="form-check-label" for="manage_lab_task">管理实验室事务</label>
+            </div>
+            <div class="form-check">
+                {{ form.change_set(class="form-check-input permission", id='change_set') }}
+                <label class="form-check-label" for="change_set">修改座位</label>
+            </div>
+            <div class="form-check">
+                {{ form.verify_asset(class="form-check-input permission", id='verify_asset') }}
+                <label class="form-check-label" for="verify_asset">资产审核</label>
+            </div>
+            <div class="form-check">
+                {{ form.change_lab_info(class="form-check-input permission", id='change_lab_info') }}
+                <label class="form-check-label" for="change_lab_info">修改实验室信息</label>
+            </div>
+            <div class="form-check">
+                {{ form.publish_lab_activity(class="form-check-input permission", id='publish_lab_activity') }}
+                <label class="form-check-label" for="publish_lab_activity">发布实验室活动</label>
+            </div>
+        </form>
+        <br>
+        <button class="btn btn-light" id="change" onclick='change()'>修改</button>
+    </div>
+{% endblock %}
+{% block js %}
+    <script>
+        $(document).ready(function () {
+            $(".permission").attr({'disabled': true});
+        });
+        const change = function () {
+            $(".permission").attr({"disabled": false});
+            $("#submit").css({"visibility": "visible"});
+            $("#selector").css({"visibility": "visible"});
+            $("#change").css({"visibility": "hidden"});
+        }
+    </script>
+{% endblock %}

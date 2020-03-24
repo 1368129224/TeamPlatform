@@ -9,6 +9,7 @@
             <th scope="col">资产</th>
             <th scope="col">开始时间</th>
             <th scope="col">结束时间</th>
+            <th scope="col">状态</th>
             <th scope="col">操作</th>
         </tr>
         </thead>
@@ -18,6 +19,12 @@
                 <td style="vertical-align: middle;">{{ asset.asset_name }}</td>
                 <td style="vertical-align: middle;">{{ asset.start_time }}</td>
                 <td style="vertical-align: middle;">{{ asset.end_time }}</td>
+                <td style="vertical-align: middle;">
+                    {% if asset.status == '0' %}待审批
+                    {% elif asset.status == '1' %}使用中
+                    {% elif asset.status == '2' %}已归还
+                    {% endif %}
+                </td>
                 <td><button class="btn btn-light">完成</button></td>
             </tr>
         {% endfor %}

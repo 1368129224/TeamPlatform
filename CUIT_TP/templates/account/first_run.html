@@ -1,53 +1,43 @@
 {% extends 'base.html' %}
 
 {% block title %}
-初始化
+    设置管理员 {{ config.LAB_NAME }}
 {% endblock %}
 
 {% block content %}
-    <p>欢迎使用CUIT-TP</p>
-    <p>初次使用请设置admin账户</p>
-    <form method="post" action="">
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=20) }}<br>
-            {% for error in form.username.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-
-        <p>
-            {{ form.email.label }}<br>
-            {{ form.email(size=20) }}<br>
-            {% for error in form.email.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.password.label }}<br>
-            {{ form.password(size=20) }}<br>
-            {% for error in form.password.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.confirm.label }}<br>
-            {{ form.confirm(size=20) }}<br>
-            {% for error in form.confirm.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-
-        {% with msgs = get_flashed_messages() %}
-            {% if msgs %}
-                <ul>
-                    {% for msg in msgs %}
-                        <li>{{ msg }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        {% endwith %}
-        <input type="submit" value="go">
-    </form>
+    <div class="row">
+        <div class="col-4 offset-4" style="text-align: center">
+            <h1>欢迎使用CUIT-TP</h1>
+            <br>
+            <p>初次使用请设置admin账户</p>
+            <form method="post" action="" style="width: 50%" class="m-auto">
+                {{ form.hidden_tag() }}
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">姓名</span>
+                    </div>
+                    {{ form.username }}
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">邮箱</span>
+                    </div>
+                    {{ form.email }}
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">密码</span>
+                    </div>
+                    {{ form.password }}
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">确认</span>
+                    </div>
+                    {{ form.confirm }}
+                </div>
+                <input type="submit" class="btn btn-light" value="注册">
+            </form>
+        </div>
+    </div>
 {% endblock %}

@@ -18,7 +18,7 @@
                 <tr>
                     <td style="vertical-align: middle;"><a href="{{ url_for('lab.activity_detail', activity_id=activity.id) }}">{{ activity.activity_name }}</a></td>
                     <td style="vertical-align: middle;">{{ activity.start_time }}</td>
-                    {% if current_user.permission.publish_lab_activity or current_uer.role=='admin' %}
+                    {% if current_user.role=='monitor' or current_user.role=='admin' %}
                         <td><button class="btn btn-light">完成</button></td>
                     {% else %}
                         <td><button class="btn btn-light disabled" disabled>完成</button></td>

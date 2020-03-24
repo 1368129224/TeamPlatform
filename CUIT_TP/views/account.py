@@ -4,7 +4,8 @@ from flask_login import current_user, login_user, logout_user, login_required
 from CUIT_TP.forms.account import (
     RegisterForm, LoginForm, ForgetPasswordForm,
     ResetPasswordForm, ProfileForm, ChangePasswordForm,
-    AdminRegisterForm, ApplyAssetForm, ForceResetPasswordForm)
+    AdminRegisterForm, ApplyAssetForm, ForceResetPasswordForm,
+    AdminProfileForm)
 from CUIT_TP.models import User, UserProfile, Asset
 from CUIT_TP.utils import send_email
 from CUIT_TP import db, app, login
@@ -53,6 +54,13 @@ def register():
             password=generate_password_hash(form.password.data),
             stu_num=form.stu_num.data,
         )
+        profile = UserProfile(
+            phone='0',
+            college='',
+            grade=0,
+            _class='',
+        )
+        profile.user = new_user
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('account.login'))
@@ -62,6 +70,8 @@ def register():
 # 登录
 @bp.route('/login/', methods=('GET', 'POST'))
 def login():
+    if not User.query.filter(User.role=='admin').first():
+        return redirect(url_for('account.register_admin'))
     if current_user.is_authenticated:
         return redirect(url_for('home.index'))
     form = LoginForm()
@@ -73,7 +83,7 @@ def login():
         if user and check_password_hash(user.password, form.password.data):
             # 登录成功
             login_user(user, remember=form.remember_me.data)
-            # TODO 安全检查
+            # TODO next安全检查
             return redirect(request.args.get('next') or url_for('home.index'))
         else:
             # 登录失败
@@ -183,11 +193,36 @@ def profile(stu_num):
         db.session.commit()
     return render_template('account/profile.html', user=user)
 
+# 修改管理员信息
+@bp.route('/change_admin_profile/', methods=['GET', 'POST'])
+@login_required
+def change_admin_profile():
+    if current_user.role == 'admin':
+        form = AdminProfileForm(
+            QQ=current_user.profile.QQ,
+            wechat=current_user.profile.wechat,
+            phone=current_user.profile.phone,
+        )
+        if request.method == 'POST':
+            form = AdminProfileForm()
+            if form.validate_on_submit():
+                current_user.profile.QQ = form.QQ.data
+                current_user.profile.wechat = form.wechat.data
+                current_user.profile.phone = form.phone.data
+                db.session.commit()
+                return redirect(url_for('account.profile', stu_num=current_user.stu_num))
+            else:
+                return render_template('account/change_profile.html', user=current_user, form=form)
+        return render_template('account/change_profile.html', user=current_user, form=form)
+    else:
+        abort(403)
+
 # 修改个人信息
 @bp.route('/change_profile/<int:stu_num>', methods=['GET', 'POST'])
 @login_required
 def change_profile(stu_num):
-    if current_user.stu_num == stu_num or current_user.role == 'admin':
+    if int(current_user.stu_num) == stu_num or (current_user.role == 'admin' and stu_num != '0000000000'):
+        # 学生修改自己的信息/管理员修改学生信息
         user = User.query.filter(User.stu_num==stu_num).first_or_404()
         form = ProfileForm(
             QQ=user.profile.QQ,

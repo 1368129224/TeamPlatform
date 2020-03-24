@@ -45,9 +45,15 @@ def team_leader():
     return User.query.filter(User.manage_team==None, User.stu_num!=0000000000, User.belong_team==None)
 
 class CreateTeamForm(FlaskForm):
-    team_name = StringField('Team name', validators=[DataRequired(), Length(max=32)])
-    desc = TextAreaField('Team description', validators=[DataRequired(), Length(max=256)])
-    leader = QuerySelectField('Leader', validators=[DataRequired()], query_factory=team_leader, get_label='username')
+    team_name = StringField('Team name', validators=[DataRequired(), Length(max=32)], render_kw={
+        'class': 'form-control',
+    })
+    desc = TextAreaField('Team description', validators=[DataRequired(), Length(max=256)], render_kw={
+        'style': "resize:none;"
+    })
+    leader = QuerySelectField('Leader', validators=[DataRequired()], query_factory=team_leader, get_label='username', render_kw={
+        'class': 'form-control',
+    })
 
 class CreateLabActivityForm(FlaskForm):
     activity_name = StringField('活动名', validators=[DataRequired(), Length(max=64)])
@@ -59,3 +65,16 @@ class CreateLabActivityForm(FlaskForm):
 class ChangeLabActivityForm(CreateLabActivityForm):
     pass
 
+def monitor():
+    return User.query.filter(User.stu_num!=0000000000)
+
+class MonitorForm(FlaskForm):
+    user = QuerySelectField('学生', validators=[DataRequired()], query_factory=monitor, get_label='username', render_kw={
+        'class': 'form-control',
+    })
+    manage_lab_student_profile = BooleanField('管理实验室学生信息')
+    manage_lab_task = BooleanField('管理实验室事务')
+    change_set = BooleanField('修改座位')
+    verify_asset = BooleanField('资产审核')
+    change_lab_info = BooleanField('修改实验室信息')
+    publish_lab_activity = BooleanField('发布实验室活动')

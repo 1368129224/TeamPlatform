@@ -5,29 +5,26 @@
 {% endblock %}
 
 {% block content %}
-<form method="post" action="">
+    <form method="post" action="">
         {{ form.hidden_tag() }}
-        <p>
-            {{ form.team_name.label }}<br>
-            {{ form.team_name(size=20) }}<br>
-            {% for error in form.team_name.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.desc.label }}<br>
-            {{ form.desc(size=20) }}<br>
-            {% for error in form.desc.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.leader.label }}<br>
-            {{ form.leader }}<br>
-            {% for error in form.leader.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <input type="submit" value="go">
+        <div class="input-group mb-3" style="width: 30%;">
+            <div class="input-group-prepend">
+                <span class="input-group-text">小组名称</span>
+            </div>
+            {{ form.team_name(class="form-control") }}
+        </div>
+        <div class="input-group mb-3" style="width: 50%;height: 200px;">
+            <div class="input-group-prepend">
+                <span class="input-group-text">小组简介</span>
+            </div>
+            {{ form.desc(class="form-control") }}
+        </div>
+        <div class="input-group mb-3" style="width: 20%;">
+            <div class="input-group-prepend">
+                <span class="input-group-text">小组组长</span>
+            </div>
+            {{ form.leader(class="form-control") }}
+        </div>
+        <input class="btn btn-light" type="submit" value="go">
     </form>
 {% endblock %}

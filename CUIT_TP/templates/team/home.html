@@ -11,7 +11,7 @@
 <div class="container" style="padding-top: 20px;padding-bottom: 20px;">
     <h1>{{ team.team_name }}</h1>
     <br>
-    <p>{{ team.desc }}</p>
+    <p>简介： {{ team.desc }}</p>
     <div class="row">
         <div class="col-6">
             <table class="table">
@@ -43,7 +43,8 @@
                 {% endfor %}
                 </tbody>
             </table>
-            {% if not normal_user %}
+            {% if current_user.role == 'admin' or current_user.manage_team_id == team.id %}
+                <button class="btn-light btn" onclick=window.location.href="{{ url_for('team.add_teammate', team_id=team.id) }}">修改信息</button>
                 <button class="btn-light btn" onclick=window.location.href="{{ url_for('team.add_teammate', team_id=team.id) }}">添加成员</button>
             {% endif %}
         </div>
@@ -54,12 +55,13 @@
                 </div>
             {% endif %}
             {% for project in projects %}
-            <div class="card" style="margin-bottom: 20px;">
-                <div class="card-header"><p class="card-text">{{ project.project_name }}</p></div>
-                <div class="card-body"><p class="card-text">{{ project.desc }}</p></div>
-                <div class="card-footer"><p class="card-text">{{ project.end_time }}</p></div>
-            </div>
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-header"><p class="card-text">{{ project.project_name }}</p></div>
+                    <div class="card-body"><p class="card-text">{{ project.desc }}</p></div>
+                    <div class="card-footer"><p class="card-text">{{ project.end_time }}</p></div>
+                </div>
             {% endfor %}
+            <br>
             {% if current_user == team.leader %}
                 <button class="btn-light btn" onclick=window.location.href="{{ url_for('team.create_project') }}">创建项目</button>
             {% endif %}

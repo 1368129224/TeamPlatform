@@ -6,10 +6,18 @@ from CUIT_TP.models import User
 
 
 class AdminRegisterForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=16)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=48)])
-    confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=16)], render_kw={
+        'class': 'form-control',
+    })
+    email = StringField('Email', validators=[DataRequired(), Email()], render_kw={
+        'class': 'form-control',
+    })
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=48)], render_kw={
+        'class': 'form-control',
+    })
+    confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')], render_kw={
+        'class': 'form-control',
+    })
 
 
 class RegisterForm(FlaskForm):
@@ -74,10 +82,12 @@ class ForceResetPasswordForm(ResetPasswordForm):
     pass
 
 
-class ProfileForm(FlaskForm):
+class AdminProfileForm(FlaskForm):
     QQ = StringField('QQ', validators=[Length(max=11)])
     wechat = StringField('wechat', validators=[Length(max=64)])
     phone = StringField('Phone', validators=[DataRequired(), Length(min=11, max=11)])
+
+class ProfileForm(AdminProfileForm):
     college = StringField('College', validators=[DataRequired(), Length(max=32)])
     grade = IntegerField('Grade', validators=[DataRequired()], render_kw={
         'data-container': "body", 'data-toggle': "focus", 'data-placement': "right", 'data-content': "入学年份，如：2016"

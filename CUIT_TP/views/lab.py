@@ -2,8 +2,8 @@ import json
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, make_response
 from flask_login import current_user, login_required
-from CUIT_TP.forms.lab import ChangeProfileForm, CreateLabTaskForm, CreateTeamForm, CreateLabActivityForm, ChangeLabActivityForm, ChangeLabTaskForm
-from CUIT_TP.models import db, User, LabTask, Asset, Team, UserProfile, LabActivity
+from CUIT_TP.forms.lab import ChangeProfileForm, CreateLabTaskForm, CreateTeamForm, CreateLabActivityForm, ChangeLabActivityForm, ChangeLabTaskForm, MonitorForm
+from CUIT_TP.models import db, User, LabTask, Asset, Team, UserProfile, LabActivity, Monitor
 from CUIT_TP import login, app
 
 bp = Blueprint('lab', __name__)
@@ -17,7 +17,7 @@ def load_user(id):
 @bp.route('/member/<int:page>/')
 @login_required
 def member(page=1):
-    if current_user.permission.manage_lab_student_profile:
+    if current_user.role == 'monitor' or current_user.role == 'admin':
         users = User.query.order_by(User.id).paginate(page, 2, False)
         return render_template('lab/member.html', users=users)
     else:
@@ -66,7 +66,7 @@ def change_profile(stu_num):
 @bp.route('/task/<int:page>/')
 @login_required
 def task(page=1):
-    if current_user.monitor_permission.manage_lab_task:
+    if current_user.role == 'monitor' or current_user.role == 'admin':
         tasks = LabTask.query.order_by(LabTask.id).paginate(page, 5, False)
         return render_template('lab/task.html', tasks=tasks)
     else:
@@ -76,7 +76,7 @@ def task(page=1):
 @bp.route('/create_task/', methods=('GET', 'POST'))
 @login_required
 def create_task():
-    if current_user.monitor_permission.manage_lab_task:
+    if current_user.role == 'monitor' or current_user.role == 'admin':
         form = CreateLabTaskForm()
         if form.validate_on_submit():
             new_lab_task = LabTask(
@@ -97,7 +97,7 @@ def create_task():
 @bp.route('/delete_task/', methods=('POST', ))
 @login_required
 def delete_task():
-    if current_user.monitor_permission.manage_lab_task:
+    if current_user.role == 'monitor' or current_user.role == 'admin':
         task_id = json.loads(request.get_data().decode(encoding='utf-8')).get('task_id')
         task = LabTask.query.filter(LabTask.id==task_id).first_or_404()
         db.session.delete(task)
@@ -118,28 +118,30 @@ def task_detail():
 @bp.route('/change_task/<int:task_id>/', methods=('POST', 'GET'))
 @login_required
 def change_task(task_id):
-    if not current_user.monitor_permission.publish_lab_activity:
-        abort(403)
-    task = LabTask.query.filter(LabTask.id == task_id).first_or_404()
-    if request.method == 'POST':
-        form = ChangeLabTaskForm()
-        if form.validate_on_submit():
-            task.task_name = form.task_name.data
-            task.desc = form.desc.data
-            task.executor = form.executor.data
-            task.execute_datetime = form.execute_time.data
-            db.session.commit()
-            return redirect(url_for('lab.task_detail', task_id=task_id))
+    if current_user.role == 'monitor' or current_user.role == 'admin':
+        task = LabTask.query.filter(LabTask.id == task_id).first_or_404()
+        if request.method == 'POST':
+            form = ChangeLabTaskForm()
+            if form.validate_on_submit():
+                task.task_name = form.task_name.data
+                task.desc = form.desc.data
+                task.executor = form.executor.data
+                task.execute_datetime = form.execute_time.data
+                db.session.commit()
+                return redirect(url_for('lab.task_detail', task_id=task_id))
+            else:
+                return render_template('lab/create_task.html', form=form, is_create=False)
         else:
+            form = ChangeLabTaskForm(
+                task_name=task.task_name,
+                desc=task.desc,
+                executor=task.executor,
+                execute_datetime=task.execute_datetime,
+            )
             return render_template('lab/create_task.html', form=form, is_create=False)
     else:
-        form = ChangeLabTaskForm(
-            task_name=task.task_name,
-            desc=task.desc,
-            executor=task.executor,
-            execute_datetime=task.execute_datetime,
-        )
-        return render_template('lab/create_task.html', form=form, is_create=False)
+        abort(403)
+
 def takeSecond(elem):
     return elem[1]
 
@@ -147,27 +149,30 @@ def takeSecond(elem):
 @bp.route('/set/')
 @login_required
 def set():
-    if not current_user.monitor_permission.change_set:
+    if current_user.role == 'monitor' or current_user.role == 'admin':
+        users = User.query.all()
+        set_users, unset_users = [], []
+        for user in users:
+            if user.profile.set_num == 0:
+                unset_users.append((user.username, user.profile.set_num, user.stu_num))
+            else:
+                set_users.append((user.username, user.profile.set_num, user.stu_num))
+        set_users.sort(key=takeSecond)
+        return render_template('lab/set.html', unset_users=unset_users, set_users=set_users)
+    else:
         abort(403)
-    users = User.query.all()
-    set_users, unset_users = [], []
-    for user in users:
-        if user.profile.set_num == 0:
-            unset_users.append((user.username, user.profile.set_num, user.stu_num))
-        else:
-            set_users.append((user.username, user.profile.set_num, user.stu_num))
-    set_users.sort(key=takeSecond)
-    return render_template('lab/set.html', unset_users=unset_users, set_users=set_users)
 
 # 修改座位
 @bp.route('/change_set/', methods=('POST', ))
 @login_required
 def change_set():
-    if current_user.monitor_permission.change_set:
+    if current_user.role == 'monitor' or current_user.role == 'admin':
         json_data = json.loads(request.get_data().decode(encoding='utf-8'))
         user = User.query.filter(User.stu_num==json_data.get('stu_num')).first()
         try:
             n = int(json_data.get('set_num'))
+            if n < 0:
+                raise ValueError
         except ValueError:
             return make_response('valueError', 200)
         if UserProfile.query.filter(UserProfile.set_num==n).first():
@@ -185,7 +190,7 @@ def change_set():
 @bp.route('/verify_asset/<int:page>/')
 @login_required
 def verify_asset(page=1):
-    if current_user.monitor_permission.verify_asset:
+    if current_user.role == 'monitor' or current_user.role == 'admin':
         assets = Asset.query.order_by(Asset.id).paginate(page, 5, False)
         return render_template('lab/verify_asset.html', assets=assets, now=datetime.now())
     else:
@@ -195,7 +200,7 @@ def verify_asset(page=1):
 @bp.route('/deliver_asset/', methods=('POST', ))
 @login_required
 def deliver_asset():
-    if current_user.monitor_permission.verify_asset:
+    if current_user.role == 'admin' or current_user.role == 'monitor':
         json_data = json.loads(request.get_data().decode(encoding='utf-8'))
         asset_id = json_data.get('asset_id')
         asset = Asset.query.filter(Asset.id==asset_id).first()
@@ -210,7 +215,7 @@ def deliver_asset():
 @bp.route('/teams/<int:page>')
 @login_required
 def teams(page=1):
-    if current_user.monitor_permission.manage_lab_teams:
+    if current_user.role == 'monitor' or current_user.role == 'admin':
         teams = Team.query.order_by(Team.id).paginate(page, 5, False)
         return render_template('lab/team.html', teams=teams)
     else:
@@ -220,7 +225,7 @@ def teams(page=1):
 @bp.route('/create_team/', methods=('GET', 'POST'))
 @login_required
 def create_team():
-    if current_user.monitor_permission.manage_lab_teams:
+    if current_user.role == 'monitor' or current_user.role == 'admin':
         form = CreateTeamForm()
         if form.validate_on_submit():
             new_team = Team(
@@ -230,8 +235,6 @@ def create_team():
             )
             leader = User.query.filter(User.id==form.leader.data.id).first()
             new_team.teammates.append(leader)
-            leader.permission.change_team_info = True
-            leader.permission.publish_team_activity = True
             db.session.add(new_team)
             db.session.commit()
             return redirect(url_for('lab.teams'))
@@ -246,13 +249,12 @@ def create_team():
 @login_required
 def create_activity():
     form = CreateLabActivityForm()
-    if current_user.role == 'admin' or current_user.monitor_permission.publish_lab_activity:
+    if current_user.role == 'admin' or current_user.role == 'monitor':
         if form.validate_on_submit():
             new_activity = LabActivity(
                 activity_name=form.activity_name.data,
                 desc=form.desc.data,
                 start_time=form.start_time.data,
-                is_lab_activity=True,
             )
             db.session.add(new_activity)
             db.session.commit()
@@ -306,4 +308,58 @@ def change_activity(activity_id):
     else:
         abort(403)
 
-
+# 班长管理
+@bp.route('/monitor/', methods=('GET', 'POST'))
+@login_required
+def monitor():
+    if current_user.role == 'admin':
+        monitor = Monitor.query.first()
+        if monitor:
+            if request.method == 'POST':
+                form = MonitorForm()
+                if form.validate_on_submit():
+                    monitor.user = form.user.data
+                    monitor.manage_lab_student_profile = form.manage_lab_student_profile.data
+                    monitor.manage_lab_task = form.manage_lab_task.data
+                    monitor.change_set = form.change_set.data
+                    monitor.verify_asset = form.verify_asset.data
+                    monitor.change_lab_info = form.change_lab_info.data
+                    monitor.publish_lab_activity = form.publish_lab_activity.data
+                    db.session.commit()
+                    return render_template('lab/monitor.html', user=monitor.user, form=form)
+                else:
+                    return render_template('lab/monitor.html', user=monitor.user, form=form)
+            else:
+                form = MonitorForm(
+                    user=monitor.user,
+                    manage_lab_student_profile=monitor.manage_lab_student_profile,
+                    manage_lab_task = monitor.manage_lab_task,
+                    change_set = monitor.change_set,
+                    verify_asset = monitor.verify_asset,
+                    change_lab_info = monitor.change_lab_info,
+                    publish_lab_activity = monitor.publish_lab_activity,
+                )
+                return render_template('lab/monitor.html', user=monitor.user, form=form)
+        else:
+            if request.method == 'POST':
+                form = MonitorForm()
+                if form.validate_on_submit():
+                    new_monitor = Monitor(
+                        user=form.user.data,
+                        manage_lab_student_profile=form.manage_lab_student_profile.data,
+                        manage_lab_task=form.manage_lab_task.data,
+                        change_set=form.change_set.data,
+                        verify_asset=form.verify_asset.data,
+                        change_lab_info=form.change_lab_info.data,
+                        publish_lab_activity=form.publish_lab_activity.data,
+                    )
+                    db.session.add(new_monitor)
+                    db.session.commit()
+                    return redirect(url_for('lab.monitor', user=new_monitor.user, form=form))
+                else:
+                    return render_template('lab/monitor.html', form=form)
+            else:
+                form = MonitorForm()
+                return render_template('lab/monitor.html', user=None, form=form)
+    else:
+        abort(403)
