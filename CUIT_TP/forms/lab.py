@@ -76,5 +76,5 @@ class MonitorForm(FlaskForm):
     manage_lab_task = BooleanField('管理实验室事务')
     change_set = BooleanField('修改座位')
     verify_asset = BooleanField('资产审核')
-    change_lab_info = BooleanField('修改实验室信息')
+    manage_lab_team = BooleanField('管理小组')
     publish_lab_activity = BooleanField('发布实验室活动')

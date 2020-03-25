@@ -24,7 +24,7 @@
         <p>班级： {{ '未设置' if not user.profile._class else user.profile._class }}</p>
     {% endif %}
     <br>
-    {% if current_user.stu_num == user.stu_num or current_user.role == 'admin' %}
+    {% if current_user.stu_num == user.stu_num or current_user.role == 'admin' or current_user.role == 'monitor'%}
         <div class="btn-group">
             <button type="button" class="btn btn-light" onclick=window.location.href='{{ url_for("account.change_profile", stu_num=user.stu_num) }}'>修改信息</button>
             <button type="button" class="btn btn-light" onclick=window.location.href='{{ url_for("account.change_password", stu_num=user.stu_num) }}'>修改密码</button>

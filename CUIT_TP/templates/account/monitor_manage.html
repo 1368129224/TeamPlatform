@@ -14,34 +14,52 @@
                                 remove_class();
                                 $('#profile_btn').addClass('active');
                                 $('#iframe')[0].src='{{ url_for('account.profile', stu_num=current_user.stu_num) }}'">个人资料</button>
-                        <button id="student_btn" type="button" class="list-group-item-light list-group-item list-group-item-action" onclick="
-                                remove_class();
-                                $('#student_btn').addClass('active');
-                                $('#iframe')[0].src='{{ url_for('lab.member') }}'">人员管理</button>
-                        <button id="team_btn" type="button" class="list-group-item-light list-group-item list-group-item-action" onclick="
-                                remove_class();
-                                $('#team_btn').addClass('active');
-                                $('#iframe')[0].src='{{ url_for('lab.teams') }}'">小组管理</button>
-                        <button id="asset_btn" type="button" class="list-group-item-light list-group-item list-group-item-action" onclick="
-                                remove_class();
-                                $('#asset_btn').addClass('active');
-                                $('#iframe')[0].src='{{ url_for('lab.verify_asset') }}'">资产审核</button>
-                        <button id="task_btn" type="button" class="list-group-item-light list-group-item list-group-item-action" onclick="
-                                remove_class();
-                                $('#task_btn').addClass('active');
-                                $('#iframe')[0].src='{{ url_for('lab.task') }}'">事务管理</button>
-                        <button id="set_btn" type="button" class="list-group-item-light list-group-item list-group-item-action" onclick="
-                                remove_class();
-                                $('#set_btn').addClass('active');
-                                $('#iframe')[0].src='{{ url_for('lab.set') }}'">座位管理</button>
-                        <button id="activity_btn" type="button" class="list-group-item-light list-group-item list-group-item-action" onclick="
-                                remove_class();
-                                $('#activity_btn').addClass('active');
-                                $('#iframe')[0].src='{{ url_for('lab.activity') }}'">活动管理</button>
-                        <button id="monitor_btn" type="button" class="list-group-item-light list-group-item list-group-item-action" onclick="
-                                remove_class();
-                                $('#monitor_btn').addClass('active');
-                                $('#iframe')[0].src='{{ url_for('lab.monitor') }}'">班长管理</button>
+                        <button id="team_btn" type="button" class="list-group-item-light list-group-item list-group-item-action"
+                                onclick="remove_class();
+                                        $('#team_btn').addClass('active');
+                                        $('#iframe')[0].src='{{ url_for('team.home', team_id=current_user.belong_team_id) }}'
+                                        ">小组信息</button>
+                        <button id="my_asset_btn" type="button" class="list-group-item-light list-group-item list-group-item-action"
+                                onclick="remove_class();
+                                        $('#my_asset_btn').addClass('active');
+                                        $('#iframe')[0].src='{{ url_for('account.assets') }}'
+                                        ">我的资产</button>
+                        {% if current_user.monitor_permission.manage_lab_student_profile %}
+                            <button id="student_btn" type="button" class="list-group-item-light list-group-item list-group-item-action" onclick="
+                                    remove_class();
+                                    $('#student_btn').addClass('active');
+                                    $('#iframe')[0].src='{{ url_for('lab.member') }}'">人员管理</button>
+                        {% endif %}
+                        {% if current_user.monitor_permission.manage_lab_team %}
+                            <button id="teams_btn" type="button" class="list-group-item-light list-group-item list-group-item-action" onclick="
+                                    remove_class();
+                                    $('#teams_btn').addClass('active');
+                                    $('#iframe')[0].src='{{ url_for('lab.teams') }}'">小组管理</button>
+                        {% endif %}
+                        {% if current_user.monitor_permission.verify_asset %}
+                            <button id="asset_btn" type="button" class="list-group-item-light list-group-item list-group-item-action" onclick="
+                                    remove_class();
+                                    $('#asset_btn').addClass('active');
+                                    $('#iframe')[0].src='{{ url_for('lab.verify_asset') }}'">资产审核</button>
+                        {% endif %}
+                        {% if current_user.monitor_permission.manage_lab_task %}
+                            <button id="task_btn" type="button" class="list-group-item-light list-group-item list-group-item-action" onclick="
+                                    remove_class();
+                                    $('#task_btn').addClass('active');
+                                    $('#iframe')[0].src='{{ url_for('lab.task') }}'">事务管理</button>
+                        {% endif %}
+                        {% if current_user.monitor_permission.change_set %}
+                            <button id="set_btn" type="button" class="list-group-item-light list-group-item list-group-item-action" onclick="
+                                    remove_class();
+                                    $('#set_btn').addClass('active');
+                                    $('#iframe')[0].src='{{ url_for('lab.set') }}'">座位管理</button>
+                        {% endif %}
+                        {% if current_user.monitor_permission.publish_lab_activity %}
+                            <button id="activity_btn" type="button" class="list-group-item-light list-group-item list-group-item-action" onclick="
+                                    remove_class();
+                                    $('#activity_btn').addClass('active');
+                                    $('#iframe')[0].src='{{ url_for('lab.activity') }}'">活动管理</button>
+                        {% endif %}
                     </div>
                 </div>
             </div>

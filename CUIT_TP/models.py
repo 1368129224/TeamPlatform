@@ -47,8 +47,8 @@ class UserProfile(db.Model):
     uid = db.Column(db.Integer, db.ForeignKey('User.id', ondelete='CASCADE'))
     user = relationship('User', backref=db.backref('profile', uselist=False))
     # avatar = db.Column(db.Integer, default=1)
-    QQ = db.Column(db.String(11), unique=True, comment='QQ')
-    wechat = db.Column(db.String(64), unique=True, comment='微信')
+    QQ = db.Column(db.String(11), comment='QQ')
+    wechat = db.Column(db.String(64), comment='微信')
     phone = db.Column(db.String(11), nullable=False, comment='电话')
     set_num = db.Column(db.Integer, default=0, comment='座位号')
     college = db.Column(db.String(32), nullable=False, comment='专业')
@@ -202,7 +202,7 @@ class Monitor(db.Model):
     manage_lab_task = db.Column(db.Boolean, default=False, comment='管理实验室事务')
     change_set = db.Column(db.Boolean, default=False, comment='修改座位')
     verify_asset = db.Column(db.Boolean, default=False, comment='资产审核')
-    change_lab_info = db.Column(db.Boolean, default=False, comment='修改实验室信息')
+    manage_lab_team = db.Column(db.Boolean, default=False, comment='管理小组')
     publish_lab_activity = db.Column(db.Boolean, default=False, comment='发布实验室活动')
 
 

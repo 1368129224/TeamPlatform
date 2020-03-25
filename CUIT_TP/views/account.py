@@ -173,6 +173,8 @@ def reset_password(token):
 def manage():
     if current_user.role == 'admin':
         return render_template('account/admin_manage.html')
+    elif current_user.role == 'monitor':
+        return render_template('account/monitor_manage.html')
     else:
         return render_template('account/manage.html')
 
@@ -221,7 +223,7 @@ def change_admin_profile():
 @bp.route('/change_profile/<int:stu_num>', methods=['GET', 'POST'])
 @login_required
 def change_profile(stu_num):
-    if int(current_user.stu_num) == stu_num or (current_user.role == 'admin' and stu_num != '0000000000'):
+    if int(current_user.stu_num) == stu_num or (current_user.role == 'admin' and stu_num != '0000000000') or (current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_student_profile):
         # 学生修改自己的信息/管理员修改学生信息
         user = User.query.filter(User.stu_num==stu_num).first_or_404()
         form = ProfileForm(
