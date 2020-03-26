@@ -1,0 +1,52 @@
+{% extends 'iframe_base.html' %}
+
+{% block content %}
+    <div class="container" style="padding-top: 20px;padding-bottom: 20px;">
+        <h1>{{ project.project_name }}</h1>
+        <br>
+        <div class="row" style="margin-top: 20px;">
+            <div class="col-6">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">需求</th>
+                        <th scope="col">状态</th>
+                        <th scope="col">优先级</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for backlog in project.backlogs %}
+                        <tr>
+                            <td><a href="#">{{ backlog.backlog_name }}</a></td>
+                            <td>{{ backlog.status }}</td>
+                            <td>{{ backlog.priority }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <button class="btn btn-light float-right" onclick="window.location.href='{{ url_for("team.create_backlog", project_id=project.id) }}'">新增需求</button>
+            </div>
+            <div class="col-6">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">缺陷</th>
+                        <th scope="col">状态</th>
+                        <th scope="col">优先级</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for bug in project.bugs %}
+                        <tr>
+                            <td><a href="#">{{ bug.backlog_name }}</a></td>
+                            <td>{{ bug.status }}</td>
+                            <td>{{ bug.prority }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <button class="btn btn-light float-right">新增缺陷</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}

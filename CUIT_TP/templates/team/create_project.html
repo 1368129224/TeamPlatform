@@ -6,9 +6,9 @@
 {% endblock %}
 
 {% block content %}
-    <h1>创建项目</h1>
+    <h1>{{ '创建项目' if is_create else '修改项目'}}</h1>
     <br>
-    <form method="post" action="">
+    <form method="post" action="{{ url_for('team.create_project') if is_create else url_for('team.change_project', project_id=project_id) }}">
         {{ form.hidden_tag() }}
         <div class="input-group mb-3" style="width: 30%;">
             <div class="input-group-prepend">
@@ -32,7 +32,7 @@
                 <div class="input-group-text"><i class="fa fa-calendar"></i></div>
             </div>
         </div>
-        <input class="btn btn-light" type="submit" value="创建">
+        <input class="btn btn-light" type="submit" value="{{ '创建' if is_create else '修改'}}">
     </form>
 {% endblock %}
 

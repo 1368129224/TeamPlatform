@@ -116,7 +116,7 @@ class Backlog(db.Model):
     desc = db.Column(db.String(256), comment='描述')
     create_time = db.Column(db.DateTime, default=datetime.now(),comment='创建时间')
     status = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='状态')
-    priority = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='优先级')
+    priority = db.Column(db.Enum('0', '1', '2', '3'), server_default='1', nullable=False, comment='优先级')
     executor = relationship('User', backref='project_backlog', uselist=False, foreign_keys=[User.backlog_id])
     notes = relationship('BacklogNote', backref='belong_item', foreign_keys=[BacklogNote.backlog_id])
 
@@ -128,7 +128,7 @@ class Bug(db.Model):
     __tablename__ = 'Bug'
     id = db.Column(db.Integer, primary_key=True)
     project_id = db.Column(db.Integer, db.ForeignKey('Project.id'))
-    backlog_name = db.Column(db.String(16), comment='缺陷')
+    bug_name = db.Column(db.String(16), comment='缺陷')
     desc = db.Column(db.String(256), comment='描述')
     create_time = db.Column(db.DateTime, default=datetime.now(), comment='创建时间')
     status = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='状态')

@@ -24,6 +24,9 @@
                                         $('#my_asset_btn').addClass('active');
                                         $('#iframe')[0].src='{{ url_for('account.assets') }}'
                                         ">我的资产</button>
+                        {% if current_user.role == 'monitor'%}
+                            <br>
+                        {% endif %}
                         {% if current_user.monitor_permission.manage_lab_student_profile %}
                             <button id="student_btn" type="button" class="list-group-item-light list-group-item list-group-item-action" onclick="
                                     remove_class();

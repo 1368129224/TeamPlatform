@@ -11,4 +11,5 @@ bp = Blueprint('home', __name__)
 def index():
     lab_task = current_user.lab_task
     lab_activity = LabActivity.query.all()
-    return render_template('home/index.html', lab_task=lab_task, lab_activity=lab_activity)
+    projects = current_user.belong_team.projects
+    return render_template('home/index.html', lab_task=lab_task, lab_activity=lab_activity, projects=projects)
