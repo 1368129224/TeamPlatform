@@ -122,7 +122,7 @@ def create_backlog(project_id):
             desc=form.desc.data,
             priority=form.priority.data,
         )
-        new_backlog.executor = form.executor.data
+        form.executor.data.project_backlog.append(new_backlog)
         db.session.add(new_backlog)
         db.session.commit()
         return redirect(url_for('team.project_detail', project_id=project_id))

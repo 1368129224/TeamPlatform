@@ -18,10 +18,10 @@ class User(UserMixin, db.Model):
 
     belong_team_id = db.Column(db.Integer, db.ForeignKey('Team.id'))
     manage_team_id = db.Column(db.Integer, db.ForeignKey('Team.id'))
-    backlog_note_id = db.Column(db.Integer, db.ForeignKey('BacklogNote.id'))
-    bug_note_id = db.Column(db.Integer, db.ForeignKey('BugNote.id'))
-    backlog_id = db.Column(db.Integer, db.ForeignKey('Backlog.id'))
-    bug_id = db.Column(db.Integer, db.ForeignKey('Bug.id'))
+    # backlog_note_id = db.Column(db.Integer, db.ForeignKey('BacklogNote.id'))
+    # bug_note_id = db.Column(db.Integer, db.ForeignKey('BugNote.id'))
+    # backlog_id = db.Column(db.Integer, db.ForeignKey('Backlog.id'))
+    # bug_id = db.Column(db.Integer, db.ForeignKey('Bug.id'))
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -83,14 +83,48 @@ class TeamActivity(db.Model):
     def __repr__(self):
         return '<TeamActivity {}>'.format(self.id)
 
+# 需求表
+class Backlog(db.Model):
+    __tablename__ = 'Backlog'
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('Project.id'))
+    uid = db.Column(db.Integer, db.ForeignKey('User.id'))
+    backlog_name = db.Column(db.String(16), comment='需求')
+    desc = db.Column(db.String(256), comment='描述')
+    create_time = db.Column(db.DateTime, default=datetime.now(),comment='创建时间')
+    status = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='状态')
+    priority = db.Column(db.Enum('0', '1', '2', '3'), server_default='1', nullable=False, comment='优先级')
+    executor = relationship('User', backref='project_backlog', foreign_keys=[uid])
+
+    def __repr__(self):
+        return '<Backlog {}>'.format(self.id)
+
+# 缺陷表
+class Bug(db.Model):
+    __tablename__ = 'Bug'
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    project_id = db.Column(db.Integer, db.ForeignKey('Project.id'))
+    uid = db.Column(db.Integer, db.ForeignKey('User.id'))
+    bug_name = db.Column(db.String(16), comment='缺陷')
+    desc = db.Column(db.String(256), comment='描述')
+    create_time = db.Column(db.DateTime, default=datetime.now(), comment='创建时间')
+    status = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='状态')
+    priority = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='优先级')
+    executor = relationship('User', backref='project_bug', foreign_keys=[uid])
+
+    def __repr__(self):
+        return '<Bug {}>'.format(self.id)
+
 # 需求记录表
 class BacklogNote(db.Model):
     __tablename__ = 'BacklogNote'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='记录ID')
+    uid = db.Column(db.Integer, db.ForeignKey('User.id'))
     backlog_id = db.Column(db.Integer, db.ForeignKey('Backlog.id'))
     content = db.Column(db.String(256), unique=False, comment='记录内容')
     create_datetime = db.Column(db.DateTime, default=datetime.now(), comment='创建时间')
-    writer = relationship('User', backref='backlog_notes', foreign_keys=[User.backlog_note_id])
+    backlog = relationship('Backlog', backref='notes', foreign_keys=[backlog_id])
+    writer = relationship('User', backref='backlog_notes', foreign_keys=[uid])
 
     def __repr__(self):
         return '<Note {}>'.format(self.id)
@@ -99,45 +133,15 @@ class BacklogNote(db.Model):
 class BugNote(db.Model):
     __tablename__ = 'BugNote'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='记录ID')
+    uid = db.Column(db.Integer, db.ForeignKey('User.id'))
     bug_id = db.Column(db.Integer, db.ForeignKey('Bug.id'))
     content = db.Column(db.String(256), unique=False, comment='记录内容')
     create_datetime = db.Column(db.DateTime, default=datetime.now(), comment='创建时间')
-    writer = relationship('User', backref='bug_notes', foreign_keys=[User.bug_note_id])
+    bug = relationship('Bug', backref='notes', foreign_keys=[bug_id])
+    writer = relationship('User', backref='bug_notes', foreign_keys=[uid])
 
     def __repr__(self):
         return '<Note {}>'.format(self.id)
-
-# 需求表
-class Backlog(db.Model):
-    __tablename__ = 'Backlog'
-    id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey('Project.id'))
-    backlog_name = db.Column(db.String(16), comment='需求')
-    desc = db.Column(db.String(256), comment='描述')
-    create_time = db.Column(db.DateTime, default=datetime.now(),comment='创建时间')
-    status = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='状态')
-    priority = db.Column(db.Enum('0', '1', '2', '3'), server_default='1', nullable=False, comment='优先级')
-    executor = relationship('User', backref='project_backlog', uselist=False, foreign_keys=[User.backlog_id])
-    notes = relationship('BacklogNote', backref='belong_item', foreign_keys=[BacklogNote.backlog_id])
-
-    def __repr__(self):
-        return '<Backlog {}>'.format(self.id)
-
-# 缺陷表
-class Bug(db.Model):
-    __tablename__ = 'Bug'
-    id = db.Column(db.Integer, primary_key=True)
-    project_id = db.Column(db.Integer, db.ForeignKey('Project.id'))
-    bug_name = db.Column(db.String(16), comment='缺陷')
-    desc = db.Column(db.String(256), comment='描述')
-    create_time = db.Column(db.DateTime, default=datetime.now(), comment='创建时间')
-    status = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='状态')
-    priority = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='优先级')
-    executor = relationship('User', backref='project_bug', uselist=False, foreign_keys=[User.bug_id])
-    notes = relationship('BugNote', backref='belong_item', foreign_keys=[BugNote.bug_id])
-
-    def __repr__(self):
-        return '<Bug {}>'.format(self.id)
 
 # 项目表
 class Project(db.Model):
