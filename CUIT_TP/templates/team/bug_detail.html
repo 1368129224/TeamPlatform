@@ -1,0 +1,15 @@
+{% extends 'iframe_base.html' %}
+
+{% block content %}
+    <div class="container" style="padding-top: 20px;padding-bottom: 20px;">
+        <h1>{{ bug.bug_name }}</h1>
+        <br>
+        <p>详细信息： {{ bug.desc }}</p>
+        <br>
+        <p>创建时间： {{ bug.create_time }}</p>
+        <p>优先级： {{ bug.priority }}</p>
+        <p>状态： {{ bug.status }}</p>
+        <p>执行人： {{ bug.executor.username }}</p>
+        <button class="btn btn-light" onclick=window.location.href="{{ url_for('team.change_bug', bug_id=bug.id) }}">修改</button>
+    </div>
+{% endblock %}

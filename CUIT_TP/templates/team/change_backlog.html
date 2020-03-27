@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container" style="padding-top: 20px;padding-bottom: 20px;">
-        <h1>新建需求</h1>
+        <h1>修改需求</h1>
         <br>
         <form method="post" action="">
             {{ form.hidden_tag() }}
@@ -23,6 +23,12 @@
                     <span class="input-group-text justify-content-center" style="width: 74px;">优先级</span>
                 </div>
                 {{ form.priority(class="form-control") }}
+            </div>
+            <div class="input-group mb-3" style="width: 30%;">
+                <div class="input-group-prepend">
+                    <span class="input-group-text justify-content-center" style="width: 74px;">状态</span>
+                </div>
+                {{ form.status(class="form-control") }}
             </div>
             <div class="input-group mb-3" style="width: 30%;">
                 <div class="input-group-prepend">

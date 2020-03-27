@@ -8,18 +8,24 @@
             <div class="col-6">
                 <table class="table">
                     <thead>
-                    <tr>
+                    <tr style="text-align: center">
                         <th scope="col">需求</th>
                         <th scope="col">状态</th>
                         <th scope="col">优先级</th>
+                        <th scope="col">操作</th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for backlog in project.backlogs %}
-                        <tr>
-                            <td><a href="#">{{ backlog.backlog_name }}</a></td>
-                            <td>{{ backlog.status }}</td>
-                            <td>{{ backlog.priority }}</td>
+                        <tr style="text-align: center">
+                            <td style="vertical-align: middle;"><a href="{{ url_for('team.backlog_detail', backlog_id=backlog.id) }}">{{ backlog.backlog_name }}</a></td>
+                            <td style="vertical-align: middle;">{{ backlog.status }}</td>
+                            <td style="vertical-align: middle;">{{ backlog.priority }}</td>
+                            <td>
+                                <button class="btn btn-light" onclick="window.location.href='{{ url_for("team.change_backlog", backlog_id=backlog.id) }}'">修改</button>
+                                &nbsp
+                                <button class="btn btn-light">删除</button>
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -29,23 +35,29 @@
             <div class="col-6">
                 <table class="table">
                     <thead>
-                    <tr>
+                    <tr style="text-align: center">
                         <th scope="col">缺陷</th>
                         <th scope="col">状态</th>
                         <th scope="col">优先级</th>
+                        <th scope="col">操作</th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for bug in project.bugs %}
                         <tr>
-                            <td><a href="#">{{ bug.backlog_name }}</a></td>
-                            <td>{{ bug.status }}</td>
-                            <td>{{ bug.prority }}</td>
+                            <td style="vertical-align: middle;"><a href="#">{{ bug.bug_name }}</a></td>
+                            <td style="vertical-align: middle;">{{ bug.status }}</td>
+                            <td style="vertical-align: middle;">{{ bug.priority }}</td>
+                            <td>
+                                <button class="btn btn-light" onclick="window.location.href='{{ url_for("team.change_bug", bug_id=bug.id) }}'">修改</button>
+                                &nbsp
+                                <button class="btn btn-light">删除</button>
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
                 </table>
-                <button class="btn btn-light float-right">新增缺陷</button>
+                <button class="btn btn-light float-right" onclick="window.location.href='{{ url_for("team.create_bug", project_id=project.id) }}'">新增缺陷</button>
             </div>
         </div>
     </div>

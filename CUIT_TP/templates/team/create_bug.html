@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container" style="padding-top: 20px;padding-bottom: 20px;">
-        <h1>新建需求</h1>
+        <h1>新建缺陷</h1>
         <br>
         <form method="post" action="">
             {{ form.hidden_tag() }}
@@ -10,7 +10,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text justify-content-center" style="width: 74px;">需求</span>
                 </div>
-                {{ form.backlog_name(class="form-control") }}
+                {{ form.bug_name(class="form-control") }}
             </div>
             <div class="input-group mb-3" style="width: 50%;height: 200px;">
                 <div class="input-group-prepend">
@@ -34,5 +34,4 @@
             <input class="btn btn-light" type="submit" value="保存">
         </form>
     </div>
-
 {% endblock %}

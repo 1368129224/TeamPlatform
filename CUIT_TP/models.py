@@ -109,7 +109,7 @@ class Bug(db.Model):
     desc = db.Column(db.String(256), comment='描述')
     create_time = db.Column(db.DateTime, default=datetime.now(), comment='创建时间')
     status = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='状态')
-    priority = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='优先级')
+    priority = db.Column(db.Enum('0', '1', '2', '3'), server_default='1', nullable=False, comment='优先级')
     executor = relationship('User', backref='project_bug', foreign_keys=[uid])
 
     def __repr__(self):

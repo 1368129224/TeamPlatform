@@ -59,7 +59,7 @@
                     <div class="card-header"><p class="card-text"><a href="{{ url_for('team.project_detail', project_id=project.id) }}">{{ project.project_name }}</a></p></div>
                     <div class="card-body"><p class="card-text">{{ project.desc }}</p></div>
                     <div class="card-footer">
-                        <p class="card-text align-items-center" style="display: inline-block;">{{ project.end_time }}</p>
+                        <p class="card-text" style="display: inline-block;margin-bottom: 0;">{{ project.end_time }}</p>
                         <button class="btn btn-secondary float-right" onclick="window.location.href='{{ url_for('team.change_project', project_id=project.id) }}'">修改信息</button>
                     </div>
                 </div>

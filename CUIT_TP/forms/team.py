@@ -26,7 +26,7 @@ class CreateProjectForm(FlaskForm):
 class ChangeProjectForm(CreateProjectForm):
     pass
 
-def get_CreateBacklog(team_id):
+def get_CreateBacklogForm(team_id):
     class CreateBacklogForm(FlaskForm):
         backlog_name = StringField('需求', validators=(Length(max=16), DataRequired()))
         desc = TextAreaField('详细信息', validators=[DataRequired(), Length(max=256)], render_kw={
@@ -38,3 +38,44 @@ def get_CreateBacklog(team_id):
                 'class': 'custom-select'
             })
     return CreateBacklogForm
+
+def get_ChangeBacklogForm(team_id):
+    class ChangeBacklogForm(FlaskForm):
+        backlog_name = StringField('需求', validators=(Length(max=16), DataRequired()))
+        desc = TextAreaField('详细信息', validators=[DataRequired(), Length(max=256)], render_kw={
+            'style': "resize:none;"
+        })
+        priority = SelectField('优先级', choices=(('0', '低'), ('1', '普通'), ('2', '高'), ('3', '紧急')))
+        status = SelectField('状态', choices=(('0', '待处理'), ('1', '开发中'), ('2', '测试中'), ('3', '已处理')))
+        executor = QuerySelectField('执行人', validators=[DataRequired()], query_factory=lambda :User.query.filter(User.belong_team_id==team_id),
+                                    get_label='username', render_kw={
+                'class': 'custom-select'
+            })
+    return ChangeBacklogForm
+
+def get_CreateBugForm(team_id):
+    class CreateBugForm(FlaskForm):
+        bug_name = StringField('缺陷', validators=(Length(max=16), DataRequired()))
+        desc = TextAreaField('详细信息', validators=[DataRequired(), Length(max=256)], render_kw={
+            'style': "resize:none;"
+        })
+        priority = SelectField('优先级', choices=(('0', '低'), ('1', '普通'), ('2', '高'), ('3', '紧急')))
+        executor = QuerySelectField('执行人', validators=[DataRequired()], query_factory=lambda :User.query.filter(User.belong_team_id==team_id),
+                                    get_label='username', render_kw={
+                'class': 'custom-select'
+            })
+    return CreateBugForm
+
+def get_ChangeBugForm(team_id):
+    class ChangeBugForm(FlaskForm):
+        bug_name = StringField('缺陷', validators=(Length(max=16), DataRequired()))
+        desc = TextAreaField('详细信息', validators=[DataRequired(), Length(max=256)], render_kw={
+            'style': "resize:none;"
+        })
+        priority = SelectField('优先级', choices=(('0', '低'), ('1', '普通'), ('2', '高'), ('3', '紧急')))
+        status = SelectField('状态', choices=(('0', '待处理'), ('1', '修复中'), ('2', '测试中'), ('3', '已修复')))
+        executor = QuerySelectField('执行人', validators=[DataRequired()], query_factory=lambda :User.query.filter(User.belong_team_id==team_id),
+                                    get_label='username', render_kw={
+                'class': 'custom-select'
+            })
+    return ChangeBugForm
