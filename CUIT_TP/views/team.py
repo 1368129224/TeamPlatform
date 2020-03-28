@@ -22,12 +22,8 @@ def home(team_id):
     team = Team.query.filter(Team.id==team_id).first_or_404()
     teammates = team.teammates
     projects = Project.query.filter(Project.belong_team==team).all()
-    if current_user.manage_team == team or current_user.role == 'admin':
-        normal_user = False
-    else:
-        normal_user = True
+    return render_template('team/home.html', team=team, teammates=teammates, projects=projects)
 
-    return render_template('team/home.html', team=team, teammates=teammates, normal_user=normal_user, projects=projects)
 
 # 删除成员
 @bp.route('/delete_teammate/<int:team_id>/<int:stu_num>')
@@ -125,130 +121,144 @@ def change_project(project_id):
 @bp.route('/create_backlog/<int:project_id>', methods=('POST', 'GET'))
 @login_required
 def create_backlog(project_id):
-    # TODO 权限
-    CreateBacklogForm = get_CreateBacklogForm(current_user.belong_team_id)
-    form = CreateBacklogForm()
-    if form.validate_on_submit():
-        new_backlog = Backlog(
-            project_id=project_id,
-            backlog_name=form.backlog_name.data,
-            desc=form.desc.data,
-            priority=form.priority.data,
-        )
-        form.executor.data.project_backlog.append(new_backlog)
-        db.session.add(new_backlog)
-        db.session.commit()
-        return redirect(url_for('team.project_detail', project_id=project_id))
-    return render_template('team/create_backlog.html', form=form)
+    project = Project.query.filter(Project.id==project_id).first_or_404()
+    if current_user.belong_team_id == project.belong_team_id or current_user.role == 'admin':
+        CreateBacklogForm = get_CreateBacklogForm(current_user.belong_team_id)
+        form = CreateBacklogForm()
+        if form.validate_on_submit():
+            new_backlog = Backlog(
+                project_id=project_id,
+                backlog_name=form.backlog_name.data,
+                desc=form.desc.data,
+                priority=form.priority.data,
+            )
+            form.executor.data.project_backlog.append(new_backlog)
+            db.session.add(new_backlog)
+            db.session.commit()
+            return redirect(url_for('team.project_detail', project_id=project_id))
+        return render_template('team/create_backlog.html', form=form)
+    else:
+        abort(403)
 
 # 需求详情
 @bp.route('/backlog_detail/<int:backlog_id>')
 @login_required
 def backlog_detail(backlog_id):
-    # TODO 权限
     backlog = Backlog.query.filter(Backlog.id==backlog_id).first_or_404()
-    return render_template('team/backlog_detail.html', backlog=backlog)
+    if current_user.belong_team_id == backlog.belong_project.belong_team_id or current_user.role == 'admin':
+        return render_template('team/backlog_detail.html', backlog=backlog)
+    else:
+        abort(403)
 
 # 修改需求
 @bp.route('/change_backlog/<int:backlog_id>', methods=('POST', 'GET'))
 @login_required
 def change_backlog(backlog_id):
-    # TODO 权限
     backlog = Backlog.query.filter(Backlog.id==backlog_id).first_or_404()
-    if request.method == 'POST':
-        ChangeBacklogForm = get_ChangeBacklogForm(current_user.belong_team_id)
-        form = ChangeBacklogForm()
-        if form.validate_on_submit():
-            backlog.backlog_name = form.backlog_name.data
-            backlog.desc = form.desc.data
-            backlog.priority = form.priority.data
-            backlog.status = form.status.data
-            if backlog.executor != form.executor.data:
-                backlog.executor.project_backlog.remove(backlog)
-                form.executor.data.project_backlog.append(backlog)
-            db.session.commit()
-            return redirect(url_for('team.backlog_detail', backlog_id=backlog_id))
+    if current_user.belong_team_id == backlog.belong_project.belong_team_id or current_user.role == 'admin':
+        if request.method == 'POST':
+            ChangeBacklogForm = get_ChangeBacklogForm(current_user.belong_team_id)
+            form = ChangeBacklogForm()
+            if form.validate_on_submit():
+                backlog.backlog_name = form.backlog_name.data
+                backlog.desc = form.desc.data
+                backlog.priority = form.priority.data
+                backlog.status = form.status.data
+                if backlog.executor != form.executor.data:
+                    backlog.executor.project_backlog.remove(backlog)
+                    form.executor.data.project_backlog.append(backlog)
+                db.session.commit()
+                return redirect(url_for('team.backlog_detail', backlog_id=backlog_id))
+            else:
+                ChangeBacklogForm = get_ChangeBacklogForm(current_user.belong_team_id)
+                form = ChangeBacklogForm(
+                    backlog_name=backlog.backlog_name,
+                    desc=backlog.desc,
+                    priority=backlog.priority,
+                    executor=backlog.executor
+                )
+                return render_template('team/change_backlog.html', form=form)
         else:
             ChangeBacklogForm = get_ChangeBacklogForm(current_user.belong_team_id)
             form = ChangeBacklogForm(
-                backlog_name=backlog.backlog_name,
-                desc=backlog.desc,
-                priority=backlog.priority,
-                executor=backlog.executor
+                backlog_name = backlog.backlog_name,
+                desc = backlog.desc,
+                priority = backlog.priority,
+                executor = backlog.executor
             )
             return render_template('team/change_backlog.html', form=form)
     else:
-        ChangeBacklogForm = get_ChangeBacklogForm(current_user.belong_team_id)
-        form = ChangeBacklogForm(
-            backlog_name = backlog.backlog_name,
-            desc = backlog.desc,
-            priority = backlog.priority,
-            executor = backlog.executor
-        )
-        return render_template('team/change_backlog.html', form=form)
+        abort(403)
 
 # 新增缺陷
 @bp.route('/create_bug/<int:project_id>', methods=('POST', 'GET'))
 @login_required
 def create_bug(project_id):
-    # TODO 权限
-    CreateBugForm = get_CreateBugForm(current_user.belong_team_id)
-    form = CreateBugForm()
-    if form.validate_on_submit():
-        new_bug = Bug(
-            project_id=project_id,
-            bug_name=form.bug_name.data,
-            desc=form.desc.data,
-            priority=form.priority.data,
-        )
-        form.executor.data.project_bug.append(new_bug)
-        db.session.add(new_bug)
-        db.session.commit()
-        return redirect(url_for('team.project_detail', project_id=project_id))
-    return render_template('team/create_bug.html', form=form)
+    project = Project.query.filter(Project.id == project_id).first_or_404()
+    if current_user.belong_team_id == project.belong_team_id or current_user.role == 'admin':
+        CreateBugForm = get_CreateBugForm(current_user.belong_team_id)
+        form = CreateBugForm()
+        if form.validate_on_submit():
+            new_bug = Bug(
+                project_id=project_id,
+                bug_name=form.bug_name.data,
+                desc=form.desc.data,
+                priority=form.priority.data,
+            )
+            form.executor.data.project_bug.append(new_bug)
+            db.session.add(new_bug)
+            db.session.commit()
+            return redirect(url_for('team.project_detail', project_id=project_id))
+        return render_template('team/create_bug.html', form=form)
+    else:
+        abort(403)
 
 # 缺陷详情
 @bp.route('/bug_detail/<int:bug_id>')
 @login_required
 def bug_detail(bug_id):
-    # TODO 权限
     bug = Bug.query.filter(Bug.id==bug_id).first_or_404()
-    return render_template('team/bug_detail.html', bug=bug)
+    if current_user.belong_team_id == bug.belong_project.belong_team_id or current_user.role == 'admin':
+        return render_template('team/bug_detail.html', bug=bug)
+    else:
+        abort(403)
 
 # 修改缺陷
 @bp.route('/change_bug/<int:bug_id>', methods=('POST', 'GET'))
 @login_required
 def change_bug(bug_id):
-    # TODO 权限
     bug = Bug.query.filter(Bug.id==bug_id).first_or_404()
-    if request.method == 'POST':
-        ChangeBugForm = get_ChangeBugForm(current_user.belong_team_id)
-        form = ChangeBugForm()
-        if form.validate_on_submit():
-            bug.bug_name = form.bug_name.data
-            bug.desc = form.desc.data
-            bug.priority = form.priority.data
-            bug.status = form.status.data
-            if bug.executor != form.executor.data:
-                bug.executor.project_bug.remove(bug)
-                form.executor.data.project_bug.append(bug)
-            db.session.commit()
-            return redirect(url_for('team.bug_detail', bug_id=bug_id))
+    if current_user.belong_team_id == bug.belong_project.belong_team_id or current_user.role == 'admin':
+        if request.method == 'POST':
+            ChangeBugForm = get_ChangeBugForm(current_user.belong_team_id)
+            form = ChangeBugForm()
+            if form.validate_on_submit():
+                bug.bug_name = form.bug_name.data
+                bug.desc = form.desc.data
+                bug.priority = form.priority.data
+                bug.status = form.status.data
+                if bug.executor != form.executor.data:
+                    bug.executor.project_bug.remove(bug)
+                    form.executor.data.project_bug.append(bug)
+                db.session.commit()
+                return redirect(url_for('team.bug_detail', bug_id=bug_id))
+            else:
+                ChangeBugForm = get_ChangeBugForm(current_user.belong_team_id)
+                form = ChangeBugForm(
+                    bug_name=bug.bug_name,
+                    desc=bug.desc,
+                    priority=bug.priority,
+                    executor=bug.executor
+                )
+                return render_template('team/change_bug.html', form=form)
         else:
             ChangeBugForm = get_ChangeBugForm(current_user.belong_team_id)
             form = ChangeBugForm(
-                bug_name=bug.bug_name,
-                desc=bug.desc,
-                priority=bug.priority,
-                executor=bug.executor
+                bug_name = bug.bug_name,
+                desc = bug.desc,
+                priority = bug.priority,
+                executor = bug.executor
             )
             return render_template('team/change_bug.html', form=form)
     else:
-        ChangeBugForm = get_ChangeBugForm(current_user.belong_team_id)
-        form = ChangeBugForm(
-            bug_name = bug.bug_name,
-            desc = bug.desc,
-            priority = bug.priority,
-            executor = bug.executor
-        )
-        return render_template('team/change_bug.html', form=form)
+        abort(403)

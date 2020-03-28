@@ -28,12 +28,19 @@
 
         </div>
         <div class="col-2">
-            {% for project in projects %}
-            <div class="card">
-                <div class="card-header">{{project.project_name}}</div>
-                <div class="card-body">{{project.desc}}</div>
-            </div>
-            {% endfor %}
+
+            <ul class="list-group" style="margin-bottom: 20px;">
+                {% if not current_user.belong_team %}
+                    <li class="list-group-item list-group-item-secondary">未加入小组</li>
+                {% elif not projects %}
+                    <li class="list-group-item list-group-item-secondary">暂无项目</li>
+                {% else %}
+                    <li class="list-group-item list-group-item-secondary">小组项目</li>
+                    {% for project in projects %}
+                        <li class="list-group-item"><a style="color: #212529" href="#">{{project.project_name}}</a></li>
+                    {% endfor %}
+                {% endif %}
+            </ul>
         </div>
     </div>
 {% endblock %}

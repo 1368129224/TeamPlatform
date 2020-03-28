@@ -60,7 +60,9 @@
                     <div class="card-body"><p class="card-text">{{ project.desc }}</p></div>
                     <div class="card-footer">
                         <p class="card-text" style="display: inline-block;margin-bottom: 0;">{{ project.end_time }}</p>
+                        {% if current_user == team.leader %}
                         <button class="btn btn-secondary float-right" onclick="window.location.href='{{ url_for('team.change_project', project_id=project.id) }}'">修改信息</button>
+                        {% endif %}
                     </div>
                 </div>
             {% endfor %}

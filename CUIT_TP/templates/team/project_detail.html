@@ -44,8 +44,8 @@
                     </thead>
                     <tbody>
                     {% for bug in project.bugs %}
-                        <tr>
-                            <td style="vertical-align: middle;"><a href="#">{{ bug.bug_name }}</a></td>
+                        <tr style="text-align: center">
+                            <td style="vertical-align: middle;"><a href="{{ url_for('team.bug_detail', bug_id=bug.id) }}">{{ bug.bug_name }}</a></td>
                             <td style="vertical-align: middle;">{{ bug.status }}</td>
                             <td style="vertical-align: middle;">{{ bug.priority }}</td>
                             <td>
