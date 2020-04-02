@@ -1,31 +1,45 @@
-{% extends 'base.html' %}
-
-{% block title %}
-    登录 {{ config.LAB_NAME }}
-{% endblock %}
-
-{% block content %}
-    <div class="row">
-        <div class="col-4 offset-4" style="text-align: center">
-            <h1>登录</h1>
-            <br>
-            <form method="post" action="" style="width: 50%" class="m-auto">
-                {{ form.csrf_token }}
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">学号或邮箱</span>
+<!DOCTYPE html>
+<html lang="en" style="height: 100%">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>登录 {{ config.LAB_NAME }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+</head>
+<body style="height: 100%">
+<div class="row m-auto justify-content-center" style="width: 100%;height: 100%;margin: 0;">
+    <div class="col-4" style="text-align: center;margin-top: 10%;">
+        <div class="card">
+            <div class="card-body">
+                <h1>欢迎使用CUIT-TP!</h1>
+                <br>
+                <form method="post" action="" style="width: 50%" class="m-auto">
+                    {{ form.csrf_token }}
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">学号或邮箱</span>
+                        </div>
+                        {{ form.stu_num_or_email }}
                     </div>
-                    {{ form.stu_num_or_email }}
-                </div>
-                <div class="input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text" style="width: 106px;text-align: center;display:block;">密码</span>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"
+                                  style="width: 106px;text-align: center;display:block;">密码</span>
+                        </div>
+                        {{ form.password }}
                     </div>
-                    {{ form.password }}
-                </div>
-                    <div style="display: inline-block;margin-right: 160px">记住登录&nbsp{{ form.remember_me() }}</div><input type="submit" class="btn btn-light" value="登录">
-                    <p style="margin-top: 30px;font-size: 0.9rem"><a style="margin-right: 160px" href="{{ url_for('account.forget_password') }}">忘记密码?</a><a href="{{ url_for('account.register') }}">没有账号?</a></p>
-            </form>
+                    <p style="margin-top: 10px;font-size: 0.9rem"><a style="margin-right: 140px"
+                                                                     href="{{ url_for('account.forget_password') }}">忘记密码?</a><a
+                            href="{{ url_for('account.register') }}">没有账号?</a></p>
+                    <div>记住登录&nbsp{{ form.remember_me }}</div>
+                    <input type="submit" class="btn btn-light" style="margin-top: 10px" value="登录">
+
+                </form>
+            </div>
         </div>
     </div>
-{% endblock %}
+</div>
+
+<script src="{{ url_for('static', filename='js/jquery-3.4.1.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script>
+</body>

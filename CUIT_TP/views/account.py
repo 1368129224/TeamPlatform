@@ -84,7 +84,7 @@ def login():
             # 登录成功
             login_user(user, remember=form.remember_me.data)
             # TODO next安全检查
-            return redirect(request.args.get('next') or url_for('home.index'))
+            return redirect(request.args.get('next') or url_for('account.manage'))
         else:
             # 登录失败
             flash('登录失败。')
@@ -172,11 +172,22 @@ def reset_password(token):
 @login_required
 def manage():
     if current_user.role == 'admin':
-        return render_template('account/admin_manage.html')
+        return render_template('account/manage/admin_manage.html')
     elif current_user.role == 'monitor':
-        return render_template('account/monitor_manage.html')
+        return render_template('account/manage/monitor_manage.html')
     else:
-        return render_template('account/manage.html')
+        return render_template('account/manage/manage.html')
+
+# Dashboard
+@bp.route('/dashboard/')
+@login_required
+def dashboard():
+    if current_user.role == 'admin':
+        return render_template('account/dashboard/admin_dashboard.html')
+    elif current_user.role == 'monitor':
+        return render_template('account/dashboard/monitor_dashboard.html')
+    else:
+        return render_template('account/dashboard/dashboard.html')
 
 # 个人信息
 @bp.route('/profile/<int:stu_num>/')
