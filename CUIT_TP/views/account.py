@@ -70,10 +70,8 @@ def register():
 # 登录
 @bp.route('/login/', methods=('GET', 'POST'))
 def login():
-    if not User.query.filter(User.role=='admin').first():
-        return redirect(url_for('account.register_admin'))
     if current_user.is_authenticated:
-        return redirect(url_for('home.index'))
+        return redirect(url_for('account.manage'))
     form = LoginForm()
     if form.validate_on_submit():
         # 使用学号或邮箱登录

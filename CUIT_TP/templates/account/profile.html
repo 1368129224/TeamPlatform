@@ -1,39 +1,97 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title></title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
-</head>
-<body>
+{% extends 'iframe_base.html' %}
 
-<div class="container" style="padding-top: 20px;padding-bottom: 20px;">
+{% block css %}
+    <style>
+        i {
+            margin-right: 10px;
+        }
+    </style>
+{% endblock %}
 
-    <h1>{{ user.username }}</h1>
-    <br>
-    <p>邮箱： {{ user.email }}</p>
-    <p>电话： {{ '未设置' if user.profile.phone == '00000000000' else user.profile.phone }}</p>
-    <p>QQ： {{ '未设置' if not user.profile.QQ else user.profile.QQ }}</p>
-    <p>微信： {{ '未设置' if not user.profile.wechat else user.profile.wechat }}</p>
-    {% if user.role != 'admin' %}
-        <p>座位号: {{ '未设置' if user.profile.set_num == 0 else user.profile.set_num }}</p>
-        <p>学号： {{ '未设置' if user.stu_num == '0000000000' else user.stu_num }}</p>
-        <p>专业： {{ '未设置' if not user.profile.college else user.profile.college}}</p>
-        <p>年级： {{ '未设置' if user.profile.grade == '0' else user.profile.grade }}</p>
-        <p>班级： {{ '未设置' if not user.profile._class else user.profile._class }}</p>
-    {% endif %}
-    <br>
-    {% if current_user.stu_num == user.stu_num or current_user.role == 'admin' or current_user.role == 'monitor'%}
-        <div class="btn-group">
-            <button type="button" class="btn btn-light" onclick=window.location.href='{{ url_for("account.change_profile", stu_num=user.stu_num) }}'>修改信息</button>
-            <button type="button" class="btn btn-light" onclick=window.location.href='{{ url_for("account.change_password", stu_num=user.stu_num) }}'>修改密码</button>
+{% block content %}
+    <div class="container" style="height: 100%">
+        <div class="row" style="height: 100%;align-items:center;">
+            <div class="col-md-4 offset-4">
+                <aside class="profile-nav alt">
+                    <section class="card">
+                        <div class="card-header user-header alt bg-dark">
+                            <div class="media">
+                                <div class="media-body">
+                                    <h2 class="text-light display-6">{{ user.username }}</h2>
+                                    {% if user.role == 'admin' %}
+                                        <p>管理员</p>
+                                    {% elif user.role == 'monitor' %}
+                                        <p>班长</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item" style="color: #878787;">
+                                <p style="margin: 0;"><i class="fa fa-envelope"></i>{{ user.email }}</p>
+                            </li>
+                            <li class="list-group-item" style="color: #878787;">
+                                <p style="margin: 0;"><i
+                                        class="fa fa-phone-square"></i>{{ '未设置' if user.profile.phone == '0' else user.profile.phone }}
+                                </p>
+                            </li>
+                            <li class="list-group-item" style="color: #878787;">
+                                <p style="margin: 0;"><i
+                                        class="fa fa-qq"></i>{{ '未设置' if not user.profile.QQ else user.profile.QQ }}</p>
+                            </li>
+                            <li class="list-group-item"
+                                style="color: #878787;border-bottom: 2px solid #878787 !important;">
+                                <p style="margin: 0;"><i
+                                        class="fa fa-wechat"></i>{{ '未设置' if not user.profile.wechat else user.profile.wechat }}
+                                </p>
+                            </li>
+                            {% if user.role != 'admin' %}
+                                <li class="list-group-item" style="color: #878787;">
+                                    <p style="margin: 0;">
+                                        座位：{{ '未设置' if user.profile.set_num == 0 else user.profile.set_num }}
+                                    </p>
+                                </li>
+                                <li class="list-group-item" style="color: #878787;">
+                                    <p style="margin: 0;">
+                                        学号：{{ '未设置' if user.stu_num == '0000000000' else user.stu_num }}
+                                    </p>
+                                </li>
+                                <li class="list-group-item" style="color: #878787;">
+                                    <p style="margin: 0;">
+                                        专业：{{ '未设置' if not user.profile.college else user.profile.college }}
+                                    </p>
+                                </li>
+                                <li class="list-group-item" style="color: #878787;">
+                                    <p style="margin: 0;">
+                                        年级：{{ '未设置' if user.profile.grade == '0' else user.profile.grade }}
+                                    </p>
+                                </li>
+                                <li class="list-group-item" style="color: #878787;">
+                                    <p style="margin: 0;">
+                                        班级：{{ '未设置' if not user.profile._class else user.profile._class }}
+                                    </p>
+                                </li>
+                            {% endif %}
+                            {% if current_user.stu_num == user.stu_num or current_user.role == 'admin' or (current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_student_profile) %}
+                                <li class="list-group-item">
+                                    <div class="btn-group" style="width: -webkit-fill-available;">
+                                        <button type="button" class="btn btn-light"
+                                                onclick=window.location.href='{{ url_for("account.change_profile", stu_num=user.stu_num) }}'>
+                                            修改信息
+                                        </button>
+                                        <button type="button" class="btn btn-light ml-auto"
+                                                onclick=window.location.href='{{ url_for("account.change_password", stu_num=user.stu_num) }}'>
+                                            修改密码
+                                        </button>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </section>
+                </aside>
+            </div>
         </div>
-    {% endif %}
-</div>
-
-<script src="{{ url_for('static', filename='js/jquery-3.4.1.js') }}"></script>
-<script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}" ></script>
-</body>
-
+    </div>
+{% endblock %}
 

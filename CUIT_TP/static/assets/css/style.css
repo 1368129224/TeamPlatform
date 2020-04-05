@@ -14,11 +14,11 @@
 
 
 Googel Fonts  */
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700");
+@import url("google-fonts.css");
 /* Googel Fonts End  
 
 */
-@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700");
+@import url("google-fonts.css");
 .bg-flat-color-1 {
   background: #00c292; }
 
@@ -910,6 +910,16 @@ header.fixed-top {
   background: #fff;
   padding: 20px; }
 
+.refresh {
+  background-color: transparent;
+  color: #99abb4 !important;
+  cursor: pointer;
+  font-size: 1em;
+  height: 40px;
+  line-height: 40px;
+  width: 40px;
+  display: block;
+  text-align: right; }
 .menutoggle {
   background-color: transparent;
   color: #99abb4 !important;

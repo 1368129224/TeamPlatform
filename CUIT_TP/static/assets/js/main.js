@@ -46,8 +46,10 @@ jQuery(document).ready(function($) {
 		});
 	});
 
-
-	 
+	// Iframe Refresh
+	$('#refresh').on('click', function () {
+		$('#iframe').attr('src', $('#iframe').attr('src'));
+	});
 	 
 	// Menu Trigger
 	$('#menuToggle').on('click', function(event) {

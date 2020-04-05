@@ -6,11 +6,13 @@
 
 {% block left_panel %}
     <ul class="nav navbar-nav" id="left_panel">
-        <li class="active"><a href="#" onclick="remove_class(this);"><i class="menu-icon fa fa-laptop"></i>Dashboard</a></li>
+        <li class="active"><a href="#" onclick="remove_class(this, '{{ url_for('account.dashboard') }}');"><i class="menu-icon fa fa-tachometer"></i>Dashboard</a></li>
         <li class="menu-title">个人信息</li>
-        <li><a href="#" onclick="remove_class(this);"><i class="menu-icon ti-email"></i>我的资料</a></li>
-        <li><a href="#" onclick="remove_class(this);"><i class="menu-icon ti-email"></i>我的小组</a></li>
-        <li><a href="#" onclick="remove_class(this);"><i class="menu-icon ti-email"></i>我的资产</a></li>
+        <li><a href="#" onclick="remove_class(this, '{{ url_for('account.profile', stu_num=current_user.stu_num) }}')"><i class="fa fa-id-card"></i>我的资料</a></li>
+        {% if current_user.belong_team %}
+        <li><a href="#" onclick="remove_class(this, '{{ url_for('team.home', team_id=current_user.belong_team_id) }}')"><i class="fa fa-group"></i>我的小组</a></li>
+        {% endif %}
+        <li><a href="#" onclick="remove_class(this, '{{ url_for('account.assets') }}')"><i class="fa fa-laptop"></i>我的资产</a></li>
     </ul>
 {% endblock %}
 

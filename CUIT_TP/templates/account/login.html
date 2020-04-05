@@ -2,38 +2,40 @@
 <html lang="en" style="height: 100%">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登录 {{ config.LAB_NAME }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cob/cs-skin-elastic.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cob/style.css') }}">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
 </head>
 <body style="height: 100%">
-<div class="row m-auto justify-content-center" style="width: 100%;height: 100%;margin: 0;">
-    <div class="col-4" style="text-align: center;margin-top: 10%;">
-        <div class="card">
-            <div class="card-body">
-                <h1>欢迎使用CUIT-TP!</h1>
+<div class="sufee-login d-flex align-content-center flex-wrap">
+    <div class="container">
+        <div class="login-content">
+            <div class="login-form">
+                <h1 style="text-align: center">欢迎使用CUIT-TP!</h1>
                 <br>
-                <form method="post" action="" style="width: 50%" class="m-auto">
+                <form method="post" action="">
                     {{ form.csrf_token }}
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">学号或邮箱</span>
-                        </div>
+                    <div class="form-group">
+                        <label>学号或邮箱</label>
                         {{ form.stu_num_or_email }}
                     </div>
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"
-                                  style="width: 106px;text-align: center;display:block;">密码</span>
-                        </div>
+                    <div class="form-group">
+                        <label>密码</label>
                         {{ form.password }}
                     </div>
-                    <p style="margin-top: 10px;font-size: 0.9rem"><a style="margin-right: 140px"
-                                                                     href="{{ url_for('account.forget_password') }}">忘记密码?</a><a
-                            href="{{ url_for('account.register') }}">没有账号?</a></p>
-                    <div>记住登录&nbsp{{ form.remember_me }}</div>
+                    <div class="checkbox">
+                        <label>
+                            {{ form.remember_me }}记住登录
+                        </label>
+                    </div>
+                    <p style="margin-top: 10px;font-size: 0.9rem">
+                        <a href="{{ url_for('account.forget_password') }}">忘记密码?</a>
+                        <a style="float: right" href="{{ url_for('account.register') }}">没有账号?</a>
+                    </p>
                     <input type="submit" class="btn btn-light" style="margin-top: 10px" value="登录">
-
                 </form>
             </div>
         </div>
