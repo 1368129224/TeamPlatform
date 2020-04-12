@@ -18,11 +18,12 @@ def load_user(id):
 @login_required
 def member(page=1):
     if (current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_student_profile) or current_user.role == 'admin':
-        users = User.query.order_by(User.id).paginate(page, 2, False)
+        users = User.query.filter(User.role!='admin').order_by(User.id).paginate(page, 8, False)
         return render_template('lab/member.html', users=users)
     else:
         abort(403)
 
+# todo 检查是否重复实现
 # 修改学生信息
 @bp.route('/change_profile/<int:stu_num>/', methods=('GET', 'POST'))
 @login_required
@@ -78,16 +79,21 @@ def task(page=1):
 def create_task():
     if (current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_task) or current_user.role == 'admin':
         form = CreateLabTaskForm()
-        if form.validate_on_submit():
-            new_lab_task = LabTask(
-                task_name=form.task_name.data,
-                desc=form.desc.data,
-                executor=form.executor.data,
-                execute_datetime=form.execute_time.data
-            )
-            db.session.add(new_lab_task)
-            db.session.commit()
-            return redirect(url_for('lab.task'))
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                new_lab_task = LabTask(
+                    task_name=form.task_name.data,
+                    desc=form.desc.data,
+                    executor=form.executor.data,
+                    execute_datetime=form.execute_time.data
+                )
+                form.executor.data.lab_task.append(new_lab_task)
+                db.session.add(new_lab_task)
+                db.session.commit()
+                return redirect(url_for('lab.task'))
+            else:
+                flash('创建失败，请检查')
+                return render_template('lab/create_task.html', form=form, is_create=True)
         else:
             return render_template('lab/create_task.html', form=form, is_create=True)
     else:
@@ -177,7 +183,7 @@ def change_set():
             return make_response('valueError', 200)
         if UserProfile.query.filter(UserProfile.set_num==n).first():
             return make_response('valueExist', 200)
-        if n > app.config['LAB_SET_NUM']:
+        if n > int(app.config['LAB_SET_NUM']):
             return make_response('valueOverflow', 200)
         user.profile.set_num = json_data.get('set_num')
         db.session.commit()

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="height: 100%;margin: 0;">
+<html lang="en" style="min-height: 100vh;margin: 0">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,25 +12,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/flag-icon.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/cs-skin-elastic.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/style.css') }}">
-    <style>
-        #weatherWidget .currentDesc {
-            color: #ffffff !important;
-        }
-
-        #flotPie1 td {
-            padding: 3px;
-        }
-
-        #flotPie1 table {
-            top: 20px !important;
-            right: -10px !important;
-        }
-    </style>
     {% block css %}
     {% endblock %}
 </head>
 
-<body style="height: 100%;margin: 0;">
+<body style="min-height: 100vh;margin: 0;">
 {% block content %}
 {% endblock %}
 <script src="{{ url_for('static', filename='js/jquery-3.4.1.js') }}"></script>

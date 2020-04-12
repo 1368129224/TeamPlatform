@@ -5,6 +5,14 @@ from sqlalchemy.orm import relationship
 from CUIT_TP import db, login, app
 from flask_login import UserMixin
 
+# 实验室事务表
+class LabTask(db.Model):
+    __tablename__ = 'LabTask'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='事务ID')
+    uid = db.Column(db.Integer, db.ForeignKey('User.id', ondelete='CASCADE'))
+    task_name = db.Column(db.String(32), nullable=False, comment='事务')
+    desc = db.Column(db.String(256), nullable=False, comment='事务详情')
+    execute_datetime = db.Column(db.DateTime, comment='开始时间')
 
 # 用户相关
 class User(UserMixin, db.Model):
@@ -15,13 +23,10 @@ class User(UserMixin, db.Model):
     stu_num = db.Column(db.String(32), unique=True, nullable=False, comment='学号')
     password = db.Column(db.String(128), nullable=False, comment='密码')
     role = db.Column(db.Enum('admin', 'monitor', 'student'), server_default='student')
+    lab_task = relationship('LabTask', backref='executor', foreign_keys=[LabTask.uid])
 
     belong_team_id = db.Column(db.Integer, db.ForeignKey('Team.id'))
     manage_team_id = db.Column(db.Integer, db.ForeignKey('Team.id'))
-    # backlog_note_id = db.Column(db.Integer, db.ForeignKey('BacklogNote.id'))
-    # bug_note_id = db.Column(db.Integer, db.ForeignKey('BugNote.id'))
-    # backlog_id = db.Column(db.Integer, db.ForeignKey('Backlog.id'))
-    # bug_id = db.Column(db.Integer, db.ForeignKey('Bug.id'))
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -64,7 +69,6 @@ class LabActivity(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='活动ID')
     activity_name = db.Column(db.String(64), nullable=False, comment='活动名称')
     desc = db.Column(db.String(256), nullable=False, comment='活动内容')
-    create_time = db.Column(db.DateTime, default=datetime.now())
     start_time = db.Column(db.DateTime, comment='开始时间')
 
     def __repr__(self):
@@ -77,7 +81,6 @@ class TeamActivity(db.Model):
     activity_name = db.Column(db.String(64), nullable=False, comment='活动名称')
     belong_team_id = db.Column(db.Integer, db.ForeignKey('Team.id'))
     desc = db.Column(db.String(256), nullable=False, comment='活动内容')
-    create_time = db.Column(db.DateTime, default=datetime.now())
     start_time = db.Column(db.DateTime, comment='开始时间')
 
     def __repr__(self):
@@ -172,17 +175,6 @@ class Team(db.Model):
 
     def __repr__(self):
         return '<Team {}>'.format(self.team_name)
-
-# 实验室事务表
-class LabTask(db.Model):
-    __tablename__ = 'LabTask'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='事务ID')
-    uid = db.Column(db.Integer, db.ForeignKey('User.id'))
-    task_name = db.Column(db.String(32), nullable=False, comment='事务')
-    desc = db.Column(db.String(256), nullable=False, comment='事务详情')
-    executor = relationship('User', backref='lab_task', uselist=False)
-    create_time = db.Column(db.DateTime, default=datetime.now(), comment='创建时间')
-    execute_datetime = db.Column(db.DateTime, comment='开始时间')
 
 # 资产表
 class Asset(db.Model):

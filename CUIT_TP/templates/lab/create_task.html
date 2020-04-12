@@ -1,62 +1,83 @@
-{% extends 'iframe_base.html' %}
-
-{% block css %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/tempusdominus-bootstrap-4.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}">
-{% endblock %}
+    <style>
+        #desc {
+            height: 360px;
+        }
+    </style>
+</head>
+<body>
 
-{% block content %}
-    <h1>{{ '新建事务' if is_create else '修改事务' }}</h1>
-    <br>
-    <form method="post" action="">
-        {{ form.hidden_tag() }}
-        <div class="input-group mb-3" style="width: 30%;">
-            <div class="input-group-prepend">
-                <span class="input-group-text justify-content-center" style="width: 74px;">事务</span>
+<div class="card" style="width: 488px;margin: 0">
+    <div class="card-body">
+        <h1>{{ '新建事务' if is_create else '修改事务' }}</h1>
+        <form method="post" action="" id="form">
+            {{ form.hidden_tag() }}
+            <div class="form-group" style="width: 50%;">
+                <label for="task_name" class="form-control-label">事务</label>
+                {{ form.task_name(class="form-control") }}
             </div>
-            {{ form.task_name(class="form-control") }}
-        </div>
-        <div class="input-group mb-3" style="width: 50%;height: 200px;">
-            <div class="input-group-prepend">
-                <span class="input-group-text justify-content-center" style="width: 74px;">详情</span>
+            <div class="form-group">
+                <label for="desc" class="form-control-label">详情</label>
+                {{ form.desc(class="form-control") }}
             </div>
-            {{ form.desc(class="form-control") }}
-        </div>
-        <div class="input-group mb-3" style="width: 30%;">
-            <div class="input-group-prepend">
-                <span class="input-group-text">执行人</span>
-            </div>
-            {{ form.executor(class="form-control") }}
-        </div>
 
-        <div class="input-group mb-3 date" id="execute_time_datetimepicker" data-target-input="nearest" style="width: 30%;">
-            <div class="input-group-prepend">
-                <span class="input-group-text justify-content-center" style="width: 74px;">时间</span>
+            <div class="input-group mb-3" style="width: 50%;">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">执行人</span>
+                </div>
+                {{ form.executor(class="form-control") }}
             </div>
-            {{ form.execute_time(class="form-control datetimepicker-input") }}
-            <div class="input-group-append" data-target="#execute_time_datetimepicker" data-toggle="datetimepicker">
-                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+
+            <div class="input-group mb-3 date" id="execute_time_datetimepicker" data-target-input="nearest"
+                 style="width: 80%;">
+                <div class="input-group-prepend">
+                    <span class="input-group-text justify-content-center" style="width: 74px;">时间</span>
+                </div>
+                {{ form.execute_time(class="form-control datetimepicker-input") }}
+                <div class="input-group-append" data-target="#execute_time_datetimepicker"
+                     data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                </div>
             </div>
-        </div>
-
-        <input class="btn btn-light" type="submit" value="go">
-    </form>
-{% endblock %}
-
-{% block js %}
-    <script src="{{ url_for('static', filename='js/all.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/moment.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tempusdominus-bootstrap-4.js') }}" ></script>
-    <script>
-        $(document).ready($(function () {
-            $('#execute_time_datetimepicker').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm',
-                todayHighlight: true,
-                icons:{
-                    time: 'fa fa-clock',
-                    date: 'fa fa-calendar-alt',
-                },
-            });
-        }));
-    </script>
-{% endblock %}
+            <input class="btn btn-light" style="display:block;margin:0 auto" type="button" onclick="submit_form()" value="创建">
+        </form>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/jquery-3.4.1.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script>
+<script src="{{ url_for('static', filename='js/all.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/moment.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tempusdominus-bootstrap-4.js') }}"></script>
+<script>
+    jQuery(document).ready(jQuery(function () {
+        jQuery('#execute_time_datetimepicker').datetimepicker({
+            format: 'YYYY-MM-DD HH:mm',
+            todayHighlight: true,
+            icons: {
+                time: "fa fa-clock-o",
+                date: 'fa fa-calendar-alt',
+            },
+        });
+    }));
+    var submit_form = function () {
+        jQuery.post('{{ url_for("lab.create_task") }}', jQuery('#form').serialize(), function (data) {
+            if(data==='true'){
+                layer.msg('创建成功', {icon: 1});
+                parent.location.reload();
+            }else{
+                layer.msg('创建失败', {icon: 5});
+            }
+        })
+    }
+</script>
+</body>
+</html>

@@ -44,26 +44,30 @@ def register():
     if current_user.is_authenticated:
         return redirect(url_for('home.index'))
     form = RegisterForm()
-    if form.validate_on_submit():
-        if User.query.filter(User.email == form.email.data).first():
-            flash('此邮箱已注册。', 'error')
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            if User.query.filter(User.email == form.email.data).first():
+                flash('此邮箱已注册')
+                return render_template('account/register.html', form=form)
+            new_user = User(
+                username=form.username.data,
+                email=form.email.data,
+                password=generate_password_hash(form.password.data),
+                stu_num=form.stu_num.data,
+            )
+            profile = UserProfile(
+                phone='0',
+                college='',
+                grade=0,
+                _class='',
+            )
+            profile.user = new_user
+            db.session.add(new_user)
+            db.session.commit()
+            return redirect(url_for('account.login'))
+        else:
+            flash('填写错误，请检查')
             return render_template('account/register.html', form=form)
-        new_user = User(
-            username=form.username.data,
-            email=form.email.data,
-            password=generate_password_hash(form.password.data),
-            stu_num=form.stu_num.data,
-        )
-        profile = UserProfile(
-            phone='0',
-            college='',
-            grade=0,
-            _class='',
-        )
-        profile.user = new_user
-        db.session.add(new_user)
-        db.session.commit()
-        return redirect(url_for('account.login'))
     else:
         return render_template('account/register.html', form=form)
 
@@ -73,20 +77,23 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('account.manage'))
     form = LoginForm()
-    if form.validate_on_submit():
-        # 使用学号或邮箱登录
-        user = User.query.filter(User.stu_num == form.stu_num_or_email.data).first()
-        if not user:
-            user = User.query.filter(User.email == form.stu_num_or_email.data).first()
-        if user and check_password_hash(user.password, form.password.data):
-            # 登录成功
-            login_user(user, remember=form.remember_me.data)
-            # TODO next安全检查
-            return redirect(request.args.get('next') or url_for('account.manage'))
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            # 使用学号或邮箱登录
+            user = User.query.filter(User.stu_num == form.stu_num_or_email.data).first()
+            if not user:
+                user = User.query.filter(User.email == form.stu_num_or_email.data).first()
+            if user and check_password_hash(user.password, form.password.data):
+                # 登录成功
+                login_user(user, remember=form.remember_me.data)
+                # TODO next安全检查
+                return redirect(request.args.get('next') or url_for('account.manage'))
+            else:
+                # 登录失败
+                flash('登录失败')
+                return redirect(url_for('account.login'))
         else:
-            # 登录失败
-            flash('登录失败。')
-            return redirect(url_for('account.login'))
+            return render_template('account/login.html', form=form)
     else:
         return render_template('account/login.html', form=form)
 
@@ -114,6 +121,7 @@ def change_password(stu_num):
         else:
             return render_template('account/change_password.html', form=form, user=current_user)
     elif current_user.role == 'admin':
+        # 管理员修改密码
         form = ForceResetPasswordForm()
         user = User.query.filter(User.stu_num==stu_num).first_or_404()
         if form.validate_on_submit():

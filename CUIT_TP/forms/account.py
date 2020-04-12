@@ -89,9 +89,7 @@ class AdminProfileForm(FlaskForm):
 
 class ProfileForm(AdminProfileForm):
     college = StringField('College', validators=[DataRequired(), Length(max=32)])
-    grade = IntegerField('Grade', validators=[DataRequired()], render_kw={
-        'data-container': "body", 'data-toggle': "focus", 'data-placement': "right", 'data-content': "入学年份，如：2016"
-    })
+    grade = IntegerField('Grade', validators=[DataRequired()])
     c_lass = StringField('Class', validators=[DataRequired(), Length(max=4)])
 
 

@@ -1,63 +1,108 @@
 {% extends 'iframe_base.html' %}
 
 {% block content %}
-    <h1>管理实验室事务</h1>
-    <br>
+    <div class="content">
+        <div class="animated fadeIn">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong class="card-title">实验室事务管理</strong>
+                        </div>
+                        <div class="card-body">
+                            <table id="bootstrap-data-table" class="table table-striped table-bordered">
+                                <thead>
+                                <tr>
+                                    <th scope="col">事务</th>
+                                    <th scope="col">执行者</th>
+                                    <th scope="col">时间</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for task in tasks.items %}
+                                    <tr>
+                                        {#                <td style="vertical-align: middle;"><a href="{{ url_for('lab.task_detail', task_id=task.id) }}">{{ task.task_name }}</a></td>#}
+                                        <td style="vertical-align: middle;"><a href="#"
+                                                                               onclick="open_detail({{ task.id }})">{{ task.task_name }}</a>
+                                        </td>
+                                        <td style="vertical-align: middle;">{{ task.executor.username }}</td>
+                                        <td style="vertical-align: middle;">{{ task.execute_datetime }}</td>
+                                        <td>
+                                            <button class="btn btn-light">完成</button>
+                                            <button class="btn btn-light" onclick="del_task({{ task.id }})">删除</button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
 
-    <table class="table">
-        <thead>
-        <tr>
-            <th scope="col">事务</th>
-            <th scope="col">执行者</th>
-            <th scope="col">时间</th>
-            <th scope="col">操作</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for task in tasks.items %}
-            <tr>
-                {#                <td style="vertical-align: middle;"><a href="{{ url_for('lab.task_detail', task_id=task.id) }}">{{ task.task_name }}</a></td>#}
-                <td style="vertical-align: middle;"><a href="#" onclick="open_detail({{ task.id }})">{{ task.task_name }}</a></td>
-                <td style="vertical-align: middle;">{{ task.executor.username }}</td>
-                <td style="vertical-align: middle;">{{ task.execute_datetime }}</td>
-                <td><button class="btn btn-light">完成</button><button class="btn btn-light" onclick="del_task({{ task.id }})">删除</button></td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+                            <div class="dataTables_paginate paging_simple_numbers" id="bootstrap-data-table_paginate"
+                                 style="margin-bottom: 10px;">
+                                <ul class="pagination justify-content-center">
 
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            {% if tasks.has_prev %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ url_for('lab.task', page=tasks.prev_num) }}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-            {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-            {% endif %}
-            {% if tasks.has_next %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ url_for('lab.task', page=tasks.next_num) }}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            {% else %}
-                <li class="page-item disabled">
-                    <a class="page-link" href="#" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            {% endif %}
-        </ul>
-    </nav>
-    <div class="row justify-content-center" style="width: inherit;margin-left: 0;margin-right: 0;margin-bottom: 10px;">
-        <button class="btn btn-light" onclick=window.location.href="{{ url_for('lab.create_task') }}">创建事务</button>
+                                    {% if tasks.has_prev %}
+                                        <li class="paginate_button page-item previous"
+                                            id="bootstrap-data-table_previous">
+                                            <a class="page-link" href="{{ url_for('lab.task', page=tasks.prev_num) }}"
+                                               aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="paginate_button page-item previous disabled"
+                                            id="bootstrap-data-table_previous">
+                                            <a class="page-link" href="#" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    {% for page in tasks.iter_pages(1,1,3,1) %}
+                                        {% if page %}
+                                            <li class="paginate_button page-item {% if page == tasks.page %}active{% endif %}"
+                                                id="bootstrap-data-table_previous">
+                                                <a class="page-link" href="{{ url_for('lab.task', page=page) }}"
+                                                   aria-label="Previous">
+                                                    <span aria-hidden="true">{{ page }}</span>
+                                                </a>
+                                            </li>
+                                        {% else %}
+                                            <li class="paginate_button page-item disabled"
+                                                id="bootstrap-data-table_previous">
+                                                <a class="page-link" href="{{ url_for('lab.task', page=page) }}"
+                                                   aria-label="Previous">
+                                                    <span aria-hidden="true">&hellip;</span>
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if tasks.has_next %}
+                                        <li class="paginate_button page-item next">
+                                            <a class="page-link" href="{{ url_for('lab.task', page=tasks.next_num) }}"
+                                               aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="paginate_button page-item next disabled">
+                                            <a class="page-link" href="#" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                                <div class="row justify-content-center"
+                                     style="width: inherit;margin-left: 0;margin-right: 0;margin-bottom: 10px;">
+                                    <button class="btn btn-light"
+                                            onclick="create_task()">创建事务
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}
 
@@ -65,8 +110,19 @@
     {{ JSGlue.include() }}
     <script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
     <script>
+        const create_task = function () {
+            jQuery.get(Flask.url_for('lab.create_task'), {}, function (data) {
+                layer.open({
+                    type: 1,
+                    title: '创建事务',
+                    skin: 'layui-layer-rim',
+                    area: '500px',
+                    content: data
+                })
+            })
+        };
         const open_detail = function (task_id) {
-            $.get(Flask.url_for('lab.task_detail', {'task_id':task_id}), function (data) {
+            $.get(Flask.url_for('lab.task_detail', {'task_id': task_id}), function (data) {
                 layer.open({
                     type: 1,
                     skin: 'layui-layer-rim',
@@ -75,13 +131,12 @@
                 });
             })
         };
-        const del_task = function(task_id){
+        const del_task = function (task_id) {
             $.post(Flask.url_for('lab.delete_task'), JSON.stringify({'task_id': task_id}), function (data) {
-                if (data==='true'){
+                if (data === 'true') {
                     alert('删除成功');
                     window.location.reload();
-                }
-                else{
+                } else {
                     alert('删除失败，请联系管理员。')
                 }
             })

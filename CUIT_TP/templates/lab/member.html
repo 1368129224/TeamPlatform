@@ -1,75 +1,203 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="height: 1348px;margin: 0">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title></title>
+    <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/themify-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pe-icon-7-stroke.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/flag-icon.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/cs-skin-elastic.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/style.css') }}">
+    <style>
+        i {
+            margin-right: 10px;
+        }
+
+        section {
+            margin-bottom: 15px !important;
+        }
+    </style>
 </head>
-<body>
 
-<div class="container" style="padding-top: 20px;padding-bottom: 20px;">
+<body style="min-height: 100vh;margin: 0;">
 
-    <h1>人员管理</h1>
-    <br>
-    <table class="table">
-        <thead>
-        <tr>
-            <th scope="col">姓名</th>
-            <th scope="col">学号</th>
-            <th scope="col">座位号</th>
-            <th scope="col">操作</th>
-        </tr>
-        </thead>
-        <tbody>
+<div class="container-fluid">
+    <div class="row">
         {% for user in users.items %}
-            <tr>
-                <td style="vertical-align: middle;"><a href="{{ url_for('account.profile', stu_num=user.stu_num) }}">{{ user.username }}</a></td>
-                <td style="vertical-align: middle;">{{ user.stu_num }}</td>
-                <td style="vertical-align: middle;">{{ user.profile.set_num }}</td>
-                {% if user.role=='admin' %}
-                    <td><button class="btn btn-light disabled" disabled>禁用</button></td>
-                {% else %}
-                    <td><button class="btn btn-light">禁用</button></td>
-                {% endif %}
-            </tr>
+            <div class="col-md-3">
+                <aside class="profile-nav alt">
+                    <section class="card">
+                        <div class="card-header user-header alt bg-dark">
+                            <div class="media">
+                                <div class="media-body">
+                                    <h2 class="text-light display-6">
+                                        {{ user.username }}
+                                    </h2>
+                                    {% if user.role == 'admin' %}
+                                        <p>管理员</p>
+                                    {% elif user.role == 'monitor' %}
+                                        <p>班长</p>
+                                    {% else %}
+                                        <p>{{ user.stu_num }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item" style="color: #878787;">
+                                <p style="margin: 0;"><i class="fa fa-envelope"></i>{{ user.email }}</p>
+                            </li>
+                            <li class="list-group-item" style="color: #878787;">
+                                <p style="margin: 0;"><i
+                                        class="fa fa-phone-square"></i>{{ '未设置' if user.profile.phone == '0' else user.profile.phone }}
+                                </p>
+                            </li>
+                            <li class="list-group-item" style="color: #878787;">
+                                <p style="margin: 0;"><i
+                                        class="fa fa-qq"></i>{{ '未设置' if not user.profile.QQ else user.profile.QQ }}
+                                </p>
+                            </li>
+                            <li class="list-group-item"
+                                style="color: #878787;border-bottom: 2px solid #878787 !important;">
+                                <p style="margin: 0;"><i
+                                        class="fa fa-wechat"></i>{{ '未设置' if not user.profile.wechat else user.profile.wechat }}
+                                </p>
+                            </li>
+                            {% if user.role != 'admin' %}
+                                <li class="list-group-item profile" style="color: #878787;">
+                                    <p style="margin: 0;">
+                                        座位：{{ '未设置' if user.profile.set_num == 0 else user.profile.set_num }}
+                                    </p>
+                                </li>
+                                <li class="list-group-item profile" style="color: #878787;">
+                                    <p style="margin: 0;">
+                                        学号：{{ '未设置' if user.stu_num == '0000000000' else user.stu_num }}
+                                    </p>
+                                </li>
+                                <li class="list-group-item profile" style="color: #878787;">
+                                    <p style="margin: 0;">
+                                        专业：{{ '未设置' if not user.profile.college else user.profile.college }}
+                                    </p>
+                                </li>
+                                <li class="list-group-item profile" style="color: #878787;">
+                                    <p style="margin: 0;">
+                                        年级：{{ '未设置' if user.profile.grade == '0' else user.profile.grade }}
+                                    </p>
+                                </li>
+                                <li class="list-group-item profile" style="color: #878787;">
+                                    <p style="margin: 0;">
+                                        班级：{{ '未设置' if not user.profile._class else user.profile._class }}
+                                    </p>
+                                </li>
+                            {% endif %}
+                            {% if current_user.stu_num == user.stu_num or current_user.role == 'admin' or (current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_student_profile) %}
+                                <li class="list-group-item">
+                                    <div class="btn-group" style="width: -webkit-fill-available;">
+                                        <button type="button" class="btn btn-light"
+                                                onclick="change_profile({{ user.stu_num }}, '{{ user.username }}')">
+                                            修改信息
+                                        </button>
+                                        <button type="button" class="btn btn-light ml-auto"
+                                                onclick="change_password({{ user.stu_num }}, '{{ user.username }}')">
+                                            修改密码
+                                        </button>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </section>
+                </aside>
+            </div>
         {% endfor %}
-        </tbody>
-    </table>
-    <nav aria-label="Page navigation">
+    </div>
+
+    <div class="dataTables_paginate paging_simple_numbers" id="bootstrap-data-table_paginate"
+         style="margin-bottom: 10px;">
         <ul class="pagination justify-content-center">
+
             {% if users.has_prev %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ url_for('lab.member', page=users.prev_num) }}" aria-label="Previous">
+                <li class="paginate_button page-item previous" id="bootstrap-data-table_previous">
+                    <a class="page-link" href="{{ url_for('lab.member', page=users.prev_num) }}"
+                       aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
             {% else %}
-                <li class="page-item disabled">
+                <li class="paginate_button page-item previous disabled" id="bootstrap-data-table_previous">
                     <a class="page-link" href="#" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
             {% endif %}
+            {% for page in users.iter_pages(1,1,3,1) %}
+                {% if page %}
+                    <li class="paginate_button page-item {% if page == users.page %}active{% endif %}"
+                        id="bootstrap-data-table_previous">
+                        <a class="page-link" href="{{ url_for('lab.member', page=page) }}" aria-label="Previous">
+                            <span aria-hidden="true">{{ page }}</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="paginate_button page-item disabled"
+                        id="bootstrap-data-table_previous">
+                        <a class="page-link" href="{{ url_for('lab.member', page=page) }}" aria-label="Previous">
+                            <span aria-hidden="true">&hellip;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
             {% if users.has_next %}
-                <li class="page-item">
+                <li class="paginate_button page-item next">
                     <a class="page-link" href="{{ url_for('lab.member', page=users.next_num) }}" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
             {% else %}
-                <li class="page-item disabled">
+                <li class="paginate_button page-item next disabled">
                     <a class="page-link" href="#" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
             {% endif %}
         </ul>
-    </nav>
-
+    </div>
 </div>
-
 <script src="{{ url_for('static', filename='js/jquery-3.4.1.js') }}"></script>
-<script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}" ></script>
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script>
+<script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/js/html5shiv.min.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/js/jquery.matchHeight.min.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/js/main.js') }}"></script>
+{{ JSGlue.include() }}
+<script>
+    const change_profile = function (stu_num, username) {
+        jQuery.get(Flask.url_for('account.change_profile', {'stu_num': stu_num}), {}, function (data) {
+            layer.open({
+                type: 1,
+                title: username.toString(),
+                area: '500px',
+                skin: 'layui-layer-rim',
+                content: data
+            })
+        })
+    };
+    const change_password = function (stu_num, username) {
+        jQuery.get(Flask.url_for('account.change_password', {'stu_num': stu_num}), {}, function (data) {
+            layer.open({
+                type: 1,
+                title: username.toString(),
+                area: '500px',
+                skin: 'layui-layer-rim',
+                content: data
+            })
+        })
+    };
+</script>
 </body>
+</html>
 

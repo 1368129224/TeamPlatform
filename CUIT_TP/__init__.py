@@ -19,12 +19,15 @@ mail = Mail(app)
 jsglue = JSGlue(app)
 
 from CUIT_TP.models import User, db
-if not User.query.filter(User.role == 'admin').first():
-    print("Administrator account info:\nusername: admin\npassword: adminadmin")
-    from werkzeug.security import generate_password_hash
-    admin = User(username='admin', email=app.config.get('ADMIN_EMAIL'), stu_num='0000000000', password=generate_password_hash('adminadmin'), role='admin')
-    db.session.add(admin)
-    db.session.commit()
+try:
+    if not User.query.filter(User.role == 'admin').first():
+        print("Administrator account info:\nusername: admin\npassword: adminadmin")
+        from werkzeug.security import generate_password_hash
+        admin = User(username='admin', email=app.config.get('ADMIN_EMAIL'), stu_num='0000000000', password=generate_password_hash('adminadmin'), role='admin')
+        db.session.add(admin)
+        db.session.commit()
+except:
+    pass
 
 from .views import account, lab, team
 app.register_blueprint(account.bp, url_prefix='/account/')

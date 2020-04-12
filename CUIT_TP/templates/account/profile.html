@@ -9,8 +9,8 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container" style="height: 100%">
-        <div class="row" style="height: 100%;align-items:center;">
+    <div class="container" style="min-height: 100vh">
+        <div class="row" style="min-height: 100vh;align-items:center;">
             <div class="col-md-4 offset-4">
                 <aside class="profile-nav alt">
                     <section class="card">
@@ -77,11 +77,11 @@
                                 <li class="list-group-item">
                                     <div class="btn-group" style="width: -webkit-fill-available;">
                                         <button type="button" class="btn btn-light"
-                                                onclick=window.location.href='{{ url_for("account.change_profile", stu_num=user.stu_num) }}'>
+                                                onclick="change_profile({{ user.stu_num }}, '{{ user.username }}')">
                                             修改信息
                                         </button>
                                         <button type="button" class="btn btn-light ml-auto"
-                                                onclick=window.location.href='{{ url_for("account.change_password", stu_num=user.stu_num) }}'>
+                                                onclick="change_password({{ user.stu_num }}, '{{ user.username }}')">
                                             修改密码
                                         </button>
                                     </div>
@@ -93,5 +93,32 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block js %}
+    {{ JSGlue.include() }}
+    <script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
+    <script>
+        const change_profile = function (stu_num, username) {
+            jQuery.get(Flask.url_for('account.change_profile', {'stu_num': stu_num}), {}, function (data) {
+                layer.open({
+                    type: 1,
+                    title: username.toString(),
+                    area: '500px',
+                    content: data
+                })
+            })
+        };
+        const change_password = function (stu_num, username) {
+            jQuery.get(Flask.url_for('account.change_password', {'stu_num': stu_num}), {}, function (data) {
+                layer.open({
+                    type: 1,
+                    title: username.toString(),
+                    area: '500px',
+                    content: data
+                })
+            })
+        };
+    </script>
 {% endblock %}
 

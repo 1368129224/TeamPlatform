@@ -8,68 +8,51 @@
 </head>
 <body>
 
-<div class="container" style="padding-top: 20px;padding-bottom: 20px;">
-    <h1>{{ user.username }}</h1>
-    <br>
-    <p>邮箱： {{ user.email }}</p>
-    {% if current_user.role != 'admin' %}
-        <p>学号： {{ user.stu_num }}</p>
-    {% endif %}
-    <br>
-    <form method="post" action="{{ url_for('account.change_profile', stu_num=user.stu_num) if user.stu_num != '0000000000' else url_for('account.change_admin_profile') }}">
-        {{ form.hidden_tag() }}
-        <div class="input-group mb-3" style="width: 20%;">
-            <div class="input-group-prepend">
-                <span class="input-group-text">电话</span>
-            </div>
-            {{ form.phone(class="form-control") }}
-        </div>
-        <div class="input-group mb-3" style="width: 20%;">
-            <div class="input-group-prepend" style="text-align: center;">
-                <span class="input-group-text justify-content-center" style="width: 58px;">QQ</span>
-            </div>
-            {{ form.QQ(class="form-control") }}
-        </div>
-        <div class="input-group mb-3" style="width: 20%;">
-            <div class="input-group-prepend">
-                <span class="input-group-text">微信</span>
-            </div>
-            {{ form.wechat(class="form-control") }}
-        </div>
-        {% if user.role != 'admin' %}
-        <div class="input-group mb-3" style="width: 20%;">
-            <div class="input-group-prepend">
-                <span class="input-group-text">专业</span>
-            </div>
-            {{ form.college(class="form-control") }}
-        </div>
-        <div class="input-group mb-3" style="width: 20%;">
-            <div class="input-group-prepend">
-                <span class="input-group-text">年级</span>
-            </div>
-            {{ form.grade(class="form-control", id="grade") }}
-        </div>
-        <div class="input-group mb-3" style="width: 20%;">
-            <div class="input-group-prepend">
-                <span class="input-group-text">班级</span>
-            </div>
-            {{ form.c_lass(class="form-control") }}
-        </div>
+<div class="card" style="margin: 0">
+    <div class="card-body">
+        <h1>{{ user.username }}</h1>
+        <p>邮箱： {{ user.email }}</p>
+        {% if current_user.role != 'admin' %}
+            <p>学号： {{ user.stu_num }}</p>
         {% endif %}
-        <div class="btn-group" style="width: 20%">
-            <button type="button" class="btn btn-light float-left" onclick=window.location.href='{{ url_for('account.profile', stu_num=user.stu_num) }}'>返回</button>
+        <br>
+        <form method="post"
+              action="{{ url_for('account.change_profile', stu_num=user.stu_num) if user.stu_num != '0000000000' else url_for('account.change_admin_profile') }}">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group">
+                <label for="phone" class="form-control-label">电话</label>
+                {{ form.phone(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <label for="QQ" class="form-control-label">QQ</label>
+                {{ form.QQ(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <label for="wechat" class="form-control-label">微信</label>
+                {{ form.wechat(class="form-control") }}
+            </div>
+            {% if user.role != 'admin' %}
+                <div class="form-group">
+                    <label for="college" class="form-control-label">专业</label>
+                    {{ form.college(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    <label for="grade" class="form-control-label">年级，如：2016</label>
+                    {{ form.grade(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    <label for="c_lass" class="form-control-label">班级</label>
+                    {{ form.c_lass(class="form-control") }}
+                </div>
+            {% endif %}
             <button type="submit" class="btn btn-light float-right">修改</button>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
 <script src="{{ url_for('static', filename='js/jquery-3.4.1.js') }}"></script>
-<script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}" ></script>
-<script>
-    $('#grade').focus(function(){
-        $('#grade').popover();
-    });
-</script>
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script>
 </body>
 
 
