@@ -40,7 +40,7 @@
                                     {% if user.role == 'admin' %}
                                         <p>管理员</p>
                                     {% elif user.role == 'monitor' %}
-                                        <p>班长</p>
+                                        <p>班长&nbsp;{{ user.stu_num }}</p>
                                     {% else %}
                                         <p>{{ user.stu_num }}</p>
                                     {% endif %}

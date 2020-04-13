@@ -18,27 +18,29 @@
                                 </div>
                             </div>
                         </div>
-
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item" style="color: #878787;">
-                                <p style="margin: 0;"><i class="fa fa-envelope"></i>{{ user.email }}</p>
-                            </li>
-                            <li class="list-group-item" style="color: #878787;">
-                                <p style="margin: 0;"><i
-                                        class="fa fa-phone-square"></i>{{ '未设置' if user.profile.phone == '0' else user.profile.phone }}
-                                </p>
-                            </li>
-                            <li class="list-group-item" style="color: #878787;">
-                                <p style="margin: 0;"><i
-                                        class="fa fa-qq"></i>{{ '未设置' if not user.profile.QQ else user.profile.QQ }}</p>
-                            </li>
-                            <li class="list-group-item"
-                                style="color: #878787;border-bottom: 2px solid #878787 !important;">
-                                <p style="margin: 0;"><i
-                                        class="fa fa-wechat"></i>{{ '未设置' if not user.profile.wechat else user.profile.wechat }}
-                                </p>
-                            </li>
-                        </ul>
+                        {% if user %}
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item" style="color: #878787;">
+                                    <p style="margin: 0;"><i class="fa fa-envelope"></i>{{ user.email }}</p>
+                                </li>
+                                <li class="list-group-item" style="color: #878787;">
+                                    <p style="margin: 0;"><i
+                                            class="fa fa-phone-square"></i>{{ '未设置' if user.profile.phone == '0' else user.profile.phone }}
+                                    </p>
+                                </li>
+                                <li class="list-group-item" style="color: #878787;">
+                                    <p style="margin: 0;"><i
+                                            class="fa fa-qq"></i>{{ '未设置' if not user.profile.QQ else user.profile.QQ }}
+                                    </p>
+                                </li>
+                                <li class="list-group-item"
+                                    style="color: #878787;border-bottom: 2px solid #878787 !important;">
+                                    <p style="margin: 0;"><i
+                                            class="fa fa-wechat"></i>{{ '未设置' if not user.profile.wechat else user.profile.wechat }}
+                                    </p>
+                                </li>
+                            </ul>
+                        {% endif %}
                         <form method="post" action="" style="padding: 10px;">
                             {{ form.hidden_tag() }}
                             <h5 id="title">班长权限</h5>
@@ -66,7 +68,8 @@
                                 {{ form.publish_lab_activity(class="form-check-input permission", id='publish_lab_activity') }}
                                 <label class="form-check-label" for="publish_lab_activity">发布实验室活动</label>
                             </div>
-                            <input class="btn btn-light" type="button" id="change" style="display:block;margin:0 auto" onclick='change_permission()' value="修改">
+                            <input class="btn btn-light" type="button" id="change" style="display:block;margin:0 auto"
+                                   onclick='change_permission()' value="修改">
                             <div class="input-group mb-3" id="selector" style="visibility: hidden;">
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">班长</span>

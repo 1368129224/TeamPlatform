@@ -34,7 +34,7 @@ class CreateLabTaskForm(FlaskForm):
     })
     executor = QuerySelectField('执行人', validators=[DataRequired()], query_factory=lab_task_executor, get_label='username')
     execute_time = DateTimeField('执行时间', validators=[DataRequired()], format='%Y-%m-%d %H:%M', render_kw={
-        'data-target':'#execute_time_datetimepicker',
+        'autocomplete':'off'
     })
 
 class ChangeLabTaskForm(CreateLabTaskForm):
@@ -59,7 +59,7 @@ class CreateLabActivityForm(FlaskForm):
     activity_name = StringField('活动名', validators=[DataRequired(), Length(max=64)])
     desc = TextAreaField('活动详情', validators=[DataRequired(), Length(max=256)])
     start_time = DateTimeField('活动时间', validators=[DataRequired()], format='%Y-%m-%d %H:%M', render_kw={
-        'data-target':'#start_time_datetimepicker',
+        'autocomplete':'off'
     })
 
 class ChangeLabActivityForm(CreateLabActivityForm):

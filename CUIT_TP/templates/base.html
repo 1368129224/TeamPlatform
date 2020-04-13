@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="height: 100%;margin: 0;">
+<html lang="en" style="min-height: 100vh;margin: 0;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no">
@@ -30,7 +30,7 @@
     {% block css %}
     {% endblock %}
 </head>
-<body style="height: 100%;margin: 0;overflow:hidden">
+<body style="min-height: 100vh;margin: 0;">
 
 <aside id="left-panel" class="left-panel">
     <nav class="navbar navbar-expand-sm navbar-default">
@@ -103,7 +103,6 @@
 <script src="{{ url_for('static', filename='assets/js/html5shiv.min.js') }}"></script>
 <script src="{{ url_for('static', filename='assets/js/jquery.matchHeight.min.js') }}"></script>
 <script src="{{ url_for('static', filename='assets/js/main.js') }}"></script>
-<script>const $ = jQuery;</script>
 {% block js %}
 {% endblock %}
 </body>

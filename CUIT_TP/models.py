@@ -13,6 +13,7 @@ class LabTask(db.Model):
     task_name = db.Column(db.String(32), nullable=False, comment='事务')
     desc = db.Column(db.String(256), nullable=False, comment='事务详情')
     execute_datetime = db.Column(db.DateTime, comment='开始时间')
+    status = db.Column(db.Enum('0', '1'), server_default='0', nullable=False, comment='状态')
 
 # 用户相关
 class User(UserMixin, db.Model):
@@ -51,7 +52,6 @@ class UserProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uid = db.Column(db.Integer, db.ForeignKey('User.id', ondelete='CASCADE'))
     user = relationship('User', backref=db.backref('profile', uselist=False))
-    # avatar = db.Column(db.Integer, default=1)
     QQ = db.Column(db.String(11), comment='QQ')
     wechat = db.Column(db.String(64), comment='微信')
     phone = db.Column(db.String(11), nullable=False, comment='电话')
@@ -70,6 +70,7 @@ class LabActivity(db.Model):
     activity_name = db.Column(db.String(64), nullable=False, comment='活动名称')
     desc = db.Column(db.String(256), nullable=False, comment='活动内容')
     start_time = db.Column(db.DateTime, comment='开始时间')
+    status = db.Column(db.Enum('0', '1'), server_default='0', nullable=False, comment='状态')
 
     def __repr__(self):
         return '<LabActivity {}>'.format(self.id)
@@ -82,6 +83,7 @@ class TeamActivity(db.Model):
     belong_team_id = db.Column(db.Integer, db.ForeignKey('Team.id'))
     desc = db.Column(db.String(256), nullable=False, comment='活动内容')
     start_time = db.Column(db.DateTime, comment='开始时间')
+    status = db.Column(db.Enum('0', '1'), server_default='0', nullable=False, comment='状态')
 
     def __repr__(self):
         return '<TeamActivity {}>'.format(self.id)

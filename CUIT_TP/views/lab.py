@@ -62,13 +62,13 @@ def change_profile(stu_num):
         else:
             return render_template('lab/change_profile.html', user=user, form=form)
 
-# 日常事务
+# 展示事务
 @bp.route('/task/')
 @bp.route('/task/<int:page>/')
 @login_required
 def task(page=1):
     if (current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_task) or current_user.role == 'admin':
-        tasks = LabTask.query.order_by(LabTask.id).paginate(page, 5, False)
+        tasks = LabTask.query.order_by(LabTask.status.asc(), LabTask.execute_datetime).paginate(page, 5, False)
         return render_template('lab/task.html', tasks=tasks)
     else:
         abort(403)
@@ -90,10 +90,9 @@ def create_task():
                 form.executor.data.lab_task.append(new_lab_task)
                 db.session.add(new_lab_task)
                 db.session.commit()
-                return redirect(url_for('lab.task'))
+                return make_response('true', 200)
             else:
-                flash('创建失败，请检查')
-                return render_template('lab/create_task.html', form=form, is_create=True)
+                return make_response('false', 200)
         else:
             return render_template('lab/create_task.html', form=form, is_create=True)
     else:
@@ -134,17 +133,17 @@ def change_task(task_id):
                 task.executor = form.executor.data
                 task.execute_datetime = form.execute_time.data
                 db.session.commit()
-                return redirect(url_for('lab.task_detail', task_id=task_id))
+                return make_response('true', 200)
             else:
-                return render_template('lab/create_task.html', form=form, is_create=False)
+                return make_response('false', 200)
         else:
             form = ChangeLabTaskForm(
                 task_name=task.task_name,
                 desc=task.desc,
                 executor=task.executor,
-                execute_datetime=task.execute_datetime,
+                execute_time=task.execute_datetime,
             )
-            return render_template('lab/create_task.html', form=form, is_create=False)
+            return render_template('lab/create_task.html', form=form, is_create=False, task=task)
     else:
         abort(403)
 
@@ -256,15 +255,18 @@ def create_team():
 def create_activity():
     form = CreateLabActivityForm()
     if current_user.role == 'admin' or (current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_team):
-        if form.validate_on_submit():
-            new_activity = LabActivity(
-                activity_name=form.activity_name.data,
-                desc=form.desc.data,
-                start_time=form.start_time.data,
-            )
-            db.session.add(new_activity)
-            db.session.commit()
-            return redirect(url_for('lab.activity'))
+        if request.method =='POST':
+            if form.validate_on_submit():
+                new_activity = LabActivity(
+                    activity_name=form.activity_name.data,
+                    desc=form.desc.data,
+                    start_time=form.start_time.data,
+                )
+                db.session.add(new_activity)
+                db.session.commit()
+                return make_response('true', 200)
+            else:
+                return make_response('false', 200)
         else:
             return render_template('lab/create_activity.html', form=form, is_create=True)
     else:
@@ -276,7 +278,7 @@ def create_activity():
 @login_required
 def activity(page=1):
     if current_user.role == 'admin' or (current_user.role == 'monitor' and current_user.monitor_permission.publish_lab_activity):
-        activities = LabActivity.query.order_by(LabActivity.id).paginate(page, 5, False)
+        activities = LabActivity.query.order_by(LabActivity.start_time).paginate(page, 5, False)
         return render_template('lab/activity.html', activities=activities, now=datetime.now())
     else:
         abort(403)
@@ -287,6 +289,19 @@ def activity(page=1):
 def activity_detail(activity_id):
     activity = LabActivity.query.filter(LabActivity.id == activity_id).first()
     return render_template('lab/activity_detail.html', activity=activity)
+
+# 删除活动
+@bp.route('/delete_activity/', methods=('POST', ))
+@login_required
+def delete_activity():
+    if (current_user.role == 'monitor' and current_user.monitor_permission.publish_lab_activity) or current_user.role == 'admin':
+        activity_id = json.loads(request.get_data().decode(encoding='utf-8')).get('activity_id')
+        activity = LabActivity.query.filter(LabActivity.id==activity_id).first_or_404()
+        db.session.delete(activity)
+        db.session.commit()
+        return make_response('true', 200)
+    else:
+        abort(403)
 
 # 修改活动
 @bp.route('/change_activity/<int:activity_id>', methods=('GET', 'POST'))
@@ -301,9 +316,9 @@ def change_activity(activity_id):
                 activity.desc = form.desc.data
                 activity.start_time = form.start_time.data
                 db.session.commit()
-                return redirect(url_for('lab.activity_detail', activity_id=activity_id))
+                return make_response('true', 200)
             else:
-                return render_template('lab/create_activity.html', form=form, is_create=False)
+                return make_response('false', 200)
         else:
             form = ChangeLabActivityForm(
                 activity_name=activity.activity_name,

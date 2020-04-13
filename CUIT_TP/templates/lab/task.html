@@ -16,22 +16,21 @@
                                     <th scope="col">事务</th>
                                     <th scope="col">执行者</th>
                                     <th scope="col">时间</th>
-                                    <th scope="col">操作</th>
+                                    <th scope="col">状态</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% for task in tasks.items %}
                                     <tr>
                                         {#                <td style="vertical-align: middle;"><a href="{{ url_for('lab.task_detail', task_id=task.id) }}">{{ task.task_name }}</a></td>#}
-                                        <td style="vertical-align: middle;"><a href="#"
-                                                                               onclick="open_detail({{ task.id }})">{{ task.task_name }}</a>
+                                        <td style="vertical-align: middle;">
+                                            <a href="#" onclick="task_detail({{ task.id }})">
+                                                {{ task.task_name }}
+                                            </a>
                                         </td>
                                         <td style="vertical-align: middle;">{{ task.executor.username }}</td>
                                         <td style="vertical-align: middle;">{{ task.execute_datetime }}</td>
-                                        <td>
-                                            <button class="btn btn-light">完成</button>
-                                            <button class="btn btn-light" onclick="del_task({{ task.id }})">删除</button>
-                                        </td>
+                                        <td style="vertical-align: middle;">{{ '未完成' if task.status=='0' else '已结束' }}</td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
@@ -109,6 +108,7 @@
 {% block js %}
     {{ JSGlue.include() }}
     <script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
+    <script src="{{ url_for('static', filename='laydate/laydate.js') }}"></script>
     <script>
         const create_task = function () {
             jQuery.get(Flask.url_for('lab.create_task'), {}, function (data) {
@@ -121,25 +121,16 @@
                 })
             })
         };
-        const open_detail = function (task_id) {
-            $.get(Flask.url_for('lab.task_detail', {'task_id': task_id}), function (data) {
+        const task_detail = function (task_id) {
+            jQuery.get(Flask.url_for('lab.task_detail', {'task_id': task_id}), function (data) {
                 layer.open({
                     type: 1,
+                    title: '事务详情',
                     skin: 'layui-layer-rim',
-                    area: ['500px', '400px'],
+                    area: '800px',
                     content: data
                 });
             })
         };
-        const del_task = function (task_id) {
-            $.post(Flask.url_for('lab.delete_task'), JSON.stringify({'task_id': task_id}), function (data) {
-                if (data === 'true') {
-                    alert('删除成功');
-                    window.location.reload();
-                } else {
-                    alert('删除失败，请联系管理员。')
-                }
-            })
-        }
     </script>
 {% endblock %}

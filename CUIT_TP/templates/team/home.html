@@ -5,10 +5,13 @@
         <div class="row">
             <div class="col-8 offset-2">
                 <div class="card" style="padding: 10px;">
-                    <div class="card-header">
-                        <h1>{{ team.team_name }}</h1>
+                    <div class="card-header user-header alt bg-dark">
+                        <h1 class="text-light display-6">{{ team.team_name }}</h1>
                     </div>
-                    <p>简介： {{ team.desc }}</p>
+                    <div class="card-body" style="padding: 15px 0 0 0;">
+                        <p>{{ team.desc }}</p>
+                        <button class="btn btn-light" style="float: right;">修改信息</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -64,12 +67,8 @@
                             </tbody>
                         </table>
                         {% if current_user.role == 'admin' or current_user.manage_team_id == team.id %}
-                            <button class="btn-light btn"
-                                    onclick=window.location.href="{{ url_for('team.add_teammate', team_id=team.id) }}">
-                                修改信息
-                            </button>
-                            <button class="btn-light btn"
-                                    onclick=window.location.href="{{ url_for('team.add_teammate', team_id=team.id) }}">
+                            <button class="btn-light btn" style="float: right;"
+                                    onclick="add_teammate({{ team.id }})">
                                 添加成员
                             </button>
                         {% endif %}
@@ -112,19 +111,35 @@
 
 {% block js %}
     {{ JSGlue.include() }}
+    <script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
+    <script src="{{ url_for('static', filename='laydate/laydate.js') }}"></script>
     <script>
         const del_teammate = function (stu_num) {
-            if (confirm('确定要删除吗') === true) {
-                $.get(Flask.url_for("team.delete_teammate", {
-                    'team_id': {{ team.id }},
+            layer.confirm('确定删除吗?', {
+                btn: ['确定', '取消']
+            }, function () {
+                jQuery.post(Flask.url_for('team.delete_teammate', {'team_id': {{ team.id }}}), JSON.stringify({
                     'stu_num': stu_num
                 }), function (data) {
                     if (data === 'true') {
-                        alert('删除成功');
+                        layer.msg('删除成功', {icon: 1});
                         window.location.reload();
+                    } else {
+                        layer.msg('删除失败', {icon: 5});
                     }
-                });
-            }
+                })
+            });
+        };
+        const add_teammate = function (team_id) {
+            jQuery.get(Flask.url_for('team.add_teammate', {'team_id': team_id}), {}, function (data) {
+                layer.open({
+                    type: 1,
+                    title: '{{ team.team_name }}',
+                    area: '500px',
+                    skin: 'layui-layer-rim',
+                    content: data
+                })
+            })
         }
     </script>
 {% endblock %}

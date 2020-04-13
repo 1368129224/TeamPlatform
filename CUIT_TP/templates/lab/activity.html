@@ -15,36 +15,24 @@
                                 <tr>
                                     <th scope="col">名称</th>
                                     <th scope="col">时间</th>
-                                    <th scope="col">操作</th>
+                                    <th scope="col">状态</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% for activity in activities.items %}
                                     <tr>
                                         <td style="vertical-align: middle;"><a
-                                                href="{{ url_for('lab.activity_detail', activity_id=activity.id) }}">{{ activity.activity_name }}</a>
+                                                href="#"
+                                                onclick="activity_detail({{ activity.id }})">{{ activity.activity_name }}</a>
                                         </td>
                                         <td style="vertical-align: middle;">{{ activity.start_time }}</td>
-                                        {% if current_user.role=='monitor' or current_user.role=='admin' %}
-                                            <td>
-                                                <button class="btn btn-light">完成</button>
-                                            </td>
-                                        {% else %}
-                                            <td>
-                                                <button class="btn btn-light disabled" disabled>完成</button>
-                                            </td>
-                                        {% endif %}
+                                        <td style="vertical-align: middle;">
+                                            {{ '未开始' if activity.status=='0' else '已结束' }}
+                                        </td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
                             </table>
-                            <div class="row justify-content-center"
-                                 style="width: inherit;margin-left: 0;margin-right: 0;margin-bottom: 10px;">
-                                <button class="btn btn-light"
-                                        onclick=window.location.href="{{ url_for('lab.create_activity') }}">新建活动
-                                </button>
-                            </div>
-
                             <div class="dataTables_paginate paging_simple_numbers" id="bootstrap-data-table_paginate"
                                  style="margin-bottom: 10px;">
                                 <ul class="pagination justify-content-center">
@@ -102,10 +90,46 @@
                                     {% endif %}
                                 </ul>
                             </div>
+                            <div class="row justify-content-center"
+                                 style="width: inherit;margin-left: 0;margin-right: 0;margin-bottom: 10px;">
+                                <button class="btn btn-light"
+                                        onclick="create_activity()">新建活动
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block js %}
+    {{ JSGlue.include() }}
+    <script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
+    <script src="{{ url_for('static', filename='laydate/laydate.js') }}"></script>
+    <script>
+        const create_activity = function () {
+            jQuery.get(Flask.url_for('lab.create_activity'), {}, function (data) {
+                layer.open({
+                    type: 1,
+                    title: '创建活动',
+                    skin: 'layui-layer-rim',
+                    area: '500px',
+                    content: data
+                })
+            })
+        };
+        const activity_detail = function (activity_id) {
+            jQuery.get(Flask.url_for('lab.activity_detail', {'activity_id': activity_id}), function (data) {
+                layer.open({
+                    type: 1,
+                    title: '活动详情',
+                    skin: 'layui-layer-rim',
+                    area: '800px',
+                    content: data
+                });
+            })
+        };
+    </script>
 {% endblock %}

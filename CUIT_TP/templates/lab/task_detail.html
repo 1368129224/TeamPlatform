@@ -1,13 +1,50 @@
 {% extends 'iframe_base.html' %}
 
 {% block content %}
-    <div class="container" style="padding-top: 20px;padding-bottom: 20px;">
+    <div class="container" id="detail" style="padding-top: 20px;padding-bottom: 20px;">
         <h1>{{ task.task_name }}</h1>
         <br>
-        <p>详细信息： {{ task.desc }}</p>
+        <h4>{{ '未完成' if task.status=='0' else '已结束' }}</h4>
         <br>
+        <p>详细信息： {{ task.desc }}</p>
         <p>执行人： {{ task.executor.username }}</p>
         <p>开始时间： {{ task.execute_datetime }}</p>
-        <button class="btn btn-light" onclick=window.location.href="{{ url_for('lab.change_task', task_id=task.id) }}">修改</button>
+        <button class="btn btn-light" style="float: right;margin-bottom: 10px;" onclick='change_task({{ task.id }})'>修改
+        </button>
+        <button class="btn btn-light" style="float: right;margin-right: 20px;margin-bottom: 10px;" onclick="del_task({{ task.id }})">删除
+        </button>
     </div>
+
+{% endblock %}
+
+{% block js %}
+    {{ JSGlue.include() }}
+    <script>
+        const change_task = function (task_id) {
+            jQuery.get(Flask.url_for('lab.change_task', {'task_id': task_id}), {}, function (data) {
+                layer.closeAll('page');
+                layer.open({
+                    type: 1,
+                    title: '修改事务',
+                    skin: 'layui-layer-rim',
+                    area: '500px',
+                    content: data
+                });
+            });
+        };
+        const del_task = function (task_id) {
+            layer.confirm('确定删除吗?', {
+                btn: ['确定', '取消']
+            }, function () {
+                jQuery.post(Flask.url_for('lab.delete_task'), JSON.stringify({'task_id': task_id}), function (data) {
+                    if (data === 'true') {
+                        layer.msg('删除成功', {icon: 1});
+                        window.location.reload();
+                    } else {
+                        layer.msg('删除失败', {icon: 5});
+                    }
+                })
+            });
+        }
+    </script>
 {% endblock %}

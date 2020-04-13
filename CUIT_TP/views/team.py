@@ -1,3 +1,4 @@
+import json
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, make_response
 from flask_login import current_user, login_user, logout_user, login_required
 from CUIT_TP.forms.team import (
@@ -26,10 +27,11 @@ def home(team_id):
 
 
 # 删除成员
-@bp.route('/delete_teammate/<int:team_id>/<int:stu_num>')
+@bp.route('/delete_teammate/<int:team_id>/', methods=('POST',))
 @login_required
-def delete_teammate(team_id, stu_num):
+def delete_teammate(team_id):
     if current_user.manage_team_id == team_id or current_user.role == 'admin':
+        stu_num = json.loads(request.get_data().decode(encoding='utf-8')).get('stu_num')
         team = Team.query.filter(Team.id==team_id).first()
         user = User.query.filter(User.stu_num==stu_num).first()
         team.teammates.remove(user)
@@ -49,11 +51,11 @@ def add_teammate(team_id):
                 team = Team.query.filter(Team.id == team_id).first()
                 team.teammates.append(form.new_teammate.data)
                 db.session.commit()
-                return redirect(url_for('team.home', team_id=team_id))
+                return make_response('true', 200)
             else:
-                return render_template('team/add_teammate.html', form=form)
+                return make_response('false', 200)
         else:
-            return render_template('team/add_teammate.html', form=form)
+            return render_template('team/add_teammate.html', form=form, team_id=team_id)
     else:
         abort(403)
 

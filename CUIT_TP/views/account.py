@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, make_response
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import current_user, login_user, logout_user, login_required
 from CUIT_TP.forms.account import (
@@ -15,28 +15,6 @@ bp = Blueprint('account', __name__)
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
-
-# 设置管理员账号
-@bp.route('/register_admin/', methods=('GET', 'POST'))
-def register_admin():
-    if current_user.is_authenticated:
-        return redirect(url_for('home.index'))
-    if User.query.filter(User.role=='admin').first():
-        return redirect(url_for('home.index'))
-    form = AdminRegisterForm()
-    if form.validate_on_submit():
-        new_user = User(
-            username=form.username.data,
-            email=form.email.data,
-            stu_num='0000000000',
-            password=generate_password_hash(form.password.data),
-            role='admin',
-        )
-        db.session.add(new_user)
-        db.session.commit()
-        return redirect(url_for('account.login'))
-    else:
-        return render_template('account/first_run.html', form=form)
 
 # 注册
 @bp.route('/register/', methods=('GET', 'POST'))
@@ -105,29 +83,35 @@ def logout():
     return redirect(url_for('account.login'))
 
 # 修改密码
-@bp.route('/change_password/<int:stu_num>', methods=('GET', 'POST'))
+@bp.route('/change_password/<string:stu_num>', methods=('GET', 'POST'))
 @login_required
 def change_password(stu_num):
-    if current_user.stu_num == stu_num or stu_num == 0:
+    if current_user.stu_num ==stu_num or stu_num == '0':
         # 主动修改密码
         form = ChangePasswordForm()
-        if form.validate_on_submit():
-            if check_password_hash(current_user.password, form.old_password.data):
-                current_user.password = generate_password_hash(form.password.data)
-                db.session.commit()
-                return redirect((url_for('account.profile', stu_num=stu_num)))
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                if check_password_hash(current_user.password, form.old_password.data):
+                    current_user.password = generate_password_hash(form.password.data)
+                    db.session.commit()
+                    return make_response('true', 200)
+                else:
+                    return make_response('false', 200)
             else:
-                return redirect(url_for('account.change_password', stu_num=stu_num))
+                return render_template('account/change_password.html', form=form, user=current_user)
         else:
             return render_template('account/change_password.html', form=form, user=current_user)
     elif current_user.role == 'admin':
-        # 管理员修改密码
         form = ForceResetPasswordForm()
-        user = User.query.filter(User.stu_num==stu_num).first_or_404()
-        if form.validate_on_submit():
-            user.password = generate_password_hash(form.password.data)
-            db.session.commit()
-            return redirect(url_for('account.profile', stu_num=user.stu_num, user=user))
+        # 管理员修改密码
+        user = User.query.filter(User.stu_num == stu_num).first_or_404()
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                user.password = generate_password_hash(form.password.data)
+                db.session.commit()
+                return make_response('true', 200)
+            else:
+                return make_response('false', 200)
         else:
             return render_template('account/change_password.html', form=form, user=user)
 
