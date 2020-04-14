@@ -1,55 +1,59 @@
-{% extends 'iframe_base.html' %}
+<style>
+    #desc {
+        height: 360px;
+    }
+</style>
 
-{% block css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tempusdominus-bootstrap-4.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}">
-{% endblock %}
-
-{% block content %}
-    <h1>{{ '创建项目' if is_create else '修改项目'}}</h1>
+<div class="container" style="padding-top: 20px;padding-bottom: 20px;">
+    <h1>{{ '创建项目' if is_create else '修改项目' }}</h1>
     <br>
-    <form method="post" action="{{ url_for('team.create_project') if is_create else url_for('team.change_project', project_id=project_id) }}">
+    <form method="post" action="" id="form">
         {{ form.hidden_tag() }}
-        <div class="input-group mb-3" style="width: 30%;">
-            <div class="input-group-prepend">
-                <span class="input-group-text justify-content-center" style="width: 74px;">项目名称</span>
-            </div>
+        <div class="form-group" style="width: 70%;">
+            <label for="project_name" class="form-control-label">项目名称</label>
             {{ form.project_name(class="form-control") }}
         </div>
-        <div class="input-group mb-3" style="width: 50%;height: 200px;">
-            <div class="input-group-prepend">
-                <span class="input-group-text justify-content-center" style="width: 74px;">项目详情</span>
-            </div>
+        <div class="form-group">
+            <label for="desc" class="form-control-label">项目详情</label>
             {{ form.desc(class="form-control") }}
         </div>
-
-        <div class="input-group mb-3 date" id="end_time_datetimepicker" data-target-input="nearest" style="width: 30%;">
-            <div class="input-group-prepend">
-                <span class="input-group-text justify-content-center" style="width: 74px;">结束时间</span>
-            </div>
-            {{ form.end_time(class="form-control datetimepicker-input") }}
-            <div class="input-group-append" data-target="#end_time_datetimepicker" data-toggle="datetimepicker">
-                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-            </div>
+        <div class="form-group" style="width: 70%;">
+            <label for="end_time" class="form-control-label">结束时间</label>
+            {{ form.end_time(class="form-control", id="time_picker") }}
         </div>
-        <input class="btn btn-light" type="submit" value="{{ '创建' if is_create else '修改'}}">
+        {% if is_create %}
+            <input class="btn btn-light" type="button" value='创建' onclick="create_form()">
+        {% else %}
+            <input class="btn btn-light" type="button" value='修改' onclick="change_form({{ project_id }})">
+        {% endif %}
     </form>
-{% endblock %}
+</div>
 
-{% block js %}
-    <script src="{{ url_for('static', filename='js/all.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/moment.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tempusdominus-bootstrap-4.js') }}" ></script>
-    <script>
-        $(document).ready($(function () {
-            $('#end_time_datetimepicker').datetimepicker({
-                format: 'YYYY-MM-DD HH:mm',
-                todayHighlight: true,
-                icons:{
-                    time: 'fa fa-clock',
-                    date: 'fa fa-calendar-alt',
-                },
-            });
-        }));
-    </script>
-{% endblock %}
+<script>
+    laydate.render({
+        elem: '#time_picker',
+        type: 'datetime',
+        format: 'yyyy-MM-dd HH:mm',
+        theme: '#393D49'
+    });
+    var create_form = function () {
+        jQuery.post('{{ url_for("team.create_project") }}', jQuery('#form').serialize(), function (data) {
+            if (data === 'true') {
+                layer.msg('创建成功', {icon: 1});
+                parent.jQuery('#iframe').attr('src', parent.jQuery('#iframe').attr('src'));
+            } else {
+                layer.msg('创建失败', {icon: 5});
+            }
+        })
+    };
+    var change_form = function (project_id) {
+        jQuery.post(Flask.url_for("team.change_project", {"project_id": project_id}), jQuery('#form').serialize(), function (data) {
+            if (data === 'true') {
+                layer.msg('创建成功', {icon: 1});
+                parent.jQuery('#iframe').attr('src', parent.jQuery('#iframe').attr('src'));
+            } else {
+                layer.msg('创建失败', {icon: 5});
+            }
+        })
+    };
+</script>

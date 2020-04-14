@@ -22,7 +22,6 @@
                                 <tbody>
                                 {% for task in tasks.items %}
                                     <tr>
-                                        {#                <td style="vertical-align: middle;"><a href="{{ url_for('lab.task_detail', task_id=task.id) }}">{{ task.task_name }}</a></td>#}
                                         <td style="vertical-align: middle;">
                                             <a href="#" onclick="task_detail({{ task.id }})">
                                                 {{ task.task_name }}

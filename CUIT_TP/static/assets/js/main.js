@@ -46,9 +46,9 @@ jQuery(document).ready(function($) {
 		});
 	});
 
-	// Iframe Refresh
+	// Manage_iframe Refresh
 	$('#refresh').on('click', function () {
-		$('#iframe').attr('src', $('#iframe').attr('src'));
+		$('#manage_iframe').attr('src', $('#manage_iframe').attr('src'));
 	});
 	 
 	// Menu Trigger

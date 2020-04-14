@@ -28,25 +28,21 @@
                                 <th scope="col">用户名</th>
                                 <th scope="col">学号</th>
                                 <th scope="col">座位号</th>
-                                <th scope="col">操作</th>
+                                {% if current_user == team.leader %}
+                                    <th scope="col">操作</th>
+                                {% endif %}
                             </tr>
                             </thead>
                             <tbody>
                             {% for teammate in teammates %}
                                 {% if teammate == team.leader %}
-                                    <tr>
+                                    <tr style="height: 63px;">
                                         <td style="vertical-align: middle;"><a
                                                 href="{{ url_for('account.profile', stu_num=teammate.stu_num) }}">{{ teammate.username }}</a>
                                             (组长)
                                         </td>
                                         <td style="vertical-align: middle;">{{ teammate.stu_num }}</td>
                                         <td style="vertical-align: middle;">{{ teammate.profile.set_num }}</td>
-                                        <td>
-                                            <button class="btn-light btn disabled"
-                                                    onclick="del_teammate({{ teammate.stu_num }})"
-                                                    disabled>删除
-                                            </button>
-                                        </td>
                                     </tr>
                                 {% else %}
                                     <tr>
@@ -55,12 +51,13 @@
                                         </td>
                                         <td style="vertical-align: middle;">{{ teammate.stu_num }}</td>
                                         <td style="vertical-align: middle;">{{ teammate.profile.set_num }}</td>
-                                        <td>
-                                            <button class="btn-light btn {% if current_user != team.leader %}disabled{% endif %}"
-                                                    onclick="del_teammate({{ teammate.stu_num }})"
-                                                    {% if current_user != team.leader %}disabled{% endif %}>删除
-                                            </button>
-                                        </td>
+                                        {% if current_user == team.leader %}
+                                            <td>
+                                                <button class="btn-light btn"
+                                                        onclick="del_teammate({{ teammate.stu_num }})">删除
+                                                </button>
+                                            </td>
+                                        {% endif %}
                                     </tr>
                                 {% endif %}
                             {% endfor %}
@@ -86,21 +83,25 @@
                         <div class="card-header">
                             <strong class="card-title">
                                 <a style="color: black !important;"
-                                   href="{{ url_for('team.project_detail', project_id=project.id) }}">{{ project.project_name }}</a>
+                                   href="javascript:void(0);"
+                                   onclick="go_detail({{ project.id }})">{{ project.project_name }}</a>
+                                {#                               href="javascript:void(0);" onclick="jQuery('#iframe').attr('src', '{{ url_for('team.project_detail', project_id=project.id) }}')">{{ project.project_name }}</a>#}
                             </strong>
+                            <p style="float: right;margin-bottom: 0">{{ project.end_time }}</p>
                         </div>
                         <div class="card-body">
                             <p class="card-text">{{ project.desc }}</p>
-                        </div>
-                        <div class="card-footer">
-                            <p class="card-text"
-                               style="display: inline-block;margin-bottom: 0;">{{ project.end_time }}</p>
+                            {% if project.status == '0' %}
+                                <button class="btn btn-light" style="float: right">结束项目</button>
+                            {% else %}
+                                <button class="btn btn-light" style="float: right">删除项目</button>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
-                {% if current_user == team.leader %}
+                {% if current_user == team.leader or current_user.role == 'admin' %}
                     <button class="btn-light btn" style="float: right;"
-                            onclick=window.location.href="{{ url_for('team.create_project') }}">
+                            onclick="create_project()">
                         创建项目
                     </button>
                 {% endif %}
@@ -140,6 +141,20 @@
                     content: data
                 })
             })
+        };
+        const create_project = function () {
+            jQuery.get(Flask.url_for('team.create_project'), {}, function (data) {
+                layer.open({
+                    type: 1,
+                    title: '新建项目',
+                    area: '500px',
+                    skin: 'layui-layer-rim',
+                    content: data
+                })
+            })
+        };
+        const go_detail = function (project_id) {
+            parent.jQuery('#manage_iframe').attr('src', Flask.url_for('team.project_detail', {'project_id': project_id}));
         }
     </script>
 {% endblock %}

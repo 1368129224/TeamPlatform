@@ -76,9 +76,12 @@ def create_project():
                 team.projects.append(new_project)
                 db.session.add(new_project)
                 db.session.commit()
-                return redirect(url_for('team.home', team_id=current_user.manage_team_id))
+                return make_response('true', 200)
             else:
-                return render_template('team/create_project.html', form=form, is_create=True)
+                print(form.desc.errors)
+                print(form.end_time.errors)
+                print(form.project_name.errors)
+                return make_response('false', 200)
         else:
             return render_template('team/create_project.html', form=form, is_create=True)
     else:
@@ -103,14 +106,9 @@ def change_project(project_id):
             project.desc = form.desc.data
             project.end_time = form.end_time.data
             db.session.commit()
-            return redirect(url_for('team.project_detail', project_id=project_id))
+            return make_response('true', 200)
         else:
-            form = ChangeProjectForm(
-                project_name=project.project_name,
-                desc=project.desc,
-                end_time=project.end_time
-            )
-            return render_template('team/create_project.html', form=form, project_id=project_id, is_create=False)
+            return make_response('false', 200)
     else:
         form = ChangeProjectForm(
             project_name=project.project_name,

@@ -20,7 +20,7 @@ class CreateProjectForm(FlaskForm):
         'style': "resize:none;"
     })
     end_time = DateTimeField('结束时间', validators=[DataRequired()], format='%Y-%m-%d %H:%M', render_kw={
-        'data-target': '#end_time_datetimepicker',
+        'autocomplete':'off'
     })
 
 class ChangeProjectForm(CreateProjectForm):

@@ -6,15 +6,17 @@ from CUIT_TP.forms.account import (
     ResetPasswordForm, ProfileForm, ChangePasswordForm,
     AdminRegisterForm, ApplyAssetForm, ForceResetPasswordForm,
     AdminProfileForm)
-from CUIT_TP.models import User, UserProfile, Asset
+from CUIT_TP.models import User, UserProfile, Asset, Team, Project, LabActivity, LabTask
 from CUIT_TP.utils import send_email
 from CUIT_TP import db, app, login
 
 bp = Blueprint('account', __name__)
 
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
 
 # 注册
 @bp.route('/register/', methods=('GET', 'POST'))
@@ -49,6 +51,7 @@ def register():
     else:
         return render_template('account/register.html', form=form)
 
+
 # 登录
 @bp.route('/login/', methods=('GET', 'POST'))
 def login():
@@ -75,6 +78,7 @@ def login():
     else:
         return render_template('account/login.html', form=form)
 
+
 # 登出
 @bp.route('/logout/', methods=('GET', 'POST'))
 @login_required
@@ -82,11 +86,12 @@ def logout():
     logout_user()
     return redirect(url_for('account.login'))
 
+
 # 修改密码
 @bp.route('/change_password/<string:stu_num>', methods=('GET', 'POST'))
 @login_required
 def change_password(stu_num):
-    if current_user.stu_num ==stu_num or stu_num == '0':
+    if current_user.stu_num == stu_num or stu_num == '0':
         # 主动修改密码
         form = ChangePasswordForm()
         if request.method == 'POST':
@@ -115,6 +120,7 @@ def change_password(stu_num):
         else:
             return render_template('account/change_password.html', form=form, user=user)
 
+
 # 忘记密码
 @bp.route('/forget_password/', methods=('GET', 'POST'))
 def forget_password():
@@ -131,6 +137,7 @@ def forget_password():
         return redirect(url_for('account.login'))
     return render_template('account/forget_password.html', form=form)
 
+
 # 发送重置密码邮件
 def send_reset_password_email(user):
     token = user.get_reset_password_token()
@@ -141,6 +148,7 @@ def send_reset_password_email(user):
                                          user=user, token=token),
                html_body=render_template('email/reset_password.html',
                                          user=user, token=token))
+
 
 # 重置密码
 @bp.route('/reset_password/<token>/', methods=['GET', 'POST'])
@@ -157,6 +165,7 @@ def reset_password(token):
         return redirect(url_for('account.login'))
     return render_template('account/reset_password.html', form=form)
 
+
 # 管理界面
 @bp.route('/manage/')
 @login_required
@@ -168,22 +177,33 @@ def manage():
     else:
         return render_template('account/manage/manage.html')
 
+
 # Dashboard
 @bp.route('/dashboard/')
 @login_required
 def dashboard():
     if current_user.role == 'admin':
-        return render_template('account/dashboard/admin_dashboard.html')
+        team_count = Team.query.count()
+        student_count = User.query.count() - 1
+        project_count = Project.query.count()
+        return render_template('account/dashboard/admin_dashboard.html', team_count=team_count,
+                               student_count=student_count, project_count=project_count)
     elif current_user.role == 'monitor':
-        return render_template('account/dashboard/monitor_dashboard.html')
+        tasks = LabTask.query.filter(LabTask.status=='0', LabTask.executor==current_user).order_by(
+            LabTask.execute_datetime).all()
+        activities = LabActivity.query.filter(LabActivity.status=='0').order_by(LabActivity.start_time).all()
+        return render_template('account/dashboard/monitor_dashboard.html', tasks=tasks, activities=activities)
     else:
-        return render_template('account/dashboard/dashboard.html')
+        tasks = LabTask.query.filter(LabTask.status == '0', LabTask.executor == current_user).order_by(
+            LabTask.execute_datetime).all()
+        return render_template('account/dashboard/dashboard.html', tasks=tasks)
+
 
 # 个人信息
 @bp.route('/profile/<int:stu_num>/')
 @login_required
 def profile(stu_num):
-    user = User.query.filter(User.stu_num==stu_num).first_or_404()
+    user = User.query.filter(User.stu_num == stu_num).first_or_404()
     if not user.profile:
         profile = UserProfile(
             phone='0',
@@ -195,6 +215,7 @@ def profile(stu_num):
         db.session.add(profile)
         db.session.commit()
     return render_template('account/profile.html', user=user)
+
 
 # 修改管理员信息
 @bp.route('/change_admin_profile/', methods=['GET', 'POST'])
@@ -220,13 +241,15 @@ def change_admin_profile():
     else:
         abort(403)
 
+
 # 修改个人信息
 @bp.route('/change_profile/<int:stu_num>', methods=['GET', 'POST'])
 @login_required
 def change_profile(stu_num):
-    if int(current_user.stu_num) == stu_num or (current_user.role == 'admin' and stu_num != '0000000000') or (current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_student_profile):
+    if int(current_user.stu_num) == stu_num or (current_user.role == 'admin' and stu_num != '0000000000') or (
+            current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_student_profile):
         # 学生修改自己的信息/管理员修改学生信息
-        user = User.query.filter(User.stu_num==stu_num).first_or_404()
+        user = User.query.filter(User.stu_num == stu_num).first_or_404()
         form = ProfileForm(
             QQ=user.profile.QQ,
             wechat=user.profile.wechat,
@@ -252,12 +275,14 @@ def change_profile(stu_num):
     else:
         abort(403)
 
+
 # 资产展示
 @bp.route('/assets/')
 @login_required
 def assets():
     assets = Asset.query.all()
     return render_template('account/assets.html', assets=assets)
+
 
 # 申请资产
 @bp.route('/apply_asset/', methods=('GET', 'POST'))

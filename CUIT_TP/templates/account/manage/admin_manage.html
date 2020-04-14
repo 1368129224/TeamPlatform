@@ -32,7 +32,7 @@
 
 
 {% block content %}
-    <iframe id="iframe" src="{{ url_for('account.dashboard') }}" frameborder="0"
+    <iframe id="manage_iframe" src="{{ url_for('account.dashboard') }}" frameborder="0"
             style="width:100%;min-height: 100vh;"></iframe>
 {% endblock %}
 
@@ -41,7 +41,7 @@
         function remove_class(t, url) {
             $("#left_panel").children("li").removeClass("active");
             $(t).parent().addClass('active');
-            $('#iframe')[0].src = url;
+            $('#manage_iframe')[0].src = url;
         }
     </script>
 {% endblock %}

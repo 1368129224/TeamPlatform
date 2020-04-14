@@ -7,77 +7,130 @@
     <div class="content">
         <div class="animated fadeIn">
             <div class="row" style="margin: 0;">
-                <div class="col-lg-3 col-md-6">
+                <div class="col-lg-3 col-md-4">
+                    <div class="card">
+                        <h1 style="text-align: center;margin-top: 10px">实验室</h1>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li class="list-group-item list-group-item-dark">实验室任务</li>
+                                {% if tasks %}
+                                    {% for task in tasks %}
+                                        <li class="list-group-item"><p
+                                                style="margin-bottom: 0">{{ task.task_name }}<span
+                                                style="float: right">{{ task.execute_datetime }}</span></p></li>
+                                    {% endfor %}
+                                {% else %}
+                                    <li class="list-group-item">暂无任务</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li class="list-group-item list-group-item-dark">实验室活动</li>
+                                {% if activities %}
+                                    {% for activity in activities %}
+                                        <li class="list-group-item"><p
+                                                style="margin-bottom: 0;">{{ activity.activity_name }}<span
+                                                style="float: right">{{ activity.start_time }}</span></p></li>
+                                    {% endfor %}
+                                {% else %}
+                                    <li class="list-group-item">暂无活动</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% if current_user.belong_team_id %}
+                        <div class="card">
+                            <h1 style="text-align: center;margin-top: 10px">我的小组</h1>
+                            <div class="card-body">
+                                <ul class="list-group">
+                                    <li class="list-group-item list-group-item-dark">小组活动</li>
+                                    {% if current_user.belong_team.activities %}
+                                        {% for activity in current_user.belong_team.activities %}
+                                            <li class="list-group-item"><p
+                                                    style="margin-bottom: 0;">{{ activity.activity_name }}<span
+                                                    style="float: right">{{ activity.start_time }}</span></p></li>
+                                        {% endfor %}
+                                    {% else %}
+                                        <li class="list-group-item">暂无活动</li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group">
+                                    <li class="list-group-item list-group-item-dark">小组项目</li>
+                                    {% if current_user.belong_team.projects %}
+                                        {% for project in current_user.belong_team.projects %}
+                                            <li class="list-group-item"><p
+                                                    style="margin-bottom: 0;">{{ project.project_name }}<span
+                                                    style="float: right">{{ project.end_time }}</span></p></li>
+                                        {% endfor %}
+                                    {% else %}
+                                        <li class="list-group-item">暂无活动</li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-lg-9 col-md-8">
                     <div class="card">
                         <div class="card-body">
-                            <div class="stat-widget-five">
-                                <div class="stat-icon dib flat-color-1">
-                                    <i class="pe-7s-cash"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <div class="text-left dib">
-                                        <div class="stat-text">$<span class="count">23569</span></div>
-                                        <div class="stat-heading">Revenue</div>
-                                    </div>
-                                </div>
-                            </div>
+                            <table id="bootstrap-data-table" class="table table-striped table-bordered">
+                                <thead>
+                                <tr>
+                                    <th scope="col">需求</th>
+                                    <th scope="col">执行者</th>
+                                    <th scope="col">优先级</th>
+                                    <th scope="col">状态</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {#                                {% for task in tasks.items %}#}
+                                {#                                    <tr>#}
+                                {#                                        <td style="vertical-align: middle;">#}
+                                {#                                            <a href="#" onclick="task_detail({{ task.id }})">#}
+                                {#                                                {{ task.task_name }}#}
+                                {#                                            </a>#}
+                                {#                                        </td>#}
+                                {#                                        <td style="vertical-align: middle;">{{ task.executor.username }}</td>#}
+                                {#                                        <td style="vertical-align: middle;">{{ task.execute_datetime }}</td>#}
+                                {#                                        <td style="vertical-align: middle;">{{ '未完成' if task.status=='0' else '已结束' }}</td>#}
+                                {#                                    </tr>#}
+                                {#                                {% endfor %}#}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="card-body">
+                            <table id="bootstrap-data-table" class="table table-striped table-bordered">
+                                <thead>
+                                <tr>
+                                    <th scope="col">缺陷</th>
+                                    <th scope="col">执行者</th>
+                                    <th scope="col">优先级</th>
+                                    <th scope="col">状态</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {#                                {% for task in tasks.items %}#}
+                                {#                                    <tr>#}
+                                {#                                        <td style="vertical-align: middle;">#}
+                                {#                                            <a href="#" onclick="task_detail({{ task.id }})">#}
+                                {#                                                {{ task.task_name }}#}
+                                {#                                            </a>#}
+                                {#                                        </td>#}
+                                {#                                        <td style="vertical-align: middle;">{{ task.executor.username }}</td>#}
+                                {#                                        <td style="vertical-align: middle;">{{ task.execute_datetime }}</td>#}
+                                {#                                        <td style="vertical-align: middle;">{{ '未完成' if task.status=='0' else '已结束' }}</td>#}
+                                {#                                    </tr>#}
+                                {#                                {% endfor %}#}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-3 col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="stat-widget-five">
-                                <div class="stat-icon dib flat-color-2">
-                                    <i class="pe-7s-cart"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <div class="text-left dib">
-                                        <div class="stat-text"><span class="count">3435</span></div>
-                                        <div class="stat-heading">Sales</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3 col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="stat-widget-five">
-                                <div class="stat-icon dib flat-color-3">
-                                    <i class="pe-7s-browser"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <div class="text-left dib">
-                                        <div class="stat-text"><span class="count">349</span></div>
-                                        <div class="stat-heading">Templates</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3 col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="stat-widget-five">
-                                <div class="stat-icon dib flat-color-4">
-                                    <i class="pe-7s-users"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <div class="text-left dib">
-                                        <div class="stat-text"><span class="count">2986</span></div>
-                                        <div class="stat-heading">Clients</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
