@@ -28,7 +28,9 @@ class ChangeProjectForm(CreateProjectForm):
 
 def get_CreateBacklogForm(team_id):
     class CreateBacklogForm(FlaskForm):
-        backlog_name = StringField('需求', validators=(Length(max=16), DataRequired()))
+        backlog_name = StringField('需求', validators=(Length(max=16), DataRequired()), render_kw={
+            'autocomplete': 'off'
+        })
         desc = TextAreaField('详细信息', validators=[DataRequired(), Length(max=256)], render_kw={
             'style': "resize:none;"
         })
@@ -41,7 +43,9 @@ def get_CreateBacklogForm(team_id):
 
 def get_ChangeBacklogForm(team_id):
     class ChangeBacklogForm(FlaskForm):
-        backlog_name = StringField('需求', validators=(Length(max=16), DataRequired()))
+        backlog_name = StringField('需求', validators=(Length(max=16), DataRequired()), render_kw={
+            'autocomplete': 'off'
+        })
         desc = TextAreaField('详细信息', validators=[DataRequired(), Length(max=256)], render_kw={
             'style': "resize:none;"
         })
@@ -55,7 +59,9 @@ def get_ChangeBacklogForm(team_id):
 
 def get_CreateBugForm(team_id):
     class CreateBugForm(FlaskForm):
-        bug_name = StringField('缺陷', validators=(Length(max=16), DataRequired()))
+        bug_name = StringField('缺陷', validators=(Length(max=16), DataRequired()), render_kw={
+            'autocomplete': 'off'
+        })
         desc = TextAreaField('详细信息', validators=[DataRequired(), Length(max=256)], render_kw={
             'style': "resize:none;"
         })
@@ -68,7 +74,9 @@ def get_CreateBugForm(team_id):
 
 def get_ChangeBugForm(team_id):
     class ChangeBugForm(FlaskForm):
-        bug_name = StringField('缺陷', validators=(Length(max=16), DataRequired()))
+        bug_name = StringField('缺陷', validators=(Length(max=16), DataRequired()), render_kw={
+            'autocomplete': 'off'
+        })
         desc = TextAreaField('详细信息', validators=[DataRequired(), Length(max=256)], render_kw={
             'style': "resize:none;"
         })

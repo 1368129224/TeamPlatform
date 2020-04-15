@@ -15,9 +15,17 @@
                                 <li class="list-group-item list-group-item-dark">实验室任务</li>
                                 {% if tasks %}
                                     {% for task in tasks %}
-                                        <li class="list-group-item"><p
-                                                style="margin-bottom: 0">{{ task.task_name }}<span
-                                                style="float: right">{{ task.execute_datetime }}</span></p></li>
+                                        <li class="list-group-item">
+                                            <p style="margin-bottom: 0">
+                                                <a href="javascript:void (0);"
+                                                   onclick="detail('lab_task', {{ task.id }})">
+                                                    {{ task.task_name }}
+                                                </a>
+                                                <span style="float: right">
+                                                    {{ task.execute_datetime }}
+                                                </span>
+                                            </p>
+                                        </li>
                                     {% endfor %}
                                 {% else %}
                                     <li class="list-group-item">暂无任务</li>
@@ -29,9 +37,17 @@
                                 <li class="list-group-item list-group-item-dark">实验室活动</li>
                                 {% if activities %}
                                     {% for activity in activities %}
-                                        <li class="list-group-item"><p
-                                                style="margin-bottom: 0;">{{ activity.activity_name }}<span
-                                                style="float: right">{{ activity.start_time }}</span></p></li>
+                                        <li class="list-group-item">
+                                            <p style="margin-bottom: 0;">
+                                                <a href="javascript:void (0);"
+                                                   onclick="detail('lab_activity', {{ activity.id }})">
+                                                    {{ activity.activity_name }}
+                                                </a>
+                                                <span style="float: right">
+                                                    {{ activity.start_time }}
+                                                </span>
+                                            </p>
+                                        </li>
                                     {% endfor %}
                                 {% else %}
                                     <li class="list-group-item">暂无活动</li>
@@ -47,9 +63,17 @@
                                     <li class="list-group-item list-group-item-dark">小组活动</li>
                                     {% if current_user.belong_team.activities %}
                                         {% for activity in current_user.belong_team.activities %}
-                                            <li class="list-group-item"><p
-                                                    style="margin-bottom: 0;">{{ activity.activity_name }}<span
-                                                    style="float: right">{{ activity.start_time }}</span></p></li>
+                                            <li class="list-group-item">
+                                                <p style="margin-bottom: 0;">
+                                                    <a href="javascript:void (0);"
+                                                       onclick="detail('team_activity', {{ activity.id }})">
+                                                        {{ activity.activity_name }}
+                                                    </a>
+                                                    <span style="float: right">
+                                                        {{ activity.start_time }}
+                                                    </span>
+                                                </p>
+                                            </li>
                                         {% endfor %}
                                     {% else %}
                                         <li class="list-group-item">暂无活动</li>
@@ -59,11 +83,19 @@
                             <div class="card-body">
                                 <ul class="list-group">
                                     <li class="list-group-item list-group-item-dark">小组项目</li>
-                                    {% if current_user.belong_team.projects %}
-                                        {% for project in current_user.belong_team.projects %}
-                                            <li class="list-group-item"><p
-                                                    style="margin-bottom: 0;">{{ project.project_name }}<span
-                                                    style="float: right">{{ project.end_time }}</span></p></li>
+                                    {% if projects %}
+                                        {% for project in projects %}
+                                            <li class="list-group-item">
+                                                <p style="margin-bottom: 0;">
+                                                    <a href="javascript:void (0);"
+                                                       onclick="switch_project({{ project.id }}, '{{ project.project_name }}')">
+                                                        {{ project.project_name }}
+                                                    </a>
+                                                    <span style="float: right">
+                                                        {{ project.end_time }}
+                                                    </span>
+                                                </p>
+                                            </li>
                                         {% endfor %}
                                     {% else %}
                                         <li class="list-group-item">暂无活动</li>
@@ -76,62 +108,84 @@
 
                 <div class="col-lg-9 col-md-8">
                     <div class="card">
+                        <div class="card-header" style="text-align: center;">
+                            <h1 id="project_name">{{ projects[0].project_name }}</h1></div>
                         <div class="card-body">
-                            <table id="bootstrap-data-table" class="table table-striped table-bordered">
-                                <thead>
-                                <tr>
-                                    <th scope="col">需求</th>
-                                    <th scope="col">执行者</th>
-                                    <th scope="col">优先级</th>
-                                    <th scope="col">状态</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {#                                {% for task in tasks.items %}#}
-                                {#                                    <tr>#}
-                                {#                                        <td style="vertical-align: middle;">#}
-                                {#                                            <a href="#" onclick="task_detail({{ task.id }})">#}
-                                {#                                                {{ task.task_name }}#}
-                                {#                                            </a>#}
-                                {#                                        </td>#}
-                                {#                                        <td style="vertical-align: middle;">{{ task.executor.username }}</td>#}
-                                {#                                        <td style="vertical-align: middle;">{{ task.execute_datetime }}</td>#}
-                                {#                                        <td style="vertical-align: middle;">{{ '未完成' if task.status=='0' else '已结束' }}</td>#}
-                                {#                                    </tr>#}
-                                {#                                {% endfor %}#}
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="card-body">
-                            <table id="bootstrap-data-table" class="table table-striped table-bordered">
-                                <thead>
-                                <tr>
-                                    <th scope="col">缺陷</th>
-                                    <th scope="col">执行者</th>
-                                    <th scope="col">优先级</th>
-                                    <th scope="col">状态</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {#                                {% for task in tasks.items %}#}
-                                {#                                    <tr>#}
-                                {#                                        <td style="vertical-align: middle;">#}
-                                {#                                            <a href="#" onclick="task_detail({{ task.id }})">#}
-                                {#                                                {{ task.task_name }}#}
-                                {#                                            </a>#}
-                                {#                                        </td>#}
-                                {#                                        <td style="vertical-align: middle;">{{ task.executor.username }}</td>#}
-                                {#                                        <td style="vertical-align: middle;">{{ task.execute_datetime }}</td>#}
-                                {#                                        <td style="vertical-align: middle;">{{ '未完成' if task.status=='0' else '已结束' }}</td>#}
-                                {#                                    </tr>#}
-                                {#                                {% endfor %}#}
-                                </tbody>
-                            </table>
+                            <h2 style="text-align: center;margin: 10px 0;">需求</h2>
+                            <div id="backlog"></div>
+                            <hr>
+                            <h2 style="text-align: center;margin: 10px 0;">缺陷</h2>
+                            <div id="bug"></div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block js %}
+    {{ JSGlue.include() }}
+    <script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
+    <script>
+        {% if projects %}
+            window.onload = function () {
+                jQuery.get(Flask.url_for('team.project_backlog', {'project_id': {{ projects[0].id }}}), {}, function (data) {
+                    jQuery('#backlog').append(data)
+                });
+                jQuery.get(Flask.url_for('team.project_bug', {'project_id': {{ projects[0].id }}}), {}, function (data) {
+                    jQuery('#bug').append(data)
+                })
+            };
+        {% endif %}
+        const flash_backlog = function (project_id, page = 1) {
+            jQuery.get(Flask.url_for('team.project_backlog', {
+                'project_id': project_id,
+                'page': page
+            }), {}, function (data) {
+                jQuery('#backlog').html(data);
+            })
+        };
+        const flash_bug = function (project_id, page = 1) {
+            jQuery.get(Flask.url_for('team.project_bug', {
+                'project_id': project_id,
+                'page': page
+            }), {}, function (data) {
+                jQuery('#bug').html(data);
+            })
+        };
+        const switch_project = function (project_id, project_name) {
+            jQuery('#project_name').html(project_name);
+            flash_backlog(project_id);
+            flash_bug(project_id);
+        };
+        const detail = function (detail_type, id) {
+            var url, title;
+            switch (detail_type) {
+                case 'lab_task': {
+                    url = Flask.url_for('lab.task_detail', {'task_id': id});
+                    title = '实验室任务';
+                    break;
+                }
+                case 'lab_activity': {
+                    url = Flask.url_for('lab.activity_detail', {'activity_id': id});
+                    title = '实验室活动';
+                    break;
+                }
+                default: {
+                    url = Flask.url_for('lab.activity_detail', {'activity_id': id});
+                    title = '小组活动';
+                }
+            }
+            jQuery.get(url, {}, function (data) {
+                layer.open({
+                    type: 1,
+                    title: title,
+                    area: '500px',
+                    skin: 'layui-layer-rim',
+                    content: data
+                })
+            })
+        }
+    </script>
 {% endblock %}

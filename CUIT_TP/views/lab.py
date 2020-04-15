@@ -2,7 +2,11 @@ import json
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, make_response
 from flask_login import current_user, login_required
-from CUIT_TP.forms.lab import ChangeProfileForm, CreateLabTaskForm, CreateTeamForm, CreateLabActivityForm, ChangeLabActivityForm, ChangeLabTaskForm, MonitorForm
+from CUIT_TP.forms.lab import (
+    ChangeProfileForm, CreateLabTaskForm, CreateTeamForm,
+    CreateLabActivityForm, ChangeLabActivityForm, ChangeLabTaskForm,
+    MonitorForm, ChangeLabSettingsForm
+)
 from CUIT_TP.models import db, User, LabTask, Asset, Team, UserProfile, LabActivity, Monitor
 from CUIT_TP import login, app
 
@@ -11,6 +15,22 @@ bp = Blueprint('lab', __name__)
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+# 系统设置
+@bp.route('/settings/')
+@login_required
+def settings():
+    if current_user.role != 'admin':
+        abort(403)
+    form = ChangeLabSettingsForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            pass
+        else:
+            pass
+    else:
+        return render_template('lab/settings.html', form=form)
+
 
 # 展示学生信息
 @bp.route('/member/')
@@ -112,10 +132,9 @@ def delete_task():
         abort(403)
 
 # 事务详情
-@bp.route('/task_detail/')
+@bp.route('/task_detail/<int:task_id>')
 @login_required
-def task_detail():
-    task_id = request.args.get('task_id')
+def task_detail(task_id):
     task = LabTask.query.filter(LabTask.id==task_id).first()
     return render_template('lab/task_detail.html', task=task)
 

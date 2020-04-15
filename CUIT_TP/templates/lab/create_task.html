@@ -55,7 +55,7 @@
     var create_form = function () {
         jQuery.post('{{ url_for("lab.create_task") }}', jQuery('#form').serialize(), function (data) {
             if (data === 'true') {
-                layer.msg('创建成功', {icon: 1});
+                layer.msg('创建成功', {icon: 1}, {time: 500});
                 parent.jQuery('#iframe').attr('src', parent.jQuery('#iframe').attr('src'));
             } else {
                 layer.msg('创建失败', {icon: 5});
@@ -65,7 +65,7 @@
     var change_form = function (task_id) {
         jQuery.post(Flask.url_for("lab.change_task", {"task_id": task_id}), jQuery('#form').serialize(), function (data) {
             if (data === 'true') {
-                layer.msg('修改成功', {icon: 1});
+                layer.msg('修改成功', {icon: 1}, {time: 500});
                 parent.jQuery('#iframe').attr('src', parent.jQuery('#iframe').attr('src'));
             } else {
                 layer.msg('修改失败', {icon: 5});

@@ -192,7 +192,11 @@ def dashboard():
         tasks = LabTask.query.filter(LabTask.status=='0', LabTask.executor==current_user).order_by(
             LabTask.execute_datetime).all()
         activities = LabActivity.query.filter(LabActivity.status=='0').order_by(LabActivity.start_time).all()
-        return render_template('account/dashboard/monitor_dashboard.html', tasks=tasks, activities=activities)
+        if current_user.belong_team_id:
+            projects = Project.query.filter(Project.belong_team_id==current_user.belong_team_id).order_by(Project.status.asc()).all()
+        else:
+            projects = None
+        return render_template('account/dashboard/monitor_dashboard.html', tasks=tasks, activities=activities, projects=projects)
     else:
         tasks = LabTask.query.filter(LabTask.status == '0', LabTask.executor == current_user).order_by(
             LabTask.execute_datetime).all()

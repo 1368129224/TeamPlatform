@@ -94,6 +94,24 @@ def project_detail(project_id):
     project = Project.query.filter(Project.id==project_id).first_or_404()
     return render_template('team/project_detail.html', project=project)
 
+# 项目需求
+@bp.route('/project_backlog/<int:project_id>/')
+@bp.route('/project_backlog/<int:project_id>/<int:page>/')
+@login_required
+def project_backlog(project_id, page=1):
+    project = Project.query.filter(Project.id==project_id).first_or_404()
+    backlogs = Backlog.query.filter(Backlog.project_id==project_id).order_by(Backlog.status.asc(), Backlog.priority.desc()).paginate(page, 5, False)
+    return render_template('team/project_backlog.html', backlogs=backlogs, project=project)
+
+# 项目缺陷
+@bp.route('/project_bug/<int:project_id>/')
+@bp.route('/project_bug/<int:project_id>/<int:page>/')
+@login_required
+def project_bug(project_id, page=1):
+    project = Project.query.filter(Project.id == project_id).first_or_404()
+    bugs = Bug.query.filter(Bug.project_id==project_id).order_by(Bug.status.asc(), Bug.priority.desc()).paginate(page, 5, False)
+    return render_template('team/project_bug.html', bugs=bugs, project=project)
+
 # 修改项目信息
 @bp.route('/change_project/<int:project_id>', methods=('GET', 'POST'))
 @login_required
@@ -125,18 +143,21 @@ def create_backlog(project_id):
     if current_user.belong_team_id == project.belong_team_id or current_user.role == 'admin':
         CreateBacklogForm = get_CreateBacklogForm(current_user.belong_team_id)
         form = CreateBacklogForm()
-        if form.validate_on_submit():
-            new_backlog = Backlog(
-                project_id=project_id,
-                backlog_name=form.backlog_name.data,
-                desc=form.desc.data,
-                priority=form.priority.data,
-            )
-            form.executor.data.project_backlog.append(new_backlog)
-            db.session.add(new_backlog)
-            db.session.commit()
-            return redirect(url_for('team.project_detail', project_id=project_id))
-        return render_template('team/create_backlog.html', form=form)
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                new_backlog = Backlog(
+                    project_id=project_id,
+                    backlog_name=form.backlog_name.data,
+                    desc=form.desc.data,
+                    priority=form.priority.data,
+                )
+                form.executor.data.project_backlog.append(new_backlog)
+                db.session.add(new_backlog)
+                db.session.commit()
+                return make_response('true', 200)
+            return make_response('false', 200)
+        else:
+            return render_template('team/create_backlog.html', form=form, project=project)
     else:
         abort(403)
 
@@ -198,18 +219,21 @@ def create_bug(project_id):
     if current_user.belong_team_id == project.belong_team_id or current_user.role == 'admin':
         CreateBugForm = get_CreateBugForm(current_user.belong_team_id)
         form = CreateBugForm()
-        if form.validate_on_submit():
-            new_bug = Bug(
-                project_id=project_id,
-                bug_name=form.bug_name.data,
-                desc=form.desc.data,
-                priority=form.priority.data,
-            )
-            form.executor.data.project_bug.append(new_bug)
-            db.session.add(new_bug)
-            db.session.commit()
-            return redirect(url_for('team.project_detail', project_id=project_id))
-        return render_template('team/create_bug.html', form=form)
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                new_bug = Bug(
+                    project_id=project_id,
+                    bug_name=form.bug_name.data,
+                    desc=form.desc.data,
+                    priority=form.priority.data,
+                )
+                form.executor.data.project_bug.append(new_bug)
+                db.session.add(new_bug)
+                db.session.commit()
+                return make_response('true', 200)
+            return make_response('false', 200)
+        else:
+            return render_template('team/create_bug.html', form=form, project=project)
     else:
         abort(403)
 

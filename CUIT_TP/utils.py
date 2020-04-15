@@ -25,7 +25,7 @@ class Config(object):
     BASEDIR = os.path.abspath(os.path.dirname(__file__))
     # 管理员账户邮箱
     ADMIN_EMAIL = "{str(app.config.get('ADMIN_EMAIL'))}"
-    # 实验室名称
+    # 系统名称
     LAB_NAME = "{str(app.config.get('LAB_NAME'))}"
     # 实验室座位数
     LAB_SET_NUM = "{str(app.config.get('LAB_SET_NUM'))}"
