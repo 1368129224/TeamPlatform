@@ -1,0 +1,12 @@
+{% extends 'iframe_base.html' %}
+
+{% block content %}
+    <div class="container" style="padding-top: 20px;padding-bottom: 20px;">
+        <h1>{{ asset.asset_name }}</h1>
+        <br>
+        <p>详细信息： {{ asset.desc }}</p>
+        <p>开始时间： {{ asset.start_time }}</p>
+        <p>结束时间： {{ asset.end_time }}</p>
+        <p>申请人： {{ asset.user.username }}</p>
+    </div>
+{% endblock %}

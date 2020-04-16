@@ -27,7 +27,8 @@
                                         </td>
                                         <td style="vertical-align: middle;">{{ activity.start_time }}</td>
                                         <td style="vertical-align: middle;">
-                                            {{ '未开始' if activity.status=='0' else '已结束' }}
+                                            <span style="vertical-align: middle;">{{ '未开始' if activity.status=='0' else '已结束' }}</span>
+                                            <button class="btn btn-light btn-sm" style="float: right;" onclick="change_status({{ activity.id }})">切换状态</button>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -131,5 +132,15 @@
                 });
             })
         };
+        const change_status = function (activity_id) {
+            jQuery.post(Flask.url_for('lab.change_activity_status', {'activity_id': activity_id}), {}, function (data) {
+                if (data === 'true') {
+                    layer.msg('切换成功', {icon: 1}, {time: 300});
+                    window.location.reload();
+                } else {
+                    layer.msg('切换失败', {icon: 5}, {time: 300});
+                }
+            })
+        }
     </script>
 {% endblock %}

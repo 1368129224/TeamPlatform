@@ -29,7 +29,9 @@
                                         </td>
                                         <td style="vertical-align: middle;">{{ task.executor.username }}</td>
                                         <td style="vertical-align: middle;">{{ task.execute_datetime }}</td>
-                                        <td style="vertical-align: middle;">{{ '未完成' if task.status=='0' else '已结束' }}</td>
+                                        <td style="vertical-align: middle;"><span style="vertical-align: middle;">{{ '未完成' if task.status=='0' else '已完成' }}</span>
+                                            <button class="btn btn-light btn-sm" style="float: right;" onclick="change_status({{ task.id }})">切换状态</button>
+                                        </td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
@@ -131,5 +133,15 @@
                 });
             })
         };
+        const change_status = function (task_id) {
+            jQuery.post(Flask.url_for('lab.change_task_status', {'task_id': task_id}), {}, function (data) {
+                if (data==='true'){
+                    layer.msg('切换成功', {icon: 1}, {time: 300});
+                        window.location.reload();
+                }else{
+                    layer.msg('切换失败', {icon: 5}, {time: 300});
+                }
+            })
+        }
     </script>
 {% endblock %}

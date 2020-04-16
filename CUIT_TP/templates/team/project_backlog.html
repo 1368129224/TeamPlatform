@@ -100,7 +100,7 @@
 
 
 <script>
-    const create_backlog = function (project_id) {
+    var create_backlog = function (project_id) {
         jQuery.get(Flask.url_for('team.create_backlog', {'project_id': project_id}), {}, function (data) {
             layer.open({
                 type: 1,

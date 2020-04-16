@@ -53,8 +53,9 @@
                                 <p style="margin: 0;"><i class="fa fa-envelope"></i>{{ user.email }}</p>
                             </li>
                             <li class="list-group-item" style="color: #878787;">
-                                <p style="margin: 0;"><i
-                                        class="fa fa-phone-square"></i>{{ '未设置' if user.profile.phone == '0' else user.profile.phone }}
+                                <p style="margin: 0;">
+                                    <i class="fa fa-phone-square"></i>
+                                    {{ '未设置' if user.profile.phone == '0' else user.profile.phone }}
                                 </p>
                             </li>
                             <li class="list-group-item" style="color: #878787;">

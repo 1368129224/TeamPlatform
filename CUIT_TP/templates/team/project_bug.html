@@ -95,7 +95,7 @@
 
 
 <script>
-    const create_bug = function (project_id) {
+    var create_bug = function (project_id) {
         jQuery.get(Flask.url_for('team.create_bug', {'project_id': project_id}), {}, function (data) {
             layer.open({
                 type: 1,

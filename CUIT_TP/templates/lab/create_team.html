@@ -1,30 +1,42 @@
-{% extends 'base.html' %}
+<style>
+    #desc {
+        height: 360px;
+    }
+</style>
 
-{% block title %}
-    创建小组
-{% endblock %}
+<div class="card" style="width: 488px;margin: 0">
+    <div class="card-body">
+        <form method="post" action="" id="form">
+            {{ form.hidden_tag() }}
+            <div class="form-group" style="width: 70%;">
+                <label for="team_name" class="form-control-label">小组名称</label>
+                {{ form.team_name(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <label for="desc" class="form-control-label">小组简介</label>
+                {{ form.desc(class="form-control") }}
+            </div>
+            <div class="form-group" style="width: 70%;">
+                <label for="leader" class="form-control-label">小组组长</label>
+                {{ form.leader(class="form-control") }}
+            </div>
+            <input class="btn btn-light" type="button" value="创建" onclick="commit_form()"/>
+        </form>
+    </div>
+</div>
 
-{% block content %}
-    <form method="post" action="">
-        {{ form.hidden_tag() }}
-        <div class="input-group mb-3" style="width: 30%;">
-            <div class="input-group-prepend">
-                <span class="input-group-text">小组名称</span>
-            </div>
-            {{ form.team_name(class="form-control") }}
-        </div>
-        <div class="input-group mb-3" style="width: 50%;height: 200px;">
-            <div class="input-group-prepend">
-                <span class="input-group-text">小组简介</span>
-            </div>
-            {{ form.desc(class="form-control") }}
-        </div>
-        <div class="input-group mb-3" style="width: 20%;">
-            <div class="input-group-prepend">
-                <span class="input-group-text">小组组长</span>
-            </div>
-            {{ form.leader(class="form-control") }}
-        </div>
-        <input class="btn btn-light" type="submit" value="go">
-    </form>
-{% endblock %}
+{{ JSGlue.include() }}
+<script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
+<script>
+    var commit_form = function () {
+        jQuery.post("{{ url_for('lab.create_team') }}", jQuery('#form').serialize(), function (data) {
+            if (data === 'true') {
+                layer.msg('创建成功', {icon: 1}, {time: 400});
+                layer.closeAll('page');
+                parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#manage_iframe').attr('src'));
+            } else {
+                layer.msg('创建失败', {icon: 5}, {time: 400});
+            }
+        })
+    }
+</script>

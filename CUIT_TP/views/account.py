@@ -287,23 +287,32 @@ def assets():
     assets = Asset.query.all()
     return render_template('account/assets.html', assets=assets)
 
+# 资产详情
+@bp.route('/asset_detail/<int:asset_id>/')
+@login_required
+def asset_detail(asset_id):
+    asset = Asset.query.filter(Asset.id==asset_id).first_or_404()
+    return render_template('account/asset_detail.html', asset=asset)
 
 # 申请资产
 @bp.route('/apply_asset/', methods=('GET', 'POST'))
 @login_required
 def apply_asset():
     form = ApplyAssetForm()
-    if form.validate_on_submit():
-        new_asset = Asset(
-            user=current_user,
-            asset_name=form.asset_name.data,
-            desc=form.desc.data,
-            start_time=form.start_time.data,
-            end_time=form.end_time.data,
-            status='0'
-        )
-        db.session.add(new_asset)
-        db.session.commit()
-        return redirect(url_for('account.assets'))
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            new_asset = Asset(
+                user=current_user,
+                asset_name=form.asset_name.data,
+                desc=form.desc.data,
+                start_time=form.start_time.data,
+                end_time=form.end_time.data,
+                status='0'
+            )
+            db.session.add(new_asset)
+            db.session.commit()
+            return make_response('true', 200)
+        else:
+            return make_response('false', 200)
     else:
         return render_template('account/apply_asset.html', form=form)

@@ -1,7 +1,7 @@
 {% extends 'iframe_base.html' %}
 
 {% block content %}
-    <div class="container-fluid" style="padding: 40px 0;">
+    <div class="container-fluid" style="padding: 40px 20px;">
         <div class="row">
             <div class="col-8 offset-2">
                 <div class="card" style="padding: 10px;">
@@ -16,7 +16,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-5 offset-1">
+            <div class="col-6">
                 <div class="card">
                     <div class="card-header" style="text-align: center">
                         <strong class="card-title">小组成员</strong>
@@ -28,7 +28,7 @@
                                 <th scope="col">用户名</th>
                                 <th scope="col">学号</th>
                                 <th scope="col">座位号</th>
-                                {% if current_user == team.leader %}
+                                {% if current_user == team.leader or current_user.role == 'admin'%}
                                     <th scope="col">操作</th>
                                 {% endif %}
                             </tr>
@@ -51,7 +51,7 @@
                                         </td>
                                         <td style="vertical-align: middle;">{{ teammate.stu_num }}</td>
                                         <td style="vertical-align: middle;">{{ teammate.profile.set_num }}</td>
-                                        {% if current_user == team.leader %}
+                                        {% if current_user == team.leader or current_user.role == 'admin'%}
                                             <td>
                                                 <button class="btn-light btn"
                                                         onclick="del_teammate({{ teammate.stu_num }})">删除
@@ -72,7 +72,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-5">
+            <div class="col-6">
                 {% if projects == [] %}
                     <div class="card">
                         <div class="card-body"><p class="card-text">目前没有项目</p></div>

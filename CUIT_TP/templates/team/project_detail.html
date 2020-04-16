@@ -25,12 +25,12 @@
                 jQuery('#project_detail').append(data)
             })
         };
-        const flash_backlog = function (project_id, page=1) {
+        var flash_backlog = function (project_id, page=1) {
             jQuery.get(Flask.url_for('team.project_backlog', {'project_id': project_id, 'page': page}), {}, function (data) {
                 jQuery('#project_detail').html(data);
             })
         };
-        const flash_bug = function (project_id, page=1) {
+        var flash_bug = function (project_id, page=1) {
             jQuery.get(Flask.url_for('team.project_bug', {'project_id': project_id, 'page': page}), {}, function (data) {
                 jQuery('#project_detail').html(data);
             })

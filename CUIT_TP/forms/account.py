@@ -100,13 +100,15 @@ class ChangePasswordForm(FlaskForm):
 
 
 class ApplyAssetForm(FlaskForm):
-    asset_name = StringField('资产名称', validators=[DataRequired(), Length(max=32)])
+    asset_name = StringField('资产名称', validators=[DataRequired(), Length(max=32)], render_kw={
+        'autocomplete':'off'
+    })
     desc = TextAreaField('详细信息', validators=[DataRequired(), Length(max=256)], render_kw={
-        'style': "resize:none;"
+        'style': "resize:none;", 'autocomplete':'off'
     })
     start_time = DateTimeField('开始时间', validators=[DataRequired()], format='%Y-%m-%d %H:%M', render_kw={
-        'data-target': '#start_datetimepicker',
+        'autocomplete':'off'
     })
     end_time = DateTimeField('结束时间', validators=[DataRequired()], format='%Y-%m-%d %H:%M', render_kw={
-        'data-target':'#end_datetimepicker',
+        'autocomplete':'off'
     })

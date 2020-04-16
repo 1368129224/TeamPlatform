@@ -1,7 +1,6 @@
 {% extends 'iframe_base.html' %}
 
 {% block content %}
-
     <div class="content">
         <div class="animated fadeIn">
             <div class="row">
@@ -14,16 +13,16 @@
                             <table id="bootstrap-data-table" class="table table-striped table-bordered">
                                 <thead>
                                 <tr>
-                                    <th>姓名</th>
-                                    <th>学号</th>
-                                    <th>状态</th>
-                                    <th>操作</th>
+                                    <th style="width: 50%">资产</th>
+                                    <th style="width: 20%">姓名</th>
+                                    <th style="width: 20%">状态</th>
+                                    <th style="width: 10%">操作</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% for asset in assets.items %}
                                     <tr>
-                                        <td style="vertical-align: middle;">{{ asset.asset_name }}</td>
+                                        <td style="vertical-align: middle;"><a href="javascript:void(0);" onclick="asset_detail({{ asset.id }})">{{ asset.asset_name }}</a></td>
                                         <td style="vertical-align: middle;">{{ asset.user.username }}</td>
                                         <td style="vertical-align: middle;">
                                             {% if asset.status == '0' %}
@@ -35,7 +34,7 @@
                                                 <p style="margin: 0;">已归还</p>
                                             {% endif %}
                                         </td>
-                                        <td>
+                                        <td style="vertical-align: middle;text-align: center">
                                             <button class="btn btn-light {% if asset.status == '1' %}disabled{% elif asset.status == '2' %}disabled{% endif %}"
                                                     onclick="change_status({{ asset.id }}, '1')"
                                                     {% if asset.status == '1' %}disabled{% elif asset.status == '2' %}disabled{% endif %}>
@@ -51,11 +50,9 @@
                                 {% endfor %}
                                 </tbody>
                             </table>
-
                             <div class="dataTables_paginate paging_simple_numbers" id="bootstrap-data-table_paginate"
                                  style="margin-bottom: 10px;">
                                 <ul class="pagination justify-content-center">
-
                                     {% if assets.has_prev %}
                                         <li class="paginate_button page-item previous"
                                             id="bootstrap-data-table_previous">
@@ -119,16 +116,30 @@
 
 {% block js %}
     {{ JSGlue.include() }}
+    <script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
     <script>
         function change_status(asset_id, status) {
-            $.post(Flask.url_for('lab.deliver_asset'), JSON.stringify({
+            jQuery.post(Flask.url_for('lab.deliver_asset'), JSON.stringify({
                 'asset_id': asset_id,
                 'status': status
             }), function (data) {
                 if (data === 'true') {
-                    alert('修改成功');
+                    layer.msg('修改成功', {icon:5}, {time:400});
                     window.location.reload();
+                }else{
+                    layer.msg('修改失败', {icon:5}, {time:400})
                 }
+            })
+        }
+        function asset_detail(asset_id) {
+            jQuery.get(Flask.url_for('account.asset_detail', {"asset_id": asset_id}), {}, function (data) {
+                layer.open({
+                    type: 1,
+                    title: '申请详情',
+                    skin: 'layui-layer-rim',
+                    area: '500px',
+                    content: data
+                });
             })
         }
     </script>

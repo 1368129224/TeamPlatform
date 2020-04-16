@@ -34,13 +34,15 @@
         elem: '#time_picker',
         type: 'datetime',
         format: 'yyyy-MM-dd HH:mm',
+        trigger: 'click',
         theme: '#393D49'
     });
     var create_form = function () {
         jQuery.post('{{ url_for("team.create_project") }}', jQuery('#form').serialize(), function (data) {
             if (data === 'true') {
                 layer.msg('创建成功', {icon: 1});
-                parent.jQuery('#iframe').attr('src', parent.jQuery('#iframe').attr('src'));
+                layer.closeAll('page');
+                parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#manage_iframe').attr('src'));
             } else {
                 layer.msg('创建失败', {icon: 5});
             }
@@ -50,7 +52,7 @@
         jQuery.post(Flask.url_for("team.change_project", {"project_id": project_id}), jQuery('#form').serialize(), function (data) {
             if (data === 'true') {
                 layer.msg('创建成功', {icon: 1});
-                parent.jQuery('#iframe').attr('src', parent.jQuery('#iframe').attr('src'));
+                parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#manage_iframe').attr('src'));
             } else {
                 layer.msg('创建失败', {icon: 5});
             }

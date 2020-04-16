@@ -138,6 +138,19 @@ def task_detail(task_id):
     task = LabTask.query.filter(LabTask.id==task_id).first()
     return render_template('lab/task_detail.html', task=task)
 
+# 切换事务状态
+# todo 修改post
+@bp.route('/change_task_status/<int:task_id>/', methods=('POST', ))
+@login_required
+def change_task_status(task_id):
+    if (current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_task) or current_user.role == 'admin':
+        task = LabTask.query.filter(LabTask.id==task_id).first_or_404()
+        task.status = '0' if task.status=='1' else '1'
+        db.session.commit()
+        return make_response('true', 200)
+    else:
+        abort(403)
+
 # 修改事务
 @bp.route('/change_task/<int:task_id>/', methods=('POST', 'GET'))
 @login_required
@@ -251,19 +264,35 @@ def teams(page=1):
 def create_team():
     if (current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_team) or current_user.role == 'admin':
         form = CreateTeamForm()
-        if form.validate_on_submit():
-            new_team = Team(
-                team_name=form.team_name.data,
-                desc=form.desc.data,
-                leader=form.leader.data,
-            )
-            leader = User.query.filter(User.id==form.leader.data.id).first()
-            new_team.teammates.append(leader)
-            db.session.add(new_team)
-            db.session.commit()
-            return redirect(url_for('lab.teams'))
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                new_team = Team(
+                    team_name=form.team_name.data,
+                    desc=form.desc.data,
+                    leader=form.leader.data,
+                )
+                leader = User.query.filter(User.id==form.leader.data.id).first()
+                new_team.teammates.append(leader)
+                db.session.add(new_team)
+                db.session.commit()
+                return make_response('true', 200)
+            else:
+                return make_response('false', 200)
         else:
             return render_template('lab/create_team.html', form=form)
+    else:
+        abort(403)
+
+# 删除小组
+@bp.route('/delete_team/', methods=('POST', ))
+@login_required
+def delete_team():
+    if (current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_team) or current_user.role == 'admin':
+        team_id = json.loads(request.get_data().decode(encoding='utf-8')).get('team_id')
+        team = Team.query.filter(Team.id==team_id).first_or_404()
+        db.session.delete(team)
+        db.session.commit()
+        return make_response('true', 200)
     else:
         abort(403)
 
@@ -297,7 +326,7 @@ def create_activity():
 @login_required
 def activity(page=1):
     if current_user.role == 'admin' or (current_user.role == 'monitor' and current_user.monitor_permission.publish_lab_activity):
-        activities = LabActivity.query.order_by(LabActivity.start_time).paginate(page, 5, False)
+        activities = LabActivity.query.order_by(LabActivity.status, LabActivity.start_time).paginate(page, 5, False)
         return render_template('lab/activity.html', activities=activities, now=datetime.now())
     else:
         abort(403)
@@ -308,6 +337,19 @@ def activity(page=1):
 def activity_detail(activity_id):
     activity = LabActivity.query.filter(LabActivity.id == activity_id).first()
     return render_template('lab/activity_detail.html', activity=activity)
+
+# 切换活动状态
+# todo 修改post
+@bp.route('/change_activity_status/<int:activity_id>/', methods=('POST', ))
+@login_required
+def change_activity_status(activity_id):
+    if (current_user.role == 'monitor' and current_user.monitor_permission.publish_lab_activity) or current_user.role == 'admin':
+        activity = LabActivity.query.filter(LabActivity.id==activity_id).first_or_404()
+        activity.status = '0' if activity.status=='1' else '1'
+        db.session.commit()
+        return make_response('true', 200)
+    else:
+        abort(403)
 
 # 删除活动
 @bp.route('/delete_activity/', methods=('POST', ))
