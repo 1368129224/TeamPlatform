@@ -100,7 +100,7 @@ def project_detail(project_id):
 @login_required
 def project_backlog(project_id, page=1):
     project = Project.query.filter(Project.id==project_id).first_or_404()
-    backlogs = Backlog.query.filter(Backlog.project_id==project_id).order_by(Backlog.status.asc(), Backlog.priority.desc()).paginate(page, 5, False)
+    backlogs = Backlog.query.filter(Backlog.belong_project_id==project_id).order_by(Backlog.status.asc(), Backlog.priority.desc()).paginate(page, 5, False)
     return render_template('team/project_backlog.html', backlogs=backlogs, project=project)
 
 # 项目缺陷
@@ -109,7 +109,7 @@ def project_backlog(project_id, page=1):
 @login_required
 def project_bug(project_id, page=1):
     project = Project.query.filter(Project.id == project_id).first_or_404()
-    bugs = Bug.query.filter(Bug.project_id==project_id).order_by(Bug.status.asc(), Bug.priority.desc()).paginate(page, 5, False)
+    bugs = Bug.query.filter(Bug.belong_project_id==project_id).order_by(Bug.status.asc(), Bug.priority.desc()).paginate(page, 5, False)
     return render_template('team/project_bug.html', bugs=bugs, project=project)
 
 # 修改项目信息
@@ -146,12 +146,12 @@ def create_backlog(project_id):
         if request.method == 'POST':
             if form.validate_on_submit():
                 new_backlog = Backlog(
-                    project_id=project_id,
                     backlog_name=form.backlog_name.data,
                     desc=form.desc.data,
                     priority=form.priority.data,
                 )
                 form.executor.data.project_backlog.append(new_backlog)
+                project.backlogs.append(new_backlog)
                 db.session.add(new_backlog)
                 db.session.commit()
                 return make_response('true', 200)
@@ -222,11 +222,11 @@ def create_bug(project_id):
         if request.method == 'POST':
             if form.validate_on_submit():
                 new_bug = Bug(
-                    project_id=project_id,
                     bug_name=form.bug_name.data,
                     desc=form.desc.data,
                     priority=form.priority.data,
                 )
+                project.bugs.append(new_bug)
                 form.executor.data.project_bug.append(new_bug)
                 db.session.add(new_bug)
                 db.session.commit()

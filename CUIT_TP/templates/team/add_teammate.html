@@ -14,7 +14,8 @@
         jQuery.post(Flask.url_for("team.add_teammate", {"team_id": team_id}), jQuery('#form').serialize(), function (data) {
             if (data === 'true') {
                 layer.msg('添加成功', {icon: 1});
-                parent.jQuery('#iframe').attr('src', parent.jQuery('#iframe').attr('src'));
+                layer.closeAll('page');
+                parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#manage_iframe').attr('src'));
             } else {
                 layer.msg('添加失败', {icon: 5});
             }
