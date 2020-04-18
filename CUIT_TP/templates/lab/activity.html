@@ -13,9 +13,9 @@
                             <table id="bootstrap-data-table" class="table table-striped table-bordered">
                                 <thead>
                                 <tr>
-                                    <th scope="col">名称</th>
-                                    <th scope="col">时间</th>
-                                    <th scope="col">状态</th>
+                                    <th scope="col" style="width: 43%">名称</th>
+                                    <th scope="col" style="width: 24%">时间</th>
+                                    <th scope="col" style="width: 33%">状态</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -28,7 +28,15 @@
                                         <td style="vertical-align: middle;">{{ activity.start_time }}</td>
                                         <td style="vertical-align: middle;">
                                             <span style="vertical-align: middle;">{{ '未开始' if activity.status=='0' else '已结束' }}</span>
-                                            <button class="btn btn-light btn-sm" style="float: right;" onclick="change_status({{ activity.id }})">切换状态</button>
+                                            <button class="btn btn-light btn-sm" style="float: right;margin: 0 5px;"
+                                                    onclick="delete_activity({{ activity.id }})">删除
+                                            </button>
+                                            <button class="btn btn-light btn-sm" style="float: right;margin: 0 5px;"
+                                                    onclick="change_status({{ activity.id }})">切换状态
+                                            </button>
+                                            <button class="btn btn-light btn-sm" style="float: right;margin: 0 5px;"
+                                                    onclick="change_activity({{ activity.id }})">修改
+                                            </button>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -110,7 +118,7 @@
     <script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
     <script src="{{ url_for('static', filename='laydate/laydate.js') }}"></script>
     <script>
-        const create_activity = function () {
+        var create_activity = function () {
             jQuery.get(Flask.url_for('lab.create_activity'), {}, function (data) {
                 layer.open({
                     type: 1,
@@ -121,18 +129,18 @@
                 })
             })
         };
-        const activity_detail = function (activity_id) {
+        var activity_detail = function (activity_id) {
             jQuery.get(Flask.url_for('lab.activity_detail', {'activity_id': activity_id}), function (data) {
                 layer.open({
                     type: 1,
                     title: '活动详情',
                     skin: 'layui-layer-rim',
-                    area: '800px',
+                    area: '500px',
                     content: data
                 });
             })
         };
-        const change_status = function (activity_id) {
+        var change_status = function (activity_id) {
             jQuery.post(Flask.url_for('lab.change_activity_status', {'activity_id': activity_id}), {}, function (data) {
                 if (data === 'true') {
                     layer.msg('切换成功', {icon: 1}, {time: 300});
@@ -141,6 +149,32 @@
                     layer.msg('切换失败', {icon: 5}, {time: 300});
                 }
             })
-        }
+        };
+        var delete_activity = function (activity_id) {
+            layer.confirm('确定删除吗?', {
+                btn: ['确定', '取消']
+            }, function () {
+                jQuery.post(Flask.url_for('lab.delete_activity'), JSON.stringify({'activity_id': activity_id}), function (data) {
+                    if (data === 'true') {
+                        layer.msg('删除成功', {icon: 1});
+                        window.location.reload();
+                    } else {
+                        layer.msg('删除失败', {icon: 5});
+                    }
+                })
+            });
+        };
+        var change_activity = function (activity_id) {
+            jQuery.get(Flask.url_for('lab.change_activity', {'activity_id': activity_id}), {}, function (data) {
+                layer.closeAll('page');
+                layer.open({
+                    type: 1,
+                    title: '修改事务',
+                    skin: 'layui-layer-rim',
+                    area: '500px',
+                    content: data
+                });
+            });
+        };
     </script>
 {% endblock %}

@@ -98,7 +98,7 @@
                                             </li>
                                         {% endfor %}
                                     {% else %}
-                                        <li class="list-group-item">暂无活动</li>
+                                        <li class="list-group-item">暂无项目</li>
                                     {% endif %}
                                 </ul>
                             </div>
@@ -108,15 +108,22 @@
 
                 <div class="col-lg-9 col-md-8">
                     <div class="card">
-                        <div class="card-header" style="text-align: center;">
-                            <h1 id="project_name">{{ projects[0].project_name }}</h1></div>
-                        <div class="card-body">
-                            <h2 style="text-align: center;margin: 10px 0;">需求</h2>
-                            <div id="backlog"></div>
-                            <hr>
-                            <h2 style="text-align: center;margin: 10px 0;">缺陷</h2>
-                            <div id="bug"></div>
-                        </div>
+                        {% if projects %}
+                            <div class="card-header" style="text-align: center;">
+                                <h1 id="project_name">{{ projects[0].project_name }}</h1>
+                            </div>
+                            <div class="card-body">
+                                <h2 style="text-align: center;margin: 10px 0;">需求</h2>
+                                <div id="backlog"></div>
+                                <hr>
+                                <h2 style="text-align: center;margin: 10px 0;">缺陷</h2>
+                                <div id="bug"></div>
+                            </div>
+                        {% else %}
+                            <div class="card-header" style="text-align: center;">
+                                <h1 id="project_name">暂无项目</h1>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

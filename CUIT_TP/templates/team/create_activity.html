@@ -29,17 +29,10 @@
                 <label for="start_time" class="form-control-label">时间</label>
                 {{ form.start_time(class="form-control", id="time_picker") }}
             </div>
-            {% if is_create %}
-                <input type="button" class="btn btn-light" style="display:block;margin:0 auto" onclick="create_form()"
-                       value="保存">
-            {% else %}
-                <input type="button" class="btn btn-light" style="display:block;margin:0 auto" onclick="change_form({{ activity_id }})"
-                       value="保存">
-            {% endif %}
+            <input type="button" class="btn btn-light" style="display:block;margin:0 auto" onclick="create_form()" value="保存">
         </form>
     </div>
 
-    {{ JSGlue.include() }}
     <script>
         laydate.render({
             elem: '#time_picker',
@@ -49,7 +42,7 @@
             theme: '#393D49'
         });
         var create_form = function () {
-            jQuery.post('{{ url_for("lab.create_activity") }}', jQuery('#form').serialize(), function (data) {
+            jQuery.post('{{ url_for("team.create_activity") }}', jQuery('#form').serialize(), function (data) {
                 if (data === 'true') {
                     layer.msg('创建成功', {icon: 1}, {time: 500});
                     layer.closeAll('page');
@@ -59,17 +52,6 @@
                 }
             })
         };
-        var change_form = function (activity_id) {
-            jQuery.post(Flask.url_for("lab.change_activity", {"activity_id": activity_id}), jQuery('#form').serialize(), function (data) {
-                if (data === 'true') {
-                    layer.msg('修改成功', {icon: 1}, {time: 500});
-                    layer.closeAll('page');
-                    parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#manage_iframe').attr('src'));
-                } else {
-                    layer.msg('修改失败', {icon: 5});
-                }
-            })
-        }
     </script>
 </div>
 </body>

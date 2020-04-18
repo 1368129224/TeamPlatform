@@ -87,3 +87,10 @@ def get_ChangeBugForm(team_id):
                 'class': 'custom-select'
             })
     return ChangeBugForm
+
+class CreateTeamActivityForm(FlaskForm):
+    activity_name = StringField('活动名', validators=[DataRequired(), Length(max=64)])
+    desc = TextAreaField('活动详情', validators=[DataRequired(), Length(max=256)])
+    start_time = DateTimeField('活动时间', validators=[DataRequired()], format='%Y-%m-%d %H:%M', render_kw={
+        'autocomplete':'off'
+    })

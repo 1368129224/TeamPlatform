@@ -15,35 +15,41 @@
                                 <tr>
                                     <th style="width: 50%">资产</th>
                                     <th style="width: 20%">姓名</th>
-                                    <th style="width: 20%">状态</th>
-                                    <th style="width: 10%">操作</th>
+                                    <th style="width: 30%">状态</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% for asset in assets.items %}
                                     <tr>
-                                        <td style="vertical-align: middle;"><a href="javascript:void(0);" onclick="asset_detail({{ asset.id }})">{{ asset.asset_name }}</a></td>
+                                        <td style="vertical-align: middle;"><a href="javascript:void(0);"
+                                                                               onclick="asset_detail({{ asset.id }})">{{ asset.asset_name }}</a>
+                                        </td>
                                         <td style="vertical-align: middle;">{{ asset.user.username }}</td>
                                         <td style="vertical-align: middle;">
                                             {% if asset.status == '0' %}
-                                                <p style="margin: 0;">待审核</p>
+                                                <span style="margin: 0;vertical-align: middle;">待审核</span>
                                             {% elif asset.status == '1' %}
-                                                <p style="margin: 0;{% if asset.end_time < now %}color: red;{% endif %}">
-                                                    已通过</p>
+                                                <span style="margin: 0;vertical-align: middle;{% if asset.end_time < now %}color: red;{% endif %}">
+                                                    已通过</span>
                                             {% elif asset.status == '2' %}
-                                                <p style="margin: 0;">已归还</p>
+                                                <span style="margin: 0;vertical-align: middle;">已归还</span>
                                             {% endif %}
-                                        </td>
-                                        <td style="vertical-align: middle;text-align: center">
-                                            <button class="btn btn-light {% if asset.status == '1' %}disabled{% elif asset.status == '2' %}disabled{% endif %}"
-                                                    onclick="change_status({{ asset.id }}, '1')"
-                                                    {% if asset.status == '1' %}disabled{% elif asset.status == '2' %}disabled{% endif %}>
-                                                通过
+                                            <button class="btn btn-light btn-sm"
+                                                    onclick="delete_asset({{ asset.id }}, '1')"
+                                                    style="float: right;margin: 0 5px;">
+                                                删除
                                             </button>
-                                            <button class="btn btn-light {% if asset.status == '0' %}disabled{% elif asset.status == '2' %}disabled{% endif %}"
+                                            <button class="btn btn-light btn-sm {% if asset.status == '0' %}disabled{% elif asset.status == '2' %}disabled{% endif %}"
                                                     onclick="change_status({{ asset.id }}, '2')"
-                                                    {% if asset.status == '0' %}disabled{% elif asset.status == '2' %}disabled{% endif %}>
+                                                    {% if asset.status == '0' %}disabled{% elif asset.status == '2' %}disabled{% endif %}
+                                                    style="float: right;margin: 0 5px;">
                                                 结束
+                                            </button>
+                                            <button class="btn btn-light btn-sm {% if asset.status == '1' %}disabled{% elif asset.status == '2' %}disabled{% endif %}"
+                                                    onclick="change_status({{ asset.id }}, '1')"
+                                                    {% if asset.status == '1' %}disabled{% elif asset.status == '2' %}disabled{% endif %}
+                                                    style="float: right;margin: 0 5px;">
+                                                通过
                                             </button>
                                         </td>
                                     </tr>
@@ -124,13 +130,14 @@
                 'status': status
             }), function (data) {
                 if (data === 'true') {
-                    layer.msg('修改成功', {icon:5}, {time:400});
+                    layer.msg('修改成功', {icon: 5}, {time: 400});
                     window.location.reload();
-                }else{
-                    layer.msg('修改失败', {icon:5}, {time:400})
+                } else {
+                    layer.msg('修改失败', {icon: 5}, {time: 400})
                 }
             })
         }
+
         function asset_detail(asset_id) {
             jQuery.get(Flask.url_for('account.asset_detail', {"asset_id": asset_id}), {}, function (data) {
                 layer.open({
@@ -141,6 +148,21 @@
                     content: data
                 });
             })
+        }
+
+        function delete_asset(asset_id) {
+            layer.confirm('确定删除吗?', {
+                btn: ['确定', '取消']
+            }, function () {
+                jQuery.post(Flask.url_for('lab.delete_asset'), JSON.stringify({'asset_id': asset_id}), function (data) {
+                    if (data === 'true') {
+                        layer.msg('删除成功', {icon: 1});
+                        window.location.reload();
+                    } else {
+                        layer.msg('删除失败', {icon: 5});
+                    }
+                })
+            });
         }
     </script>
 {% endblock %}

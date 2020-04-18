@@ -125,6 +125,7 @@ def delete_task():
     if (current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_task) or current_user.role == 'admin':
         task_id = json.loads(request.get_data().decode(encoding='utf-8')).get('task_id')
         task = LabTask.query.filter(LabTask.id==task_id).first_or_404()
+        task.executor.lab_task.remove(task)
         db.session.delete(task)
         db.session.commit()
         return make_response('true', 200)
@@ -242,6 +243,21 @@ def deliver_asset():
         asset_id = json_data.get('asset_id')
         asset = Asset.query.filter(Asset.id==asset_id).first()
         asset.status = json_data.get('status')
+        db.session.commit()
+        return make_response('true', 200)
+    else:
+        abort(403)
+
+# 删除资产
+@bp.route('/delete_asset/', methods=('POST', ))
+@login_required
+def delete_asset():
+    if current_user.role == 'admin' or (current_user.role == 'monitor' and current_user.monitor_permission.verify_asset):
+        json_data = json.loads(request.get_data().decode(encoding='utf-8'))
+        asset_id = json_data.get('asset_id')
+        asset = Asset.query.filter(Asset.id == asset_id).first()
+        asset.user.assets.remove(asset)
+        db.session.delete(asset)
         db.session.commit()
         return make_response('true', 200)
     else:
@@ -386,7 +402,7 @@ def change_activity(activity_id):
                 desc=activity.desc,
                 start_time=activity.start_time,
             )
-            return render_template('lab/create_activity.html', form=form, is_create=False)
+            return render_template('lab/create_activity.html', form=form, is_create=False, activity_id=activity_id)
     else:
         abort(403)
 

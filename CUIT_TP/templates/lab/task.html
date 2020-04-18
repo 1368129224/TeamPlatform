@@ -13,10 +13,10 @@
                             <table id="bootstrap-data-table" class="table table-striped table-bordered">
                                 <thead>
                                 <tr>
-                                    <th scope="col">事务</th>
-                                    <th scope="col">执行者</th>
-                                    <th scope="col">时间</th>
-                                    <th scope="col">状态</th>
+                                    <th scope="col" style="width: 30%">事务</th>
+                                    <th scope="col" style="width: 25%">执行者</th>
+                                    <th scope="col" style="width: 20%">时间</th>
+                                    <th scope="col" style="width: 25%">状态</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -29,8 +29,17 @@
                                         </td>
                                         <td style="vertical-align: middle;">{{ task.executor.username }}</td>
                                         <td style="vertical-align: middle;">{{ task.execute_datetime }}</td>
-                                        <td style="vertical-align: middle;"><span style="vertical-align: middle;">{{ '未完成' if task.status=='0' else '已完成' }}</span>
-                                            <button class="btn btn-light btn-sm" style="float: right;" onclick="change_status({{ task.id }})">切换状态</button>
+                                        <td style="vertical-align: middle;"><span
+                                                style="vertical-align: middle;">{{ '未完成' if task.status=='0' else '已完成' }}</span>
+                                            <button class="btn btn-light btn-sm" style="float: right;margin: 0 5px;"
+                                                    onclick="delete_task({{ task.id }})">删除
+                                            </button>
+                                            <button class="btn btn-light btn-sm" style="float: right;margin: 0 5px;"
+                                                    onclick="change_status({{ task.id }})">切换状态
+                                            </button>
+                                            <button class="btn btn-light btn-sm" style="float: right;margin: 0 5px;"
+                                                    onclick="change_task({{ task.id }})">修改
+                                            </button>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -128,20 +137,45 @@
                     type: 1,
                     title: '事务详情',
                     skin: 'layui-layer-rim',
-                    area: '800px',
+                    area: '500px',
                     content: data
                 });
             })
         };
         const change_status = function (task_id) {
             jQuery.post(Flask.url_for('lab.change_task_status', {'task_id': task_id}), {}, function (data) {
-                if (data==='true'){
+                if (data === 'true') {
                     layer.msg('切换成功', {icon: 1}, {time: 300});
-                        window.location.reload();
-                }else{
+                    window.location.reload();
+                } else {
                     layer.msg('切换失败', {icon: 5}, {time: 300});
                 }
             })
-        }
+        };
+        var delete_task = function (task_id) {
+            layer.confirm('确定删除吗?', {
+                btn: ['确定', '取消']
+            }, function () {
+                jQuery.post(Flask.url_for('lab.delete_task'), JSON.stringify({'task_id': task_id}), function (data) {
+                    if (data === 'true') {
+                        layer.msg('删除成功', {icon: 1}, {time: 300});
+                        window.location.reload();
+                    } else {
+                        layer.msg('删除失败', {icon: 5}, {time: 300});
+                    }
+                })
+            })
+        };
+        var change_task = function (task_id) {
+            jQuery.get(Flask.url_for('lab.change_task', {'task_id': task_id}), {}, function (data) {
+                layer.open({
+                    type: 1,
+                    title: '修改事务',
+                    skin: 'layui-layer-rim',
+                    area: '500px',
+                    content: data
+                });
+            });
+        };
     </script>
 {% endblock %}

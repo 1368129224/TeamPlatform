@@ -58,7 +58,7 @@
             if (data === 'true') {
                 layer.msg('创建成功', {icon: 1}, {time: 500});
                 layer.closeAll('page');
-                parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#iframe').attr('src'));
+                parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#manage_iframe').attr('src'));
             } else {
                 layer.msg('创建失败', {icon: 5});
             }
@@ -69,12 +69,12 @@
             if (data === 'true') {
                 layer.msg('修改成功', {icon: 1}, {time: 500});
                 layer.closeAll('page');
-                parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#iframe').attr('src'));
+                parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#manage_iframe').attr('src'));
             } else {
                 layer.msg('修改失败', {icon: 5});
             }
         })
-    }
+    };
 </script>
 </body>
 </html>

@@ -3,32 +3,21 @@
 {% block content %}
     <div class="container-fluid" style="padding: 40px 20px;">
         <div class="row">
-            <div class="col-8 offset-2">
+            <div class="col-10 offset-1">
                 <div class="card" style="padding: 10px;">
                     <div class="card-header user-header alt bg-dark">
                         <h1 class="text-light display-6">{{ team.team_name }}</h1>
                     </div>
                     <div class="card-body" style="padding: 15px 0 0 0;">
                         <p>{{ team.desc }}</p>
-                        <button class="btn btn-light" style="float: right;">修改信息</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-6">
-                <div class="card">
-                    <div class="card-header" style="text-align: center">
-                        <strong class="card-title">小组成员</strong>
-                    </div>
-                    <div class="card-body">
+                        <br>
                         <table class="table">
                             <thead>
                             <tr>
-                                <th scope="col">用户名</th>
-                                <th scope="col">学号</th>
-                                <th scope="col">座位号</th>
-                                {% if current_user == team.leader or current_user.role == 'admin'%}
+                                <th scope="col" style="width: 35%">用户名</th>
+                                <th scope="col" style="width: 30%">学号</th>
+                                <th scope="col" style="width: 25%">座位号</th>
+                                {% if current_user == team.leader or current_user.role == 'admin' %}
                                     <th scope="col">操作</th>
                                 {% endif %}
                             </tr>
@@ -51,7 +40,7 @@
                                         </td>
                                         <td style="vertical-align: middle;">{{ teammate.stu_num }}</td>
                                         <td style="vertical-align: middle;">{{ teammate.profile.set_num }}</td>
-                                        {% if current_user == team.leader or current_user.role == 'admin'%}
+                                        {% if current_user == team.leader or current_user.role == 'admin' %}
                                             <td>
                                                 <button class="btn-light btn"
                                                         onclick="del_teammate({{ teammate.stu_num }})">删除
@@ -63,17 +52,58 @@
                             {% endfor %}
                             </tbody>
                         </table>
-                        {% if current_user.role == 'admin' or current_user.manage_team_id == team.id %}
-                            <button class="btn-light btn" style="float: right;"
-                                    onclick="add_teammate({{ team.id }})">
-                                添加成员
-                            </button>
-                        {% endif %}
+                        <div class="row justify-content-center"
+                             style="width: inherit;margin-left: 0;margin-right: 0;">
+                            {% if current_user.role == 'admin' or current_user.manage_team_id == team.id %}
+                                <button class="btn-light btn" style="float: right;margin: 0 5px;"
+                                        onclick="add_teammate({{ team.id }})">
+                                    添加成员
+                                </button>
+                            {% endif %}
+                            <button class="btn btn-light" style="float: right;margin: 0 5px;">修改信息</button>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="row">
             <div class="col-6">
-                {% if projects == [] %}
+                {% if not activities %}
+                    <div class="card">
+                        <div class="card-body"><p class="card-text">目前没有活动</p></div>
+                    </div>
+                {% endif %}
+                {% for activity in activities %}
+                    <div class="card" style="margin-bottom: 20px;">
+                        <div class="card-header">
+                            <strong class="card-title">
+                                <a style="color: black !important;"
+                                   href="javascript:void(0);"
+                                   onclick="activity_detail({{ activity.id }})">{{ activity.activity_name }}</a>
+                            </strong>
+                            <p style="float: right;margin-bottom: 0">{{ activity.start_time }}</p>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ activity.desc }}</p>
+                            {% if activity.status == '0' %}
+                                <button class="btn btn-light" style="float: right;margin: 0 5px;" onclick="delete_activity({{ activity.id }})">删除</button>
+                                <button class="btn btn-light" style="float: right;margin: 0 5px;">切换状态</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+                {% if current_user == team.leader %}
+                    <div class="row justify-content-center"
+                         style="width: inherit;margin-left: 0;margin-right: 0;">
+                        <button class="btn-light btn" style="float: right;"
+                                onclick="create_activity()">
+                            创建活动
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-6">
+                {% if not projects %}
                     <div class="card">
                         <div class="card-body"><p class="card-text">目前没有项目</p></div>
                     </div>
@@ -84,26 +114,25 @@
                             <strong class="card-title">
                                 <a style="color: black !important;"
                                    href="javascript:void(0);"
-                                   onclick="go_detail({{ project.id }})">{{ project.project_name }}</a>
-                                {#                               href="javascript:void(0);" onclick="jQuery('#iframe').attr('src', '{{ url_for('team.project_detail', project_id=project.id) }}')">{{ project.project_name }}</a>#}
+                                   onclick="go_project_detail({{ project.id }})">{{ project.project_name }}</a>
                             </strong>
                             <p style="float: right;margin-bottom: 0">{{ project.end_time }}</p>
                         </div>
                         <div class="card-body">
                             <p class="card-text">{{ project.desc }}</p>
-                            {% if project.status == '0' %}
-                                <button class="btn btn-light" style="float: right">结束项目</button>
-                            {% else %}
-                                <button class="btn btn-light" style="float: right">删除项目</button>
-                            {% endif %}
+                            <button class="btn btn-light" style="float: right">结束项目</button>
+                            <button class="btn btn-light" style="float: right">删除项目</button>
                         </div>
                     </div>
                 {% endfor %}
-                {% if current_user == team.leader or current_user.role == 'admin' %}
-                    <button class="btn-light btn" style="float: right;"
-                            onclick="create_project()">
-                        创建项目
-                    </button>
+                {% if current_user == team.leader %}
+                    <div class="row justify-content-center"
+                         style="width: inherit;margin-left: 0;margin-right: 0;">
+                        <button class="btn-light btn" style="float: right;"
+                                onclick="create_project()">
+                            创建项目
+                        </button>
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -115,7 +144,7 @@
     <script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
     <script src="{{ url_for('static', filename='laydate/laydate.js') }}"></script>
     <script>
-        const del_teammate = function (stu_num) {
+        var del_teammate = function (stu_num) {
             layer.confirm('确定删除吗?', {
                 btn: ['确定', '取消']
             }, function () {
@@ -131,7 +160,7 @@
                 })
             });
         };
-        const add_teammate = function (team_id) {
+        var add_teammate = function (team_id) {
             jQuery.get(Flask.url_for('team.add_teammate', {'team_id': team_id}), {}, function (data) {
                 layer.open({
                     type: 1,
@@ -142,7 +171,7 @@
                 })
             })
         };
-        const create_project = function () {
+        var create_project = function () {
             jQuery.get(Flask.url_for('team.create_project'), {}, function (data) {
                 layer.open({
                     type: 1,
@@ -153,8 +182,46 @@
                 })
             })
         };
-        const go_detail = function (project_id) {
+        var create_activity = function () {
+            jQuery.get(Flask.url_for('team.create_activity'), {}, function (data) {
+                layer.open({
+                    type: 1,
+                    title: '新建活动',
+                    area: '500px',
+                    skin: 'layui-layer-rim',
+                    content: data
+                })
+            })
+        };
+        var activity_detail = function (activity_id) {
+            jQuery.get(Flask.url_for('team.activity_detail', {"activity_id": activity_id}), {}, function (data) {
+                layer.open({
+                    type: 1,
+                    title: '活动详情',
+                    area: '500px',
+                    skin: 'layui-layer-rim',
+                    content: data
+                })
+            })
+        };
+        var delete_activity = function (activity_id) {
+            layer.confirm('确定删除吗?', {
+                btn: ['确定', '取消']
+            }, function () {
+                jQuery.post(Flask.url_for('team.delete_activity'), JSON.stringify({
+                    'activity_id': activity_id
+                }), function (data) {
+                    if (data === 'true') {
+                        layer.msg('删除成功', {icon: 1});
+                        window.location.reload();
+                    } else {
+                        layer.msg('删除失败', {icon: 5});
+                    }
+                })
+            });
+        };
+        var go_project_detail = function (project_id) {
             parent.jQuery('#manage_iframe').attr('src', Flask.url_for('team.project_detail', {'project_id': project_id}));
-        }
+        };
     </script>
 {% endblock %}

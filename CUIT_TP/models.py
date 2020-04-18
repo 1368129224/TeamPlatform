@@ -25,7 +25,7 @@ class User(UserMixin, db.Model):
     stu_num = db.Column(db.String(32), unique=True, nullable=False, comment='学号')
     password = db.Column(db.String(128), nullable=False, comment='密码')
     role = db.Column(db.Enum('admin', 'monitor', 'student'), server_default='student')
-    lab_task = relationship('LabTask', back_populates='executor', foreign_keys=[LabTask.uid], cascade="all, delete-orphan", single_parent=True)
+    lab_task = relationship('LabTask', back_populates='executor', foreign_keys=[LabTask.uid], cascade="all, delete-orphan")
     belong_team_id = db.Column(db.Integer, db.ForeignKey('Team.id', ondelete='SET NULL'))
     belong_team = relationship('Team', back_populates='teammates', foreign_keys=[belong_team_id])
     manage_team_id = db.Column(db.Integer, db.ForeignKey('Team.id', ondelete='SET NULL'))
@@ -36,7 +36,7 @@ class User(UserMixin, db.Model):
     backlog_notes = relationship('BacklogNote', back_populates='writer', cascade="all, delete-orphan", single_parent=True)
     bug_notes = relationship('BugNote', back_populates='writer', cascade="all, delete-orphan", single_parent=True)
     assets = relationship('Asset', back_populates='user', cascade="all, delete-orphan", single_parent=True)
-    monitor_permission = relationship('Monitor', back_populates='user')
+    monitor_permission = relationship('Monitor', back_populates='user', uselist=False)
 
     def __repr__(self):
         return '<User {}>'.format(self.username)

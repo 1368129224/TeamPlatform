@@ -4,7 +4,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from CUIT_TP.forms.team import (
     AddTeammateForm, CreateProjectForm, ChangeProjectForm,
     get_CreateBacklogForm, get_ChangeBacklogForm, get_CreateBugForm,
-    get_ChangeBugForm,
+    get_ChangeBugForm, CreateTeamActivityForm
 )
 from CUIT_TP.models import db, User, Team, Project, TeamActivity, Backlog, Bug
 from CUIT_TP import login
@@ -22,8 +22,9 @@ def load_user(id):
 def home(team_id):
     team = Team.query.filter(Team.id==team_id).first_or_404()
     teammates = team.teammates
-    projects = Project.query.filter(Project.belong_team==team).all()
-    return render_template('team/home.html', team=team, teammates=teammates, projects=projects)
+    projects = Project.query.filter(Project.belong_team==team).order_by(Project.status, Project.end_time).all()
+    activities = TeamActivity.query.filter(TeamActivity.belong_team_id==team_id).order_by(TeamActivity.status, TeamActivity.start_time).all()
+    return render_template('team/home.html', team=team, teammates=teammates, projects=projects, activities=activities)
 
 
 # 删除成员
@@ -284,5 +285,50 @@ def change_bug(bug_id):
                 executor = bug.executor
             )
             return render_template('team/change_bug.html', form=form)
+    else:
+        abort(403)
+
+# 新建活动
+@bp.route('/create_activity/', methods=('GET', 'POST'))
+@login_required
+def create_activity():
+    form = CreateTeamActivityForm()
+    if current_user.manage_team:
+        if request.method =='POST':
+            if form.validate_on_submit():
+                new_activity = TeamActivity(
+                    activity_name=form.activity_name.data,
+                    desc=form.desc.data,
+                    start_time=form.start_time.data,
+                )
+                new_activity.belong_team = current_user.belong_team
+                db.session.add(new_activity)
+                db.session.commit()
+                return make_response('true', 200)
+            else:
+                return make_response('false', 200)
+        else:
+            return render_template('team/create_activity.html', form=form, is_create=True)
+    else:
+        abort(403)
+
+# 活动详情
+@bp.route('/activity_detail/<int:activity_id>')
+@login_required
+def activity_detail(activity_id):
+    activity = TeamActivity.query.filter(TeamActivity.id==activity_id).first_or_404()
+    return render_template('team/activity_detail.html', activity=activity)
+
+# 删除活动
+@bp.route('/delete_activity/', methods=('POST', ))
+@login_required
+def delete_activity():
+    activity_id = json.loads(request.get_data().decode(encoding='utf-8')).get('activity_id')
+    activity = TeamActivity.query.filter(TeamActivity.belong_team_id==activity_id).first_or_404()
+    if current_user.manage_team == activity.belong_team:
+        activity.belong_team.activities.remove(activity)
+        db.session.delete(activity)
+        db.session.commit()
+        return make_response('true', 200)
     else:
         abort(403)
