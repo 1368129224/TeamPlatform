@@ -95,6 +95,39 @@ def project_detail(project_id):
     project = Project.query.filter(Project.id==project_id).first_or_404()
     return render_template('team/project_detail.html', project=project)
 
+# 删除项目
+@bp.route('/delete_project/', methods=('POST', ))
+@login_required
+def delete_project():
+    if current_user.manage_team:
+        project_id = json.loads(request.get_data().decode(encoding='utf-8')).get('project_id')
+        project = Project.query.filter(Project.id==project_id).first_or_404()
+        if project in current_user.manage_team.projects:
+            db.session.delete(project)
+            project.belong_team.projects.remove(project)
+            db.session.commit()
+            return make_response('true', 200)
+        else:
+            abort(403)
+    else:
+        abort(403)
+
+# 结束项目
+@bp.route('/end_project/', methods=('POST', ))
+@login_required
+def end_project():
+    if current_user.manage_team:
+        project_id = json.loads(request.get_data().decode('utf-8')).get('project_id')
+        project = Project.query.filter(Project.id==project_id).first_or_404()
+        if project in current_user.manage_team.projects:
+            project.status = '1'
+            db.session.commit()
+            return make_response('true', 200)
+        else:
+            abort(403)
+    else:
+        abort(403)
+
 # 项目需求
 @bp.route('/project_backlog/<int:project_id>/')
 @bp.route('/project_backlog/<int:project_id>/<int:page>/')
@@ -118,23 +151,26 @@ def project_bug(project_id, page=1):
 @login_required
 def change_project(project_id):
     project = Project.query.filter(Project.id==project_id).first_or_404()
-    if request.method == 'POST':
-        form = ChangeProjectForm()
-        if form.validate_on_submit():
-            project.project_name = form.project_name.data
-            project.desc = form.desc.data
-            project.end_time = form.end_time.data
-            db.session.commit()
-            return make_response('true', 200)
+    if project in current_user.manage_team.projects:
+        if request.method == 'POST':
+            form = ChangeProjectForm()
+            if form.validate_on_submit():
+                project.project_name = form.project_name.data
+                project.desc = form.desc.data
+                project.end_time = form.end_time.data
+                db.session.commit()
+                return make_response('true', 200)
+            else:
+                return make_response('false', 200)
         else:
-            return make_response('false', 200)
+            form = ChangeProjectForm(
+                project_name=project.project_name,
+                desc=project.desc,
+                end_time=project.end_time
+            )
+            return render_template('team/create_project.html', form=form, project_id=project_id, is_create=False)
     else:
-        form = ChangeProjectForm(
-            project_name=project.project_name,
-            desc=project.desc,
-            end_time=project.end_time
-        )
-        return render_template('team/create_project.html', form=form, project_id=project_id, is_create=False)
+        abort(403)
 
 # 新增需求
 @bp.route('/create_backlog/<int:project_id>', methods=('POST', 'GET'))

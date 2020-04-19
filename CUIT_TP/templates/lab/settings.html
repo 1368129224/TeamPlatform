@@ -4,7 +4,7 @@
     <div class="content">
         <div class="animated fadeIn">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-8 offset-2">
                     <div class="card">
                         <div class="card-header" style="text-align: center">
                             <h4 class="card-title">系统设置</h4>
@@ -12,11 +12,49 @@
                         <div class="card-body">
                             <form method="post" action="" id="form">
                                 {{ form.hidden_tag() }}
-                                <div class="form-group" style="width: 70%;">
-                                    <label for="backlog_name" class="form-control-label">需求</label>
+                                <div class="form-group">
+                                    <label for="admin_email" class="form-control-label">管理员邮箱</label>
                                     {{ form.admin_email(class="form-control") }}
                                 </div>
-                                <input class="btn btn-light" type="button" value="新建" onclick="create_form()"/>
+                                <div class="form-group">
+                                    <label for="lab_name" class="form-control-label">系统名称</label>
+                                    {{ form.lab_name(class="form-control") }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="lab_set_num" class="form-control-label">座位数</label>
+                                    {{ form.lab_set_num(class="form-control") }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="mail_server" class="form-control-label">服务器地址</label>
+                                    {{ form.mail_server(class="form-control") }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="mail_port" class="form-control-label">端口号</label>
+                                    {{ form.mail_port(class="form-control") }}
+                                </div>
+                                <div class="form-check" style="text-align: center">
+                                    <label for="mail_use_tls"
+                                           class="form-check-label">{{ form.mail_use_tls(class="form-check-input") }}是否使用TLS</label>
+                                </div>
+                                <div class="form-check" style="text-align: center">
+                                    <label for="mail_use_ssl"
+                                           class="form-check-label">{{ form.mail_use_ssl(class="form-check-input") }}是否使用SSL</label>
+                                </div>
+                                <div class="form-group">
+                                    <label for="mail_username" class="form-control-label">邮箱用户名</label>
+                                    {{ form.mail_username(class="form-control") }}
+                                </div>
+                                <div class="form-group">
+                                    <label for="mail_password" class="form-control-label">邮箱密码</label>
+                                    {{ form.mail_password(class="form-control") }}
+                                </div>
+                                <div style="text-align: center">
+                                    <input class="btn btn-light"
+                                           type="button"
+                                           onclick="jQuery('.form-control').attr('disabled', false);jQuery('.form-check-input').attr('disabled', false);jQuery('#submit_btn').attr('disabled', false);"
+                                           value="修改">
+                                    <input class="btn btn-light" id="submit_btn" type="button" value="保存" onclick="submit_form()"/>
+                                </div>
                             </form>
                         </div>
                     </div>
@@ -31,6 +69,24 @@
     <script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
     <script src="{{ url_for('static', filename='laydate/laydate.js') }}"></script>
     <script>
-
+        jQuery(document).ready(function () {
+            jQuery('.form-control').attr('disabled', true);
+            jQuery('.form-check-input').attr('disabled', true);
+            jQuery('#submit_btn').attr('disabled', true);
+        });
+        var submit_form = function () {
+            layer.confirm('确定修改吗?', {
+                btn: ['确定', '取消']
+            }, function () {
+                jQuery.post(Flask.url_for('lab.settings'), jQuery('#form').serialize(), function (data) {
+                    if (data === 'true') {
+                        layer.msg('修改成功', {icon: 1});
+                        window.location.reload();
+                    } else {
+                        layer.msg('修改失败', {icon: 5});
+                    }
+                })
+            });
+        }
     </script>
 {% endblock %}

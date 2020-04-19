@@ -4,8 +4,8 @@ from flask_login import current_user, login_user, logout_user, login_required
 from CUIT_TP.forms.account import (
     RegisterForm, LoginForm, ForgetPasswordForm,
     ResetPasswordForm, ProfileForm, ChangePasswordForm,
-    AdminRegisterForm, ApplyAssetForm, ForceResetPasswordForm,
-    AdminProfileForm)
+    ApplyAssetForm, ForceResetPasswordForm, AdminProfileForm
+)
 from CUIT_TP.models import User, UserProfile, Asset, Team, Project, LabActivity, LabTask
 from CUIT_TP.utils import send_email
 from CUIT_TP import db, app, login
@@ -189,14 +189,16 @@ def dashboard():
         return render_template('account/dashboard/admin_dashboard.html', team_count=team_count,
                                student_count=student_count, project_count=project_count)
     elif current_user.role == 'monitor':
-        tasks = LabTask.query.filter(LabTask.status=='0', LabTask.executor==current_user).order_by(
+        tasks = LabTask.query.filter(LabTask.status == '0', LabTask.executor == current_user).order_by(
             LabTask.execute_datetime).all()
-        activities = LabActivity.query.filter(LabActivity.status=='0').order_by(LabActivity.start_time).all()
+        activities = LabActivity.query.filter(LabActivity.status == '0').order_by(LabActivity.start_time).all()
         if current_user.belong_team_id:
-            projects = Project.query.filter(Project.belong_team_id==current_user.belong_team_id).order_by(Project.status.asc()).all()
+            projects = Project.query.filter(Project.belong_team_id == current_user.belong_team_id).order_by(
+                Project.status.asc()).all()
         else:
             projects = None
-        return render_template('account/dashboard/monitor_dashboard.html', tasks=tasks, activities=activities, projects=projects)
+        return render_template('account/dashboard/monitor_dashboard.html', tasks=tasks, activities=activities,
+                               projects=projects)
     else:
         tasks = LabTask.query.filter(LabTask.status == '0', LabTask.executor == current_user).order_by(
             LabTask.execute_datetime).all()
@@ -287,12 +289,14 @@ def assets():
     assets = Asset.query.all()
     return render_template('account/assets.html', assets=assets)
 
+
 # 资产详情
 @bp.route('/asset_detail/<int:asset_id>/')
 @login_required
 def asset_detail(asset_id):
-    asset = Asset.query.filter(Asset.id==asset_id).first_or_404()
+    asset = Asset.query.filter(Asset.id == asset_id).first_or_404()
     return render_template('account/asset_detail.html', asset=asset)
+
 
 # 申请资产
 @bp.route('/apply_asset/', methods=('GET', 'POST'))

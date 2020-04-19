@@ -4,7 +4,7 @@
     <div class="container" style="padding-top: 20px;padding-bottom: 20px;">
         <div class="row justify-content-center" style="width: inherit;margin: 20px 0;">
             <div class="col-12">
-                <h1 style="text-align: center; margin-bottom: 10px">{{ project.project_name }}</h1>
+                <h1 style="text-align: center; margin-bottom: 10px">{{ project.project_name }}{% if project.status == '1' %}<strong>&nbsp;已结束</strong>{% endif %}</h1>
             </div>
             <button class="btn btn-light" style="margin: 0 10px" onclick="flash_backlog({{ project.id }})">需求</button>
             <button class="btn btn-light" style="margin: 0 10px" onclick="flash_bug({{ project.id }})">缺陷</button>

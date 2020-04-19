@@ -17,10 +17,9 @@ def send_email(subject, sender, recipients, text_body, html_body):
 
 def save_config():
     with open(os.path.join(app.config.get('BASEDIR'), 'config.py'), 'w', encoding='utf-8') as f:
-        f.write(
-            f'''
-import os
-            
+        f.write(f'''import os
+
+
 class Config(object):
     BASEDIR = os.path.abspath(os.path.dirname(__file__))
     # 管理员账户邮箱
@@ -35,6 +34,7 @@ class Config(object):
     # database
     SQLALCHEMY_DATABASE_URI = "{str(app.config.get('SQLALCHEMY_DATABASE_URI'))}"
     SQLALCHEMY_TRACK_MODIFICATIONS = {str(app.config.get('SQLALCHEMY_TRACK_MODIFICATIONS'))}
+    SQLALCHEMY_POOL_SIZE = {str(app.config.get('SQLALCHEMY_POOL_SIZE'))}
     # mail
     MAIL_SERVER = "{str(app.config.get('MAIL_SERVER'))}"
     MAIL_PORT = {str(app.config.get('MAIL_PORT'))}
@@ -42,6 +42,4 @@ class Config(object):
     MAIL_USE_SSL = {str(app.config.get('MAIL_USE_SSL'))}
     MAIL_USERNAME = "{str(app.config.get('MAIL_USERNAME'))}"
     MAIL_PASSWORD = "{str(app.config.get('MAIL_PASSWORD'))}"
-    TEST = "{str(app.config.get('TEST'))}"
-'''
-        )
+''')

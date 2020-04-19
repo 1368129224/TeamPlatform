@@ -10,11 +10,10 @@ class ChangeLabSettingsForm(FlaskForm):
     admin_email = StringField('管理员邮箱', validators=(DataRequired(), ))
     lab_name = StringField('系统名称', validators=(DataRequired(), Length(max=32)))
     lab_set_num = IntegerField('座位数', validators=(DataRequired(), ))
-    sqlalchemy_database_url = StringField('数据库连接字符串', validators=(DataRequired(), Length(max=512)))
     mail_server = StringField('服务器地址', validators=(DataRequired(), ))
     mail_port = IntegerField('端口号', validators=(DataRequired(), ))
-    mail_use_tls = BooleanField('是否使用TLS', validators=(DataRequired(), ))
-    mail_use_ssl = BooleanField('是否使用SSL', validators=(DataRequired(), ))
+    mail_use_tls = BooleanField('是否使用TLS')
+    mail_use_ssl = BooleanField('是否使用SSL')
     mail_username = StringField('邮箱用户名', validators=(DataRequired(), ))
     mail_password = StringField('邮箱密码', validators=(DataRequired(), ))
 

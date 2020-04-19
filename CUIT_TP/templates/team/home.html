@@ -86,7 +86,9 @@
                         <div class="card-body">
                             <p class="card-text">{{ activity.desc }}</p>
                             {% if activity.status == '0' %}
-                                <button class="btn btn-light" style="float: right;margin: 0 5px;" onclick="delete_activity({{ activity.id }})">删除</button>
+                                <button class="btn btn-light" style="float: right;margin: 0 5px;"
+                                        onclick="delete_activity({{ activity.id }})">删除
+                                </button>
                                 <button class="btn btn-light" style="float: right;margin: 0 5px;">切换状态</button>
                             {% endif %}
                         </div>
@@ -111,17 +113,26 @@
                 {% for project in projects %}
                     <div class="card" style="margin-bottom: 20px;">
                         <div class="card-header">
-                            <strong class="card-title">
+                            <span class="card-title">
                                 <a style="color: black !important;"
                                    href="javascript:void(0);"
-                                   onclick="go_project_detail({{ project.id }})">{{ project.project_name }}</a>
-                            </strong>
+                                   onclick="go_project_detail({{ project.id }})">{{ project.project_name }}
+                                    {% if project.status == '1' %}<strong>&nbsp;已结束</strong>{% endif %}</a>
+                            </span>
                             <p style="float: right;margin-bottom: 0">{{ project.end_time }}</p>
                         </div>
                         <div class="card-body">
                             <p class="card-text">{{ project.desc }}</p>
-                            <button class="btn btn-light" style="float: right">结束项目</button>
-                            <button class="btn btn-light" style="float: right">删除项目</button>
+                            <button class="btn btn-light {% if project.status == '1' %}disabled{% endif %}"
+                                    style="float: right;margin: 0 5px;" onclick="end_project({{ project.id }})"
+                                    {% if project.status == '1' %}disabled{% endif %}>结束项目
+                            </button>
+                            <button class="btn btn-light" style="float: right;margin: 0 5px;"
+                                    onclick="delete_project({{ project.id }})">删除项目
+                            </button>
+                            <button class="btn btn-light" style="float: right;margin: 0 5px;"
+                                    onclick="change_project({{ project.id }})">修改信息
+                            </button>
                         </div>
                     </div>
                 {% endfor %}
@@ -171,17 +182,6 @@
                 })
             })
         };
-        var create_project = function () {
-            jQuery.get(Flask.url_for('team.create_project'), {}, function (data) {
-                layer.open({
-                    type: 1,
-                    title: '新建项目',
-                    area: '500px',
-                    skin: 'layui-layer-rim',
-                    content: data
-                })
-            })
-        };
         var create_activity = function () {
             jQuery.get(Flask.url_for('team.create_activity'), {}, function (data) {
                 layer.open({
@@ -219,6 +219,60 @@
                     }
                 })
             });
+        };
+        var create_project = function () {
+            jQuery.get(Flask.url_for('team.create_project'), {}, function (data) {
+                layer.open({
+                    type: 1,
+                    title: '新建项目',
+                    area: '500px',
+                    skin: 'layui-layer-rim',
+                    content: data
+                })
+            })
+        };
+        var change_project = function (project_id) {
+            jQuery.get(Flask.url_for('team.change_project', {"project_id": project_id}), {}, function (data) {
+                layer.open({
+                    type: 1,
+                    title: '修改项目',
+                    area: '500px',
+                    skin: 'layui-layer-rim',
+                    content: data
+                })
+            })
+        };
+        var end_project = function (project_id) {
+            layer.confirm('确认结束吗?', {
+                btn: ["确定", "取消"]
+            }, function () {
+                jQuery.post(Flask.url_for('team.end_project'), JSON.stringify({
+                    'project_id': project_id
+                }), function (data) {
+                    if (data === 'true') {
+                        layer.msg('修改成功', {icon: 1});
+                        window.location.reload();
+                    } else {
+                        layer.msg('修改失败', {icon: 5});
+                    }
+                })
+            })
+        };
+        var delete_project = function (project_id) {
+            layer.confirm('确认删除吗?', {
+                btn: ["确定", "取消"]
+            }, function () {
+                jQuery.post(Flask.url_for('team.delete_project'), JSON.stringify({
+                    'project_id': project_id
+                }), function (data) {
+                    if (data === 'true') {
+                        layer.msg('删除成功', {icon: 1});
+                        window.location.reload();
+                    } else {
+                        layer.msg('删除失败', {icon: 5});
+                    }
+                })
+            })
         };
         var go_project_detail = function (project_id) {
             parent.jQuery('#manage_iframe').attr('src', Flask.url_for('team.project_detail', {'project_id': project_id}));
