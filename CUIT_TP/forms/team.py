@@ -50,7 +50,7 @@ def get_ChangeBacklogForm(team_id):
             'style': "resize:none;"
         })
         priority = SelectField('优先级', choices=(('0', '低'), ('1', '普通'), ('2', '高'), ('3', '紧急')))
-        status = SelectField('状态', choices=(('0', '待处理'), ('1', '开发中'), ('2', '测试中'), ('3', '已处理')))
+        status = SelectField('状态', choices=(('0', '待处理'), ('1', '修复中'), ('2', '测试中'), ('3', '已修复')))
         executor = QuerySelectField('执行人', validators=[DataRequired()], query_factory=lambda :User.query.filter(User.belong_team_id==team_id),
                                     get_label='username', render_kw={
                 'class': 'custom-select'

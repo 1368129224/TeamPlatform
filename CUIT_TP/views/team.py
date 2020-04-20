@@ -226,16 +226,9 @@ def change_backlog(backlog_id):
                     backlog.executor.project_backlog.remove(backlog)
                     form.executor.data.project_backlog.append(backlog)
                 db.session.commit()
-                return redirect(url_for('team.backlog_detail', backlog_id=backlog_id))
+                return make_response('true', 200)
             else:
-                ChangeBacklogForm = get_ChangeBacklogForm(current_user.belong_team_id)
-                form = ChangeBacklogForm(
-                    backlog_name=backlog.backlog_name,
-                    desc=backlog.desc,
-                    priority=backlog.priority,
-                    executor=backlog.executor
-                )
-                return render_template('team/change_backlog.html', form=form)
+                return make_response('false', 200)
         else:
             ChangeBacklogForm = get_ChangeBacklogForm(current_user.belong_team_id)
             form = ChangeBacklogForm(
@@ -244,7 +237,7 @@ def change_backlog(backlog_id):
                 priority = backlog.priority,
                 executor = backlog.executor
             )
-            return render_template('team/change_backlog.html', form=form)
+            return render_template('team/change_backlog.html', form=form, backlog=backlog)
     else:
         abort(403)
 
@@ -302,16 +295,9 @@ def change_bug(bug_id):
                     bug.executor.project_bug.remove(bug)
                     form.executor.data.project_bug.append(bug)
                 db.session.commit()
-                return redirect(url_for('team.bug_detail', bug_id=bug_id))
+                return make_response('true', 200)
             else:
-                ChangeBugForm = get_ChangeBugForm(current_user.belong_team_id)
-                form = ChangeBugForm(
-                    bug_name=bug.bug_name,
-                    desc=bug.desc,
-                    priority=bug.priority,
-                    executor=bug.executor
-                )
-                return render_template('team/change_bug.html', form=form)
+                return make_response('false', 200)
         else:
             ChangeBugForm = get_ChangeBugForm(current_user.belong_team_id)
             form = ChangeBugForm(
@@ -320,7 +306,7 @@ def change_bug(bug_id):
                 priority = bug.priority,
                 executor = bug.executor
             )
-            return render_template('team/change_bug.html', form=form)
+            return render_template('team/change_bug.html', form=form, bug=bug)
     else:
         abort(403)
 
@@ -364,6 +350,19 @@ def delete_activity():
     if current_user.manage_team == activity.belong_team:
         activity.belong_team.activities.remove(activity)
         db.session.delete(activity)
+        db.session.commit()
+        return make_response('true', 200)
+    else:
+        abort(403)
+
+# 切换活动状态
+@bp.route('/change_activity_status/', methods=('POST', ))
+@login_required
+def change_activity_status():
+    activity_id = json.loads(request.get_data().decode('utf-8')).get('activity_id')
+    activity = TeamActivity.query.filter(TeamActivity.id==activity_id).first_or_404()
+    if current_user.manage_team == activity.belong_team:
+        activity.status = '0' if activity.status == '1' else '1'
         db.session.commit()
         return make_response('true', 200)
     else:

@@ -1,29 +1,49 @@
 <table id="bootstrap-data-table" class="table table-striped table-bordered">
     <thead>
     <tr>
-        <th scope="col">需求</th>
-        <th scope="col">执行者</th>
-        <th scope="col">优先级</th>
-        <th scope="col">状态</th>
+        <th scope="col" style="width: 40%">需求</th>
+        <th scope="col" style="width: 27%">执行者</th>
+        <th scope="col" style="width: 10%">优先级</th>
+        <th scope="col" style="width: 23%">状态</th>
     </tr>
     </thead>
     <tbody>
     {% for backlog in backlogs.items %}
         <tr>
             <td style="vertical-align: middle;">
-                <a href="#">
+                <a href="javascript:void(0);" onclick="backlog_detail({{ backlog.id }})">
                     {{ backlog.backlog_name }}
                 </a>
             </td>
             <td style="vertical-align: middle;">{{ backlog.executor.username }}</td>
-            <td style="vertical-align: middle;">{{ backlog.priority }}</td>
-            <td style="vertical-align: middle;">{{ backlog.status }}&nbsp;
-                <button class="btn btn-light"
-                        onclick="window.location.href='{{ url_for("team.change_backlog", backlog_id=backlog.id) }}'">
+            <td style="vertical-align: middle;">
+                {% if backlog.priority == '0' %}
+                    低
+                {% elif backlog.priority == '1' %}
+                    正常
+                {% elif backlog.priority == '2' %}
+                    高
+                {% elif backlog.priority == '3' %}
+                    紧急
+                {% endif %}
+            </td>
+            <td style="vertical-align: middle;">
+                <span style="vertical-align: middle;">
+                {% if backlog.status == '0' %}
+                    待处理
+                {% elif backlog.status == '1' %}
+                    开发中
+                {% elif backlog.status == '2' %}
+                    测试中
+                {% elif backlog.status == '3' %}
+                    已处理
+                {% endif %}
+                </span>
+                <button class="btn btn-light btn-sm" style="float: right;margin: 0 5px;"
+                        onclick="change_backlog({{ backlog.id }})">
                     修改
                 </button>
-                &nbsp;
-                <button class="btn btn-light">删除</button>
+                <button class="btn btn-light btn-sm" style="float: right;margin: 0 5px;">删除</button>
             </td>
         </tr>
     {% endfor %}
@@ -98,13 +118,34 @@
     </div>
 </div>
 
-
 <script>
     var create_backlog = function (project_id) {
         jQuery.get(Flask.url_for('team.create_backlog', {'project_id': project_id}), {}, function (data) {
             layer.open({
                 type: 1,
                 title: '新增需求',
+                area: '500px',
+                skin: 'layui-layer-rim',
+                content: data
+            })
+        })
+    };
+    var backlog_detail = function (backlog_id) {
+        jQuery.get(Flask.url_for('team.backlog_detail', {'backlog_id': backlog_id}), {}, function (data) {
+            layer.open({
+                type: 1,
+                title: '需求详情',
+                area: '500px',
+                skin: 'layui-layer-rim',
+                content: data
+            })
+        })
+    };
+    var change_backlog = function (backlog_id) {
+        jQuery.get(Flask.url_for('team.change_backlog', {'backlog_id': backlog_id}), {}, function (data) {
+            layer.open({
+                type: 1,
+                title: '修改需求',
                 area: '500px',
                 skin: 'layui-layer-rim',
                 content: data

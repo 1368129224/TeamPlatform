@@ -41,7 +41,7 @@
                                             <p style="margin-bottom: 0;">
                                                 <a href="javascript:void (0);"
                                                    onclick="detail('lab_activity', {{ activity.id }})">
-                                                    {{ activity.activity_name }}
+                                                    {{ activity.activity_name }}{% if activity.status == '1' %}<strong>&nbsp;已结束</strong>{% endif %}
                                                 </a>
                                                 <span style="float: right">
                                                     {{ activity.start_time }}
@@ -67,7 +67,7 @@
                                                 <p style="margin-bottom: 0;">
                                                     <a href="javascript:void (0);"
                                                        onclick="detail('team_activity', {{ activity.id }})">
-                                                        {{ activity.activity_name }}
+                                                        {{ activity.activity_name }}{% if activity.status == '1' %}<strong>&nbsp;已结束</strong>{% endif %}
                                                     </a>
                                                     <span style="float: right">
                                                         {{ activity.start_time }}
@@ -88,8 +88,8 @@
                                             <li class="list-group-item">
                                                 <p style="margin-bottom: 0;">
                                                     <a href="javascript:void (0);"
-                                                       onclick="switch_project({{ project.id }}, '{{ project.project_name }}')">
-                                                        {{ project.project_name }}
+                                                       onclick="switch_project({{ project.id }}, '{{ project.project_name }}{% if project.status == "1" %}<strong>&nbsp;已结束</strong>{% endif %}')">
+                                                        {{ project.project_name }}{% if project.status == '1' %}<strong>&nbsp;已结束</strong>{% endif %}
                                                     </a>
                                                     <span style="float: right">
                                                         {{ project.end_time }}
@@ -110,7 +110,7 @@
                     <div class="card">
                         {% if projects %}
                             <div class="card-header" style="text-align: center;">
-                                <h1 id="project_name">{{ projects[0].project_name }}</h1>
+                                <h1 id="project_name">{{ projects[0].project_name }}{% if projects[0].status == '1' %}<strong>&nbsp;已结束</strong>{% endif %}</h1>
                             </div>
                             <div class="card-body">
                                 <h2 style="text-align: center;margin: 10px 0;">需求</h2>
@@ -145,7 +145,7 @@
                 })
             };
         {% endif %}
-        const flash_backlog = function (project_id, page = 1) {
+        var flash_backlog = function (project_id, page = 1) {
             jQuery.get(Flask.url_for('team.project_backlog', {
                 'project_id': project_id,
                 'page': page
@@ -153,7 +153,7 @@
                 jQuery('#backlog').html(data);
             })
         };
-        const flash_bug = function (project_id, page = 1) {
+        var flash_bug = function (project_id, page = 1) {
             jQuery.get(Flask.url_for('team.project_bug', {
                 'project_id': project_id,
                 'page': page
@@ -161,12 +161,12 @@
                 jQuery('#bug').html(data);
             })
         };
-        const switch_project = function (project_id, project_name) {
+        var switch_project = function (project_id, project_name) {
             jQuery('#project_name').html(project_name);
             flash_backlog(project_id);
             flash_bug(project_id);
         };
-        const detail = function (detail_type, id) {
+        var detail = function (detail_type, id) {
             var url, title;
             switch (detail_type) {
                 case 'lab_task': {
@@ -180,7 +180,7 @@
                     break;
                 }
                 default: {
-                    url = Flask.url_for('lab.activity_detail', {'activity_id': id});
+                    url = Flask.url_for('team.activity_detail', {'activity_id': id});
                     title = '小组活动';
                 }
             }

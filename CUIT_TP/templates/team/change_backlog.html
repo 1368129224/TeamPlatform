@@ -1,44 +1,57 @@
 {% extends 'iframe_base.html' %}
 
+{% block css %}
+    <style>
+        #desc {
+            height: 260px;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
-<div class="container" style="padding-top: 20px;padding-bottom: 20px;">
+    <div class="container" style="padding-top: 20px;padding-bottom: 20px;">
         <h1>修改需求</h1>
         <br>
-        <form method="post" action="">
+        <form method="post" action="" id="form">
             {{ form.hidden_tag() }}
-            <div class="input-group mb-3" style="width: 30%;">
-                <div class="input-group-prepend">
-                    <span class="input-group-text justify-content-center" style="width: 74px;">需求</span>
-                </div>
+            <div class="form-group" style="width: 70%;">
+                <label for="backlog_name" class="form-control-label">需求</label>
                 {{ form.backlog_name(class="form-control") }}
             </div>
-            <div class="input-group mb-3" style="width: 50%;height: 200px;">
-                <div class="input-group-prepend">
-                    <span class="input-group-text justify-content-center" style="width: 74px;">详情</span>
-                </div>
+            <div class="form-group">
+                <label for="desc" class="form-control-label">详情</label>
                 {{ form.desc(class="form-control") }}
             </div>
-            <div class="input-group mb-3" style="width: 30%;">
-                <div class="input-group-prepend">
-                    <span class="input-group-text justify-content-center" style="width: 74px;">优先级</span>
-                </div>
-                {{ form.priority(class="form-control") }}
-            </div>
-            <div class="input-group mb-3" style="width: 30%;">
-                <div class="input-group-prepend">
-                    <span class="input-group-text justify-content-center" style="width: 74px;">状态</span>
-                </div>
+            <div class="form-group" style="width: 70%;">
+                <label for="status" class="form-control-label">状态</label>
                 {{ form.status(class="form-control") }}
             </div>
-            <div class="input-group mb-3" style="width: 30%;">
-                <div class="input-group-prepend">
-                    <span class="input-group-text justify-content-center" style="width: 74px;">执行人</span>
-                </div>
+            <div class="form-group" style="width: 70%;">
+                <label for="priority" class="form-control-label">优先级</label>
+                {{ form.priority(class="form-control") }}
+            </div>
+            <div class="form-group" style="width: 70%;">
+                <label for="executor" class="form-control-label">执行人</label>
                 {{ form.executor(class="form-control") }}
             </div>
-
-            <input class="btn btn-light" type="submit" value="保存">
+            <input class="btn btn-light" type="button" value="保存" onclick="change_backlog({{ backlog.id }})">
         </form>
     </div>
+{% endblock %}
 
+{% block js %}
+    {{ JSGlue.include() }}
+    <script>
+        var change_backlog = function (backlog_id) {
+            jQuery.post(Flask.url_for("team.change_backlog", {'backlog_id': backlog_id}), jQuery('#form').serialize(), function (data) {
+                if (data === 'true') {
+                    layer.msg('修改成功', {icon: 1}, {time: 500});
+                    layer.closeAll('page');
+                    flash_backlog({{ backlog.belong_project_id }});
+                } else {
+                    layer.msg('修改失败', {icon: 5}, {time: 500});
+                }
+            })
+        }
+    </script>
 {% endblock %}

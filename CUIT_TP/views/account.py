@@ -202,7 +202,14 @@ def dashboard():
     else:
         tasks = LabTask.query.filter(LabTask.status == '0', LabTask.executor == current_user).order_by(
             LabTask.execute_datetime).all()
-        return render_template('account/dashboard/dashboard.html', tasks=tasks)
+        activities = LabActivity.query.filter(LabActivity.status == '0').order_by(LabActivity.start_time).all()
+        if current_user.belong_team_id:
+            projects = Project.query.filter(Project.belong_team_id == current_user.belong_team_id).order_by(
+                Project.status.asc()).all()
+        else:
+            projects = None
+        return render_template('account/dashboard/dashboard.html', tasks=tasks, activities=activities,
+                               projects=projects)
 
 
 # 个人信息

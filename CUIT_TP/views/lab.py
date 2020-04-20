@@ -3,9 +3,9 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, make_response
 from flask_login import current_user, login_required
 from CUIT_TP.forms.lab import (
-    ChangeProfileForm, CreateLabTaskForm, CreateTeamForm,
-    CreateLabActivityForm, ChangeLabActivityForm, ChangeLabTaskForm,
-    MonitorForm, ChangeLabSettingsForm
+    CreateLabTaskForm, CreateTeamForm, CreateLabActivityForm,
+    ChangeLabActivityForm, ChangeLabTaskForm, MonitorForm,
+    ChangeLabSettingsForm
 )
 from CUIT_TP.models import db, User, LabTask, Asset, Team, UserProfile, LabActivity, Monitor
 from CUIT_TP import login, app
@@ -78,46 +78,6 @@ def member(page=1):
         abort(403)
 
 
-# todo 检查是否重复实现
-# 修改学生信息
-@bp.route('/change_profile/<int:stu_num>/', methods=('GET', 'POST'))
-@login_required
-def change_profile(stu_num):
-    if current_user.role != 'admin' and stu_num == '0000000000':
-        abort(403)
-    elif not (current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_student_profile):
-        abort(403)
-    else:
-        user = User.query.filter(User.stu_num == stu_num).first_or_404()
-        form = ChangeProfileForm(
-            username=user.username,
-            email=user.email,
-            stu_num=user.stu_num,
-            role=user.role,
-            phone=user.profile.phone,
-            college=user.profile.college,
-            grade=user.profile.grade,
-            c_lass=user.profile._class,
-        )
-        if request.method == 'POST':
-            form = ChangeProfileForm()
-            if form.validate_on_submit():
-                user.username = form.username.data
-                user.email = form.email.data
-                user.stu_num = form.stu_num.data
-                user.role = form.role.data
-                user.profile.phone = form.phone.data
-                user.profile.college = form.college.data
-                user.profile.grade = form.grade.data
-                user.profile._class = form.c_lass.data
-                db.session.commit()
-                return redirect(url_for('lab.change_profile', stu_num=stu_num))
-            else:
-                return render_template('lab/change_profile.html', user=user, form=form)
-        else:
-            return render_template('lab/change_profile.html', user=user, form=form)
-
-
 # 展示事务
 @bp.route('/task/')
 @bp.route('/task/<int:page>/')
@@ -183,12 +143,12 @@ def task_detail(task_id):
 
 
 # 切换事务状态
-# todo 修改post
-@bp.route('/change_task_status/<int:task_id>/', methods=('POST',))
+@bp.route('/change_task_status/', methods=('POST',))
 @login_required
-def change_task_status(task_id):
+def change_task_status():
     if (
             current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_task) or current_user.role == 'admin':
+        task_id = json.loads(request.get_data().decode('utf-8')).get('task_id')
         task = LabTask.query.filter(LabTask.id == task_id).first_or_404()
         task.status = '0' if task.status == '1' else '1'
         db.session.commit()
@@ -422,12 +382,12 @@ def activity_detail(activity_id):
 
 
 # 切换活动状态
-# todo 修改post
-@bp.route('/change_activity_status/<int:activity_id>/', methods=('POST',))
+@bp.route('/change_activity_status/', methods=('POST',))
 @login_required
-def change_activity_status(activity_id):
+def change_activity_status():
     if (
             current_user.role == 'monitor' and current_user.monitor_permission.publish_lab_activity) or current_user.role == 'admin':
+        activity_id = json.loads(request.get_data().decode('utf-8')).get('activity_id')
         activity = LabActivity.query.filter(LabActivity.id == activity_id).first_or_404()
         activity.status = '0' if activity.status == '1' else '1'
         db.session.commit()

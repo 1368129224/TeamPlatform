@@ -1,29 +1,49 @@
 <table id="bootstrap-data-table" class="table table-striped table-bordered">
     <thead>
     <tr>
-        <th scope="col">缺陷</th>
-        <th scope="col">执行者</th>
-        <th scope="col">优先级</th>
-        <th scope="col">状态</th>
+        <th scope="col" style="width: 40%">缺陷</th>
+        <th scope="col" style="width: 27%">执行者</th>
+        <th scope="col" style="width: 10%">优先级</th>
+        <th scope="col" style="width: 23%">状态</th>
     </tr>
     </thead>
     <tbody>
     {% for bug in bugs.items %}
         <tr>
             <td style="vertical-align: middle;">
-                <a href="#">
+                <a href="javascript:void(0);" onclick="bug_detail({{ bug.id }})">
                     {{ bug.bug_name }}
                 </a>
             </td>
             <td style="vertical-align: middle;">{{ bug.executor.username }}</td>
-            <td style="vertical-align: middle;">{{ bug.priority }}</td>
-            <td style="vertical-align: middle;">{{ bug.status }}&nbsp;
-                <button class="btn btn-light"
-                        onclick="window.location.href='{{ url_for("team.change_bug", bug_id=bug.id) }}'">
+            <td style="vertical-align: middle;">
+                {% if bug.priority == '0' %}
+                    低
+                {% elif bug.priority == '1' %}
+                    正常
+                {% elif bug.priority == '2' %}
+                    高
+                {% elif bug.priority == '3' %}
+                    紧急
+                {% endif %}
+            </td>
+            <td style="vertical-align: middle;">
+                <span style="vertical-align: middle;">
+                    {% if bug.status == '0' %}
+                        待处理
+                    {% elif bug.status == '1' %}
+                        开发中
+                    {% elif bug.status == '2' %}
+                        测试中
+                    {% elif bug.status == '3' %}
+                        已处理
+                    {% endif %}
+                </span>
+                <button class="btn btn-light btn-sm" style="float: right;margin: 0 5px;"
+                        onclick="change_bug({{ bug.id }})">
                     修改
                 </button>
-                &nbsp
-                <button class="btn btn-light">删除</button>
+                <button class="btn btn-light btn-sm" style="float: right;margin: 0 5px;">删除</button>
             </td>
         </tr>
     {% endfor %}
@@ -100,6 +120,28 @@
             layer.open({
                 type: 1,
                 title: '新增缺陷',
+                area: '500px',
+                skin: 'layui-layer-rim',
+                content: data
+            })
+        })
+    };
+    var bug_detail = function (bug_id) {
+        jQuery.get(Flask.url_for('team.bug_detail', {'bug_id': bug_id}), {}, function (data) {
+            layer.open({
+                type: 1,
+                title: '缺陷详情',
+                area: '500px',
+                skin: 'layui-layer-rim',
+                content: data
+            })
+        })
+    };
+    var change_bug = function (bug_id) {
+        jQuery.get(Flask.url_for('team.change_bug', {'bug_id': bug_id}), {}, function (data) {
+            layer.open({
+                type: 1,
+                title: '修改缺陷',
                 area: '500px',
                 skin: 'layui-layer-rim',
                 content: data

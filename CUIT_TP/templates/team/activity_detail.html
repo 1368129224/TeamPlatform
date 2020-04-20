@@ -4,7 +4,7 @@
     <div class="container" style="padding-top: 20px;padding-bottom: 20px;">
         <h1>{{ activity.activity_name }}</h1>
         <br>
-        <h4>{{ '未开始' if activity.status=='0' else '已结束' }}</h4>
+        <h4>{{ '未开始' if activity.status == '0' else '已结束' }}</h4>
         <br>
         <p>详细信息： {{ activity.desc }}</p>
         <p>开始时间： {{ activity.start_time }}</p>

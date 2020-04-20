@@ -1,44 +1,58 @@
 {% extends 'iframe_base.html' %}
 
+{% block css %}
+    <style>
+        #desc {
+            height: 260px;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
 <div class="container" style="padding-top: 20px;padding-bottom: 20px;">
         <h1>修改缺陷</h1>
         <br>
-        <form method="post" action="">
+        <form method="post" action="" id="form">
             {{ form.hidden_tag() }}
-            <div class="input-group mb-3" style="width: 30%;">
-                <div class="input-group-prepend">
-                    <span class="input-group-text justify-content-center" style="width: 74px;">需求</span>
-                </div>
+            <div class="form-group" style="width: 70%;">
+                <label for="bug_name" class="form-control-label">缺陷</label>
                 {{ form.bug_name(class="form-control") }}
             </div>
-            <div class="input-group mb-3" style="width: 50%;height: 200px;">
-                <div class="input-group-prepend">
-                    <span class="input-group-text justify-content-center" style="width: 74px;">详情</span>
-                </div>
+            <div class="form-group">
+                <label for="desc" class="form-control-label">详情</label>
                 {{ form.desc(class="form-control") }}
             </div>
-            <div class="input-group mb-3" style="width: 30%;">
-                <div class="input-group-prepend">
-                    <span class="input-group-text justify-content-center" style="width: 74px;">优先级</span>
-                </div>
-                {{ form.priority(class="form-control") }}
-            </div>
-            <div class="input-group mb-3" style="width: 30%;">
-                <div class="input-group-prepend">
-                    <span class="input-group-text justify-content-center" style="width: 74px;">状态</span>
-                </div>
+            <div class="form-group" style="width: 70%;">
+                <label for="status" class="form-control-label">状态</label>
                 {{ form.status(class="form-control") }}
             </div>
-            <div class="input-group mb-3" style="width: 30%;">
-                <div class="input-group-prepend">
-                    <span class="input-group-text justify-content-center" style="width: 74px;">执行人</span>
-                </div>
+            <div class="form-group" style="width: 70%;">
+                <label for="priority" class="form-control-label">优先级</label>
+                {{ form.priority(class="form-control") }}
+            </div>
+            <div class="form-group" style="width: 70%;">
+                <label for="executor" class="form-control-label">执行人</label>
                 {{ form.executor(class="form-control") }}
             </div>
-
-            <input class="btn btn-light" type="submit" value="保存">
+            <input class="btn btn-light" type="button" value="保存" onclick="change_bug({{ bug.id }})">
         </form>
     </div>
 
+{% endblock %}
+
+{% block js %}
+    {{ JSGlue.include() }}
+    <script>
+        var change_bug = function (bug_id) {
+            jQuery.post(Flask.url_for("team.change_bug", {'bug_id': bug_id}), jQuery('#form').serialize(), function (data) {
+                if (data === 'true') {
+                    layer.msg('修改成功', {icon: 1}, {time: 500});
+                    layer.closeAll('page');
+                    flash_backlog({{ bug.belong_project_id }});
+                } else {
+                    layer.msg('修改失败', {icon: 5}, {time: 500});
+                }
+            })
+        }
+    </script>
 {% endblock %}

@@ -141,7 +141,7 @@
             })
         };
         var change_status = function (activity_id) {
-            jQuery.post(Flask.url_for('lab.change_activity_status', {'activity_id': activity_id}), {}, function (data) {
+            jQuery.post(Flask.url_for('lab.change_activity_status'), JSON.stringify({'activity_id': activity_id}), function (data) {
                 if (data === 'true') {
                     layer.msg('切换成功', {icon: 1}, {time: 300});
                     window.location.reload();

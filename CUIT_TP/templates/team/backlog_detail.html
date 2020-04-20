@@ -10,6 +10,5 @@
         <p>优先级： {{ backlog.priority }}</p>
         <p>状态： {{ backlog.status }}</p>
         <p>执行人： {{ backlog.executor.username }}</p>
-        <button class="btn btn-light" onclick=window.location.href="{{ url_for('team.change_backlog', backlog_id=backlog.id) }}">修改</button>
     </div>
 {% endblock %}

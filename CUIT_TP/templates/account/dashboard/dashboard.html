@@ -7,78 +7,192 @@
     <div class="content">
         <div class="animated fadeIn">
             <div class="row" style="margin: 0;">
-                <div class="col-lg-3 col-md-6">
+                <div class="col-lg-3 col-md-4">
                     <div class="card">
+                        <h1 style="text-align: center;margin-top: 10px">实验室</h1>
                         <div class="card-body">
-                            <div class="stat-widget-five">
-                                <div class="stat-icon dib flat-color-1">
-                                    <i class="pe-7s-cash"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <div class="text-left dib">
-                                        <div class="stat-text">$<span class="count">23569</span></div>
-                                        <div class="stat-heading">Revenue</div>
-                                    </div>
-                                </div>
-                            </div>
+                            <ul class="list-group">
+                                <li class="list-group-item list-group-item-dark">实验室任务</li>
+                                {% if tasks %}
+                                    {% for task in tasks %}
+                                        <li class="list-group-item">
+                                            <p style="margin-bottom: 0">
+                                                <a href="javascript:void (0);"
+                                                   onclick="detail('lab_task', {{ task.id }})">
+                                                    {{ task.task_name }}
+                                                </a>
+                                                <span style="float: right">
+                                                    {{ task.execute_datetime }}
+                                                </span>
+                                            </p>
+                                        </li>
+                                    {% endfor %}
+                                {% else %}
+                                    <li class="list-group-item">暂无任务</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                <li class="list-group-item list-group-item-dark">实验室活动</li>
+                                {% if activities %}
+                                    {% for activity in activities %}
+                                        <li class="list-group-item">
+                                            <p style="margin-bottom: 0;">
+                                                <a href="javascript:void (0);"
+                                                   onclick="detail('lab_activity', {{ activity.id }})">
+                                                    {{ activity.activity_name }}{% if activity.status == '1' %}<strong>&nbsp;已结束</strong>{% endif %}
+                                                </a>
+                                                <span style="float: right">
+                                                    {{ activity.start_time }}
+                                                </span>
+                                            </p>
+                                        </li>
+                                    {% endfor %}
+                                {% else %}
+                                    <li class="list-group-item">暂无活动</li>
+                                {% endif %}
+                            </ul>
                         </div>
                     </div>
-                </div>
-
-                <div class="col-lg-3 col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="stat-widget-five">
-                                <div class="stat-icon dib flat-color-2">
-                                    <i class="pe-7s-cart"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <div class="text-left dib">
-                                        <div class="stat-text"><span class="count">3435</span></div>
-                                        <div class="stat-heading">Sales</div>
-                                    </div>
-                                </div>
+                    {% if current_user.belong_team_id %}
+                        <div class="card">
+                            <h1 style="text-align: center;margin-top: 10px">我的小组</h1>
+                            <div class="card-body">
+                                <ul class="list-group">
+                                    <li class="list-group-item list-group-item-dark">小组活动</li>
+                                    {% if current_user.belong_team.activities %}
+                                        {% for activity in current_user.belong_team.activities %}
+                                            <li class="list-group-item">
+                                                <p style="margin-bottom: 0;">
+                                                    <a href="javascript:void (0);"
+                                                       onclick="detail('team_activity', {{ activity.id }})">
+                                                        {{ activity.activity_name }}{% if activity.status == '1' %}<strong>&nbsp;已结束</strong>{% endif %}
+                                                    </a>
+                                                    <span style="float: right">
+                                                        {{ activity.start_time }}
+                                                    </span>
+                                                </p>
+                                            </li>
+                                        {% endfor %}
+                                    {% else %}
+                                        <li class="list-group-item">暂无活动</li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group">
+                                    <li class="list-group-item list-group-item-dark">小组项目</li>
+                                    {% if projects %}
+                                        {% for project in projects %}
+                                            <li class="list-group-item">
+                                                <p style="margin-bottom: 0;">
+                                                    <a href="javascript:void (0);"
+                                                       onclick="switch_project({{ project.id }}, '{{ project.project_name }}{% if project.status == "1" %}<strong>&nbsp;已结束</strong>{% endif %}')">
+                                                        {{ project.project_name }}{% if project.status == '1' %}<strong>&nbsp;已结束</strong>{% endif %}
+                                                    </a>
+                                                    <span style="float: right">
+                                                        {{ project.end_time }}
+                                                    </span>
+                                                </p>
+                                            </li>
+                                        {% endfor %}
+                                    {% else %}
+                                        <li class="list-group-item">暂无项目</li>
+                                    {% endif %}
+                                </ul>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
                 </div>
 
-                <div class="col-lg-3 col-md-6">
+                <div class="col-lg-9 col-md-8">
                     <div class="card">
-                        <div class="card-body">
-                            <div class="stat-widget-five">
-                                <div class="stat-icon dib flat-color-3">
-                                    <i class="pe-7s-browser"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <div class="text-left dib">
-                                        <div class="stat-text"><span class="count">349</span></div>
-                                        <div class="stat-heading">Templates</div>
-                                    </div>
-                                </div>
+                        {% if projects %}
+                            <div class="card-header" style="text-align: center;">
+                                <h1 id="project_name">{{ projects[0].project_name }}{% if projects[0].status == '1' %}<strong>&nbsp;已结束</strong>{% endif %}</h1>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-3 col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="stat-widget-five">
-                                <div class="stat-icon dib flat-color-4">
-                                    <i class="pe-7s-users"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <div class="text-left dib">
-                                        <div class="stat-text"><span class="count">2986</span></div>
-                                        <div class="stat-heading">Clients</div>
-                                    </div>
-                                </div>
+                            <div class="card-body">
+                                <h2 style="text-align: center;margin: 10px 0;">需求</h2>
+                                <div id="backlog"></div>
+                                <hr>
+                                <h2 style="text-align: center;margin: 10px 0;">缺陷</h2>
+                                <div id="bug"></div>
                             </div>
-                        </div>
+                        {% else %}
+                            <div class="card-header" style="text-align: center;">
+                                <h1 id="project_name">暂无项目</h1>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block js %}
+    {{ JSGlue.include() }}
+    <script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
+    <script>
+        {% if projects %}
+            window.onload = function () {
+                jQuery.get(Flask.url_for('team.project_backlog', {'project_id': {{ projects[0].id }}}), {}, function (data) {
+                    jQuery('#backlog').append(data)
+                });
+                jQuery.get(Flask.url_for('team.project_bug', {'project_id': {{ projects[0].id }}}), {}, function (data) {
+                    jQuery('#bug').append(data)
+                })
+            };
+        {% endif %}
+        var flash_backlog = function (project_id, page = 1) {
+            jQuery.get(Flask.url_for('team.project_backlog', {
+                'project_id': project_id,
+                'page': page
+            }), {}, function (data) {
+                jQuery('#backlog').html(data);
+            })
+        };
+        var flash_bug = function (project_id, page = 1) {
+            jQuery.get(Flask.url_for('team.project_bug', {
+                'project_id': project_id,
+                'page': page
+            }), {}, function (data) {
+                jQuery('#bug').html(data);
+            })
+        };
+        var switch_project = function (project_id, project_name) {
+            jQuery('#project_name').html(project_name);
+            flash_backlog(project_id);
+            flash_bug(project_id);
+        };
+        var detail = function (detail_type, id) {
+            var url, title;
+            switch (detail_type) {
+                case 'lab_task': {
+                    url = Flask.url_for('lab.task_detail', {'task_id': id});
+                    title = '实验室任务';
+                    break;
+                }
+                case 'lab_activity': {
+                    url = Flask.url_for('lab.activity_detail', {'activity_id': id});
+                    title = '实验室活动';
+                    break;
+                }
+                default: {
+                    url = Flask.url_for('team.activity_detail', {'activity_id': id});
+                    title = '小组活动';
+                }
+            }
+            jQuery.get(url, {}, function (data) {
+                layer.open({
+                    type: 1,
+                    title: title,
+                    area: '500px',
+                    skin: 'layui-layer-rim',
+                    content: data
+                })
+            })
+        }
+    </script>
 {% endblock %}
