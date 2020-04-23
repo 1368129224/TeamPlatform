@@ -72,3 +72,12 @@ class MonitorForm(FlaskForm):
     verify_asset = BooleanField('资产审核')
     manage_lab_team = BooleanField('管理小组')
     publish_lab_activity = BooleanField('发布实验室活动')
+
+def get_ChangeLeaderForm(team_id):
+    class ChangeLeaderForm(FlaskForm):
+        new_leader = QuerySelectField('新组长', validators=[DataRequired()], query_factory=lambda :User.query.filter(User.belong_team_id==team_id),
+                                        get_label='username', render_kw={
+                'class': 'custom-select'
+            })
+    return ChangeLeaderForm
+

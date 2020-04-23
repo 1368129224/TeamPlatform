@@ -36,6 +36,7 @@
                                         <td style="text-align: center">
                                             <button class="btn btn-light btn-sm" onclick="delete_team({{ team.id }})">删除
                                             </button>
+                                            <button class="btn btn-light btn-sm" onclick="change_leader({{ team.id }})">修改组长</button>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -116,6 +117,17 @@
                         layer.msg('删除失败', {icon: 5});
                     }
                 })
+            })
+        }
+        function change_leader(team_id) {
+            jQuery.get(Flask.url_for('lab.change_leader', {'team_id': team_id}), {}, function (data) {
+                layer.open({
+                    type: 1,
+                    title: '修改组长',
+                    skin: 'layui-layer-rim',
+                    area: '500px',
+                    content: data
+                });
             })
         }
         function go(url) {

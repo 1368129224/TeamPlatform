@@ -1,0 +1,24 @@
+<div class="container" style="padding-top: 20px;padding-bottom: 20px;">
+    <h1>修改组长</h1>
+    <br>
+    <form method="post" action="" id="form">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.new_leader }}
+            <input class="btn btn-light" style="margin-top: 20px" type="button" onclick="submit_change_leader_form({{ team_id }})" value="修改"/>
+        </div>
+    </form>
+</div>
+<script>
+    const submit_change_leader_form = function (team_id) {
+        jQuery.post(Flask.url_for("lab.change_leader", {"team_id": team_id}), jQuery('#form').serialize(), function (data) {
+            if (data === 'true') {
+                layer.msg('修改成功', {icon: 1});
+                layer.closeAll('page');
+                parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#manage_iframe').attr('src'));
+            } else {
+                layer.msg('修改失败', {icon: 5});
+            }
+        })
+    }
+</script>

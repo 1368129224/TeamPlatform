@@ -1,45 +1,117 @@
 {% extends 'iframe_base.html' %}
 
-{% block content %}
-    <h1>座位管理</h1>
-    <br>
-    {% for unset_user in unset_users %}
-        <div class="card" style="width: 10rem;display: inline-block;text-align: center">
-            <div class="card-header" style="height: fit-content">
-                <p style="margin-bottom: 0;">
-                    <a href="{{ url_for('account.profile', stu_num=unset_user[2]) }}"><strong>{{ unset_user[0] }}</strong></a>
-                </p>
-            </div>
-            <div class="card-body">
-                <button class="btn btn-light" onclick="change_set({{ unset_user[2] }}, {{ unset_user[1] }})">未设置</button>
-            </div>
-        </div>
-    {% endfor %}
-    <hr>
-    {% for set_user in set_users %}
-        <div class="card" style="width: 10rem;display: inline-block;text-align: center">
-            <div class="card-header" style="height: fit-content"><p style="margin-bottom: 0;">
-                <a href="{{ url_for('account.profile', stu_num=set_user[2]) }}"><strong>{{ set_user[0] }}</strong></a>
-            </p></div>
-            <div class="card-body">
-                <button class="btn btn-light" onclick="change_set({{ set_user[2] }}, {{ set_user[1] }})">{{ set_user[1] }} </button>
-            </div>
-        </div>
-    {% endfor %}
+{% block css %}
+    <style type="text/css">
+        * {
+            padding: 0;
+            margin: 0;
+        }
 
+        #box {
+            height: 800px;
+
+            position: relative;
+            left: 50px;
+            top: 50px;
+        }
+
+        #box:after {
+            content: ".";
+            font-size: 0px;
+            display: block;
+            visibility: none;
+            clear: both;
+            height: 0;
+        }
+
+        .drag {
+            width: 100%;
+            height: 100%;
+            color: #fff;
+            cursor: pointer;
+            background: #333;
+        }
+
+        #box .block {
+            float: left;
+            outline: 2px solid black;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="content">
+        <div class="animated fadeIn">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header" style="text-align: center">
+                            <strong class="card-title">座位管理</strong>
+                        </div>
+                        <div class="card-body" style="padding: 10px;display: inline-block;">
+                            {% for unset_user in unset_users %}
+                                <div class="card" style="width: 10rem;display: inline-block;text-align: center;margin: 5px 5px;">
+                                    <div class="card-body">
+                                        <p style="margin-bottom: 0;">
+                                            <a href="{{ url_for('account.profile', stu_num=unset_user[2]) }}"><strong>{{ unset_user[0] }}</strong></a>
+                                        </p>
+                                        <p style="margin-bottom: 0;">未设置</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <hr>
+                        {% for set_user in set_users %}
+                            <div class="card" style="width: 10rem;display: inline-block;text-align: center">
+                                <div class="card-header" style="height: fit-content"><p style="margin-bottom: 0;">
+                                    <a href="{{ url_for('account.profile', stu_num=set_user[2]) }}"><strong>{{ set_user[0] }}</strong></a>
+                                </p></div>
+                                <div class="card-body">
+                                    <button class="btn btn-light"
+                                            onclick="change_set({{ set_user[2] }}, {{ set_user[1] }})">{{ set_user[1] }} </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        <div id="box">
+                            <div class="drag" id="drag">drag</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block js %}
     {{ JSGlue.include() }}
+    <script src="{{ url_for('static', filename='js/blockDrag.min.js') }}"></script>
     <script>
+        var demo = new blockDrag({block: "(6,8)"});
+        var blockNum = Number(demo.col) * Number(demo.row);
+        for (var i = 0; i < blockNum; i++) {
+            jQuery("<div class='block' style='width:" + demo.set.blockW + "px;height:" + demo.set.blockH + "px'></div>").appendTo($("#box"));
+        }
+
         function change_set(stu_num, set_num) {
             var set = prompt('请输入座位号： ', set_num);
-            jQuery.post(Flask.url_for('lab.change_set'), JSON.stringify({'stu_num': stu_num, 'set_num': set}), function (data) {
+            jQuery.post(Flask.url_for('lab.change_set'), JSON.stringify({
+                'stu_num': stu_num,
+                'set_num': set
+            }), function (data) {
                 switch (data) {
-                    case ('true'): window.location.reload();break;
-                    case ('valueError'): alert('请输入正确座位号');break;
-                    case ('valueExist'): alert('该座位号以占用');break;
-                    case ('valueOverflow'): alert('座位号无效');break;
+                    case ('true'):
+                        window.location.reload();
+                        break;
+                    case ('valueError'):
+                        alert('请输入正确座位号');
+                        break;
+                    case ('valueExist'):
+                        alert('该座位号以占用');
+                        break;
+                    case ('valueOverflow'):
+                        alert('座位号无效');
+                        break;
                 }
             })
         }

@@ -5,7 +5,7 @@ from flask_login import current_user, login_required
 from CUIT_TP.forms.lab import (
     CreateLabTaskForm, CreateTeamForm, CreateLabActivityForm,
     ChangeLabActivityForm, ChangeLabTaskForm, MonitorForm,
-    ChangeLabSettingsForm
+    ChangeLabSettingsForm, get_ChangeLeaderForm
 )
 from CUIT_TP.models import db, User, LabTask, Asset, Team, UserProfile, LabActivity, Monitor
 from CUIT_TP import login, app
@@ -292,6 +292,29 @@ def teams(page=1):
     else:
         abort(403)
 
+
+# 更改小组组长
+@bp.route('/change_leader/<int:team_id>', methods=('POST', 'GET'))
+@login_required
+def change_leader(team_id):
+    if (
+            current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_team) or current_user.role == 'admin':
+        ChangeTeamleaderForm = get_ChangeLeaderForm(team_id)
+        form = ChangeTeamleaderForm()
+        if request.method == 'POST':
+            form = ChangeTeamleaderForm()
+            if form.validate_on_submit():
+                new_leader = form.new_leader.data
+                team = Team.query.filter(Team.id==team_id).first_or_404()
+                team.leader = new_leader
+                db.session.commit()
+                return make_response('true', 200)
+            else:
+                return make_response('false', 200)
+        else:
+            return render_template('lab/change_leader.html', form=form, team_id=team_id)
+    else:
+        abort(403)
 
 # 新建小组
 @bp.route('/create_team/', methods=('GET', 'POST'))
