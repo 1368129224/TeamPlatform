@@ -1,0 +1,45 @@
+{% extends 'iframe_base.html' %}
+
+{% block content %}
+    <div class="container" style="padding-top: 20px;padding-bottom: 20px;">
+        <div class="row justify-content-center" style="width: inherit;margin: 20px 0;">
+            <div class="col-12">
+                <h1 style="text-align: center; margin-bottom: 10px">文档共享</h1>
+            </div>
+            <button class="btn btn-light" style="margin: 0 10px" onclick="flash_team()">小组文件</button>
+            <button class="btn btn-light" style="margin: 0 10px" onclick="flash_lab()">实验室文件</button>
+            <button class="btn btn-light" style="margin: 0 10px" onclick="flash_my_files()">我的文件</button>
+        </div>
+        <div class="row">
+            <div class="col-12" id="file_list">
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ JSGlue.include() }}
+    <script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
+    <script>
+        window.onload = function () {
+            jQuery.get(Flask.url_for('file.lab_files', {'page': 1}), {}, function (data) {
+                jQuery('#file_list').append(data)
+            })
+        };
+        var flash_team = function (page=1) {
+            jQuery.get(Flask.url_for('file.team_files', {'page': page}), {}, function (data) {
+                jQuery('#file_list').html(data);
+            })
+        };
+        var flash_lab = function (page=1) {
+            jQuery.get(Flask.url_for('file.lab_files', {'page': page}), {}, function (data) {
+                jQuery('#file_list').html(data);
+            })
+        };
+        var flash_my_files = function (page=1) {
+            jQuery.get(Flask.url_for('file.my_files', {'page': page}), {}, function (data) {
+                jQuery('#file_list').html(data);
+            })
+        }
+    </script>
+{% endblock %}

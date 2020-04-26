@@ -18,6 +18,11 @@
                 class="fa fa-group"></i>我的小组</a></li>
         <li><a href="#" onclick="remove_class(this, '{{ url_for('account.assets') }}')"><i class="fa fa-laptop"></i>我的资产</a>
         </li>
+        <li>
+            <a href="#" onclick="remove_class(this, '{{ url_for('file.files') }}');">
+                <i class="fa fa-folder"></i>文件共享
+            </a>
+        </li>
         <li class="menu-title">实验室</li>
         {% if current_user.monitor_permission.manage_lab_student_profile %}
             <li><a href="#" onclick="remove_class(this, '{{ url_for('lab.member') }}');"><i

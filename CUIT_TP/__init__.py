@@ -31,10 +31,11 @@ try:
 except:
     pass
 
-from .views import account, lab, team
+from .views import account, lab, team, file
 app.register_blueprint(account.bp, url_prefix='/account/')
 app.register_blueprint(lab.bp, url_prefix='/lab/')
 app.register_blueprint(team.bp, url_prefix='/team/')
+app.register_blueprint(file.bp, url_prefix='/file/')
 
 @app.route('/')
 def index():

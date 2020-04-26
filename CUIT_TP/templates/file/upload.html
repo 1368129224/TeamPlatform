@@ -1,0 +1,37 @@
+<div class="container" style="padding-top: 20px;padding-bottom: 20px;">
+    <form method="post" action="" id="form" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file" class="form-control-label">选择文件</label>
+            <input class="form-control-file" id="file" name="file" required="" type="file">
+        </div>
+        <div class="form-group" style="width: 40%;">
+            <label for="is_team_file" class="form-control-label">分享范围</label>
+            <select class="form-control" id="is_team_file" name="is_team_file">
+                <option value="0">实验室</option>
+                <option value="1">小组</option>
+            </select>
+        </div>
+        <input class="btn btn-light" style="margin-top: 20px" type="button" onclick="submit_upload_form()" value="上传"/>
+    </form>
+</div>
+<script>
+    var submit_upload_form = function () {
+        jQuery.ajax({
+            url: Flask.url_for("file.upload"),
+            type: 'POST',
+            data: new FormData(jQuery('#form')[0]),
+            cache: false,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                if (data === 'true') {
+                    layer.msg('上传成功', {icon: 1});
+                    layer.closeAll('page');
+                    parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#manage_iframe').attr('src'));
+                } else {
+                    layer.msg('上传失败', {icon: 5});
+                }
+            }
+        })
+    }
+</script>

@@ -5,6 +5,22 @@ from sqlalchemy.orm import relationship
 from CUIT_TP import db, login, app
 from flask_login import UserMixin
 
+# 文件表
+class File(db.Model):
+    __tablename__ = 'File'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    uid = db.Column(db.Integer, db.ForeignKey('User.id', ondelete='CASCADE'))
+    file_origin_name = db.Column(db.String(64), comment='文件原名称')
+    file_uuid = db.Column(db.String(128), comment='uuid')
+    file_new_name = db.Column(db.String(136), comment='uuid')
+    file_path = db.Column(db.String(256), comment='路径')
+    upload_datetime = db.Column(db.DateTime, default=datetime.now(), comment='上传时间')
+    is_lab_file = db.Column(db.Boolean, comment='是否是小组内分享')
+    uploader = relationship('User', back_populates='files')
+
+    def __repr__(self):
+        return '<File {}>'.format(self.file_origin_name)
+
 # 实验室事务表
 class LabTask(db.Model):
     __tablename__ = 'LabTask'
@@ -26,6 +42,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(128), nullable=False, comment='密码')
     role = db.Column(db.Enum('admin', 'monitor', 'student'), server_default='student')
     lab_task = relationship('LabTask', back_populates='executor', foreign_keys=[LabTask.uid], cascade="all, delete-orphan")
+    files = relationship('File', back_populates='uploader', foreign_keys=[File.uid], cascade="all, delete-orphan")
     belong_team_id = db.Column(db.Integer, db.ForeignKey('Team.id', ondelete='SET NULL'))
     belong_team = relationship('Team', back_populates='teammates', foreign_keys=[belong_team_id])
     manage_team_id = db.Column(db.Integer, db.ForeignKey('Team.id', ondelete='SET NULL'))

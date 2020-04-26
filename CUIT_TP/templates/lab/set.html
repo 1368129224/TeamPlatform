@@ -85,14 +85,7 @@
 
 {% block js %}
     {{ JSGlue.include() }}
-    <script src="{{ url_for('static', filename='js/blockDrag.min.js') }}"></script>
     <script>
-        var demo = new blockDrag({block: "(6,8)"});
-        var blockNum = Number(demo.col) * Number(demo.row);
-        for (var i = 0; i < blockNum; i++) {
-            jQuery("<div class='block' style='width:" + demo.set.blockW + "px;height:" + demo.set.blockH + "px'></div>").appendTo($("#box"));
-        }
-
         function change_set(stu_num, set_num) {
             var set = prompt('请输入座位号： ', set_num);
             jQuery.post(Flask.url_for('lab.change_set'), JSON.stringify({
