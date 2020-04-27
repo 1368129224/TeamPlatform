@@ -1,8 +1,8 @@
 <table id="bootstrap-data-table" class="table table-striped table-bordered">
     <thead>
     <tr>
-        <th scope="col" style="width: 63%">文件名</th>
-        <th scope="col" style="width: 15%">上传者</th>
+        <th scope="col" style="width: 69%">文件名</th>
+        <th scope="col" style="width: 9%">共享范围</th>
         <th scope="col" style="width: 16%">上传时间</th>
         <th scope="col" style="width: 6%">操作</th>
     </tr>
@@ -16,7 +16,7 @@
                         {{ file.file_origin_name }}
                     </a>
                 </td>
-                <td style="vertical-align: middle;">{{ file.uploader.username }}</td>
+                <td style="vertical-align: middle;">{{ '实验室' if file.is_lab_file else '小组'}}</td>
                 <td style="vertical-align: middle;">{{ file.upload_datetime }}</td>
                 <td style="text-align: center">
                     <button class="btn btn-light btn-sm" onclick="delete_file({{ file.id }})">

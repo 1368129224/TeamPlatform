@@ -172,7 +172,6 @@ def change_task(task_id):
                 task.executor = form.executor.data
                 task.execute_datetime = form.execute_time.data
                 db.session.commit()
-
                 return make_response('true', 200)
             else:
                 return make_response('false', 200)

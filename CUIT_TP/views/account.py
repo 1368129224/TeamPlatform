@@ -1,3 +1,4 @@
+import json
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, make_response
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import current_user, login_user, logout_user, login_required
@@ -6,7 +7,7 @@ from CUIT_TP.forms.account import (
     ResetPasswordForm, ProfileForm, ChangePasswordForm,
     ApplyAssetForm, ForceResetPasswordForm, AdminProfileForm
 )
-from CUIT_TP.models import User, UserProfile, Asset, Team, Project, LabActivity, LabTask
+from CUIT_TP.models import User, UserProfile, Asset, Team, Project, LabActivity, LabTask, File
 from CUIT_TP.utils import send_email
 from CUIT_TP import db, app, login
 
@@ -288,12 +289,30 @@ def change_profile(stu_num):
     else:
         abort(403)
 
+# 删除账号
+@bp.route('/delete_account/', methods=('POST', ))
+@login_required
+def delete_account():
+    if current_user.role == 'admin':
+        uid = json.loads(request.get_data().decode(encoding='utf-8')).get('uid')
+        user = User.query.filter(User.id==uid).first_or_404()
+        import os
+        files = File.query.filter(File.uploader == user).all()
+        for file in files:
+            db.session.delete(file)
+            os.remove(file.file_path)
+        db.session.delete(user)
+        db.session.commit()
+        return make_response('true', 200)
+    else:
+        abort(403)
+
 
 # 资产展示
 @bp.route('/assets/')
 @login_required
 def assets():
-    assets = Asset.query.all()
+    assets = Asset.query.filter(Asset.user==current_user)
     return render_template('account/assets.html', assets=assets)
 
 

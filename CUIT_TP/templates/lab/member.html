@@ -99,11 +99,17 @@
                             {% if current_user.stu_num == user.stu_num or current_user.role == 'admin' or (current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_student_profile) %}
                                 <li class="list-group-item">
                                     <div class="btn-group" style="width: -webkit-fill-available;">
-                                        <button type="button" class="btn btn-light"
+                                        <button type="button" class="btn btn-light" style="margin: 0 5px"
                                                 onclick="change_profile({{ user.stu_num }}, '{{ user.username }}')">
                                             修改信息
                                         </button>
-                                        <button type="button" class="btn btn-light ml-auto"
+                                        {% if current_user.role == 'admin' %}
+                                            <button type="button" class="btn btn-light" style="margin: 0 5px"
+                                                    onclick="delete_account({{ user.id }})">
+                                                删除账号
+                                            </button>
+                                        {% endif %}
+                                        <button type="button" class="btn btn-light" style="margin: 0 5px"
                                                 onclick="change_password({{ user.stu_num }}, '{{ user.username }}')">
                                             修改密码
                                         </button>
@@ -176,7 +182,7 @@
 <script src="{{ url_for('static', filename='assets/js/main.js') }}"></script>
 {{ JSGlue.include() }}
 <script>
-    const change_profile = function (stu_num, username) {
+    var change_profile = function (stu_num, username) {
         jQuery.get(Flask.url_for('account.change_profile', {'stu_num': stu_num}), {}, function (data) {
             layer.open({
                 type: 1,
@@ -187,7 +193,7 @@
             })
         })
     };
-    const change_password = function (stu_num, username) {
+    var change_password = function (stu_num, username) {
         jQuery.get(Flask.url_for('account.change_password', {'stu_num': stu_num}), {}, function (data) {
             layer.open({
                 type: 1,
@@ -198,6 +204,21 @@
             })
         })
     };
+    var delete_account = function (uid) {
+        layer.confirm('确认删除吗?', {
+            btn: ["确定", "取消"]
+        }, function () {
+            jQuery.post(Flask.url_for('account.delete_account'), JSON.stringify({'uid': uid}), function (data) {
+                if (data === 'true') {
+                    layer.msg('删除成功', {icon: 1});
+                    layer.closeAll('page');
+                    parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#manage_iframe').attr('src'));
+                } else {
+                    layer.msg('删除失败', {icon: 5});
+                }
+            })
+        })
+    }
 </script>
 </body>
 </html>

@@ -223,8 +223,7 @@ def change_backlog(backlog_id):
                 backlog.priority = form.priority.data
                 backlog.status = form.status.data
                 if backlog.executor != form.executor.data:
-                    backlog.executor.project_backlog.remove(backlog)
-                    form.executor.data.project_backlog.append(backlog)
+                    backlog.executor = form.executor.data
                 db.session.commit()
                 return make_response('true', 200)
             else:
@@ -292,8 +291,7 @@ def change_bug(bug_id):
                 bug.priority = form.priority.data
                 bug.status = form.status.data
                 if bug.executor != form.executor.data:
-                    bug.executor.project_bug.remove(bug)
-                    form.executor.data.project_bug.append(bug)
+                    bug.executor = form.executor.data
                 db.session.commit()
                 return make_response('true', 200)
             else:

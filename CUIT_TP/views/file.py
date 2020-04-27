@@ -60,8 +60,8 @@ def files():
 @bp.route('/team_files/<int:page>/')
 @login_required
 def team_files(page=1):
-    if File.query.filter(File.is_lab_file==False).all():
-        files = File.query.filter(File.uploader.belong_team_id==current_user.belong_team_id, File.is_lab_file==False).order_by(File.upload_datetime.desc()).paginate(page, 5, False)
+    if File.query.join(User).filter(File.is_lab_file==False, User.belong_team_id==current_user.belong_team_id).all():
+        files = File.query.join(User).filter(File.is_lab_file==False, User.belong_team_id==current_user.belong_team_id).order_by(File.upload_datetime.desc()).paginate(page, 5, False)
     else:
         files = None
     return render_template('file/team_files.html', files=files)
