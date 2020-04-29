@@ -142,7 +142,7 @@ def forget_password():
 # 发送重置密码邮件
 def send_reset_password_email(user):
     token = user.get_reset_password_token()
-    send_email('Reset Your Password',
+    send_email('重置密码',
                sender=app.config['MAIL_USERNAME'],
                recipients=[user.email],
                text_body=render_template('email/reset_password.txt',

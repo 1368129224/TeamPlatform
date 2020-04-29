@@ -1,14 +1,15 @@
 import json
 from datetime import datetime
-from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, make_response
+from flask import Blueprint, render_template, request, redirect, url_for, abort, make_response
 from flask_login import current_user, login_required
 from CUIT_TP.forms.lab import (
     CreateLabTaskForm, CreateTeamForm, CreateLabActivityForm,
     ChangeLabActivityForm, ChangeLabTaskForm, MonitorForm,
     ChangeLabSettingsForm, get_ChangeLeaderForm
 )
-from CUIT_TP.models import db, User, LabTask, Asset, Team, UserProfile, LabActivity, Monitor
+from CUIT_TP.models import db, User, LabTask, Asset, Team, LabActivity, Monitor
 from CUIT_TP import login, app
+from CUIT_TP.utils import send_email
 
 bp = Blueprint('lab', __name__)
 
@@ -109,6 +110,13 @@ def create_task():
                 form.executor.data.lab_task.append(new_lab_task)
                 db.session.add(new_lab_task)
                 db.session.commit()
+                send_email('新的实验室任务',
+                           sender=app.config['MAIL_USERNAME'],
+                           recipients=[form.executor.data.email],
+                           text_body=render_template('email/new_lab_task.txt',
+                                                     user=form.executor.data, task=new_lab_task),
+                           html_body=render_template('email/new_lab_task.html',
+                                                     user=form.executor.data, task=new_lab_task))
                 return make_response('true', 200)
             else:
                 return make_response('false', 200)
@@ -210,18 +218,9 @@ def set():
 def change_set():
     if (current_user.role == 'monitor' and current_user.monitor_permission.change_set) or current_user.role == 'admin':
         json_data = json.loads(request.get_data().decode(encoding='utf-8'))
-        user = User.query.filter(User.stu_num == json_data.get('stu_num')).first()
-        try:
-            n = int(json_data.get('set_num'))
-            if n < 0:
-                raise ValueError
-        except ValueError:
-            return make_response('valueError', 200)
-        if UserProfile.query.filter(UserProfile.set_num == n).first():
-            return make_response('valueExist', 200)
-        if n > int(app.config['LAB_SET_NUM']):
-            return make_response('valueOverflow', 200)
-        user.profile.set_num = json_data.get('set_num')
+        for k, v in json_data.items():
+            u = User.query.filter(User.stu_num==str(k)).first_or_404()
+            u.profile.set_num = v
         db.session.commit()
         return make_response('true', 200)
     else:
@@ -368,6 +367,15 @@ def create_activity():
                 )
                 db.session.add(new_activity)
                 db.session.commit()
+                users = User.query.filter(User.role!='admin').all()
+                for user in users:
+                    send_email('新的实验室活动',
+                               sender=app.config['MAIL_USERNAME'],
+                               recipients=[user.email],
+                               text_body=render_template('email/new_lab_activity.txt',
+                                                         user=user, activity=new_activity),
+                               html_body=render_template('email/new_lab_activity.html',
+                                                         user=user, activity=new_activity))
                 return make_response('true', 200)
             else:
                 return make_response('false', 200)

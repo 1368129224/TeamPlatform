@@ -35,8 +35,8 @@
                         </div>
                         <div class="card-body" style="padding: 10px;display: inline-block;">
                             {% for unset_user in unset_users %}
-                                <div class="unset-set" ondrop="drop(event)" ondragover="allowDrop(event)">
-                                    <div class="card"
+                                <div class="unset-set" id="0" ondrop="drop(event)" ondragover="allowDrop(event)">
+                                    <div class="card stu"
                                          style="width: 10rem;display: inline-block;text-align: center;margin: 5px 5px;"
                                          draggable="true" ondragstart="drag(event)" id="{{ unset_user[2] }}">
                                         <div class="card-body">
@@ -55,7 +55,7 @@
                                     <div class="set" id="{{ i + 1 }}" ondrop="drop(event)"
                                          ondragover="allowDrop(event)">
                                         {% if i + 1 in set_users.keys() %}
-                                            <div class="card"
+                                            <div class="card stu"
                                                  style="width: 10rem;display: inline-block;text-align: center;margin: 5px 5px;"
                                                  draggable="true" ondragstart="drag(event)"
                                                  id="{{ set_users[i + 1].stu_num }}">
@@ -72,7 +72,7 @@
                                 </div>
                             {% endfor %}
                             <div class="row justify-content-center" style="width: inherit;margin: 20px 20px">
-                                <button class="btn btn-light">保存</button>
+                                <button class="btn btn-light" onclick="change_set()">保存</button>
                             </div>
                         </div>
                     </div>
@@ -83,10 +83,24 @@
 {% endblock %}
 
 {% block js %}
+    <script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
     {{ JSGlue.include() }}
     <script>
         function change_set() {
-
+            var sets = {};
+            jQuery(".card.stu").each(function () {
+                console.log(jQuery(this)[0].id);
+                console.log(jQuery(this).parent()[0].id);
+                sets[jQuery(this)[0].id] = jQuery(this).parent()[0].id;
+            });
+            jQuery.post(Flask.url_for('lab.change_set'), JSON.stringify(sets), function (data) {
+                if (data === 'true') {
+                    layer.msg('修改成功', {icon: 1}, {time: 500});
+                    parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#manage_iframe').attr('src'));
+                } else {
+                    layer.msg('修改失败', {icon: 5});
+                }
+            })
         }
 
         function drag(ev) {

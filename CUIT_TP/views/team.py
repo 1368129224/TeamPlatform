@@ -7,7 +7,8 @@ from CUIT_TP.forms.team import (
     get_ChangeBugForm, CreateTeamActivityForm
 )
 from CUIT_TP.models import db, User, Team, Project, TeamActivity, Backlog, Bug
-from CUIT_TP import login
+from CUIT_TP import login, app
+from CUIT_TP.utils import send_email
 
 
 bp = Blueprint('team', __name__)
@@ -324,6 +325,15 @@ def create_activity():
                 new_activity.belong_team = current_user.belong_team
                 db.session.add(new_activity)
                 db.session.commit()
+                teammates = User.query.filter(User.belong_team == current_user.manage_team).all()
+                for teammate in teammates:
+                    send_email('新的实验室活动',
+                               sender=app.config['MAIL_USERNAME'],
+                               recipients=[teammate.email],
+                               text_body=render_template('email/new_team_activity.txt',
+                                                         user=teammate, activity=new_activity),
+                               html_body=render_template('email/new_team_activity.html',
+                                                         user=teammate, activity=new_activity))
                 return make_response('true', 200)
             else:
                 return make_response('false', 200)

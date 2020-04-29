@@ -1,0 +1,10 @@
+您好, {{ user.username }}
+您有一项新的实验室任务:
+
+{{ task.task_name }}
+
+{{ task.desc }}
+
+详情请登录系统查看
+
+{{ config.LAB_NAME }}
