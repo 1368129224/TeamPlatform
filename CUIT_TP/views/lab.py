@@ -187,23 +187,18 @@ def change_task(task_id):
         abort(403)
 
 
-def takeSecond(elem):
-    return elem[1]
-
-
 # 展示座位
 @bp.route('/set/')
 @login_required
 def set():
     if (current_user.role == 'monitor' and current_user.monitor_permission.change_set) or current_user.role == 'admin':
-        users = User.query.all()
-        set_users, unset_users = [], []
+        users = User.query.filter(User.role!='admin').all()
+        set_users, unset_users = {}, []
         for user in users:
             if user.profile.set_num == 0:
                 unset_users.append((user.username, user.profile.set_num, user.stu_num))
             else:
-                set_users.append((user.username, user.profile.set_num, user.stu_num))
-        set_users.sort(key=takeSecond)
+                set_users[user.profile.set_num] = user
         return render_template('lab/set.html', unset_users=unset_users, set_users=set_users)
     else:
         abort(403)

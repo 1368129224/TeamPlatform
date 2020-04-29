@@ -27,7 +27,7 @@ class Config(object):
     # 系统名称
     LAB_NAME = "{str(app.config.get('LAB_NAME'))}"
     # 实验室座位数
-    LAB_SET_NUM = "{str(app.config.get('LAB_SET_NUM'))}"
+    LAB_SET_NUM = {str(app.config.get('LAB_SET_NUM'))}
     # flask-WTF
     CSRF_ENABLED = {str(app.config.get('CSRF_ENABLED'))}
     SECRET_KEY = "{str(app.config.get('SECRET_KEY'))}"
