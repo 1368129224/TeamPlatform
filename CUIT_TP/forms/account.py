@@ -5,35 +5,20 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationE
 from CUIT_TP.models import User
 
 
-class AdminRegisterForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=16)], render_kw={
-        'class': 'form-control',
-    })
-    email = StringField('Email', validators=[DataRequired(), Email()], render_kw={
-        'class': 'form-control',
-    })
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=48)], render_kw={
-        'class': 'form-control',
-    })
-    confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')], render_kw={
-        'class': 'form-control',
-    })
-
-
 class RegisterForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=16)], render_kw={
+    username = StringField('Username', validators=[DataRequired('请输入姓名'), Length(min=2, max=16)], render_kw={
         'class': 'form-control',
     })
-    stu_num = StringField('Stu_num', validators=[DataRequired(), Length(min=10, max=10)], render_kw={
+    stu_num = StringField('Stu_num', validators=[DataRequired('请输入学号'), Length(min=10, max=10)], render_kw={
         'class': 'form-control',
     })
-    email = StringField('Email', validators=[DataRequired(), Email()], render_kw={
+    email = StringField('Email', validators=[DataRequired('请输入邮箱'), Email('邮箱格式错误')], render_kw={
         'class': 'form-control',
     })
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=48)], render_kw={
+    password = PasswordField('Password', validators=[DataRequired('请输入密码'), Length(min=8, max=48, message='密码长度8-48位')], render_kw={
         'class': 'form-control',
     })
-    confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')], render_kw={
+    confirm = PasswordField('Repeat Password', validators=[DataRequired('请确认密码'), EqualTo('password')], render_kw={
         'class': 'form-control',
     })
 
@@ -70,7 +55,7 @@ class ForgetPasswordForm(FlaskForm):
 
 
 class ResetPasswordForm(FlaskForm):
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=10, max=48)], render_kw={
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, max=48, message='密码长度8-48位')], render_kw={
         'class': 'form-control',
     })
     confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')], render_kw={
@@ -85,18 +70,18 @@ class ForceResetPasswordForm(ResetPasswordForm):
 class AdminProfileForm(FlaskForm):
     QQ = StringField('QQ', validators=[Length(max=11)])
     wechat = StringField('wechat', validators=[Length(max=64)])
-    phone = StringField('Phone', validators=[DataRequired(), Length(min=11, max=11)])
+    phone = StringField('Phone', validators=[DataRequired(), Length(min=11, max=11, message='号码格式错误')])
 
 class ProfileForm(AdminProfileForm):
-    college = StringField('College', validators=[DataRequired(), Length(max=32)])
-    grade = IntegerField('Grade', validators=[DataRequired()])
-    c_lass = StringField('Class', validators=[DataRequired(), Length(max=4)])
+    college = StringField('专业', validators=[DataRequired(), Length(max=32)])
+    grade = IntegerField('年级', validators=[DataRequired()])
+    c_lass = StringField('班级', validators=[DataRequired(), Length(max=4, message='格式错误')])
 
 
 class ChangePasswordForm(FlaskForm):
-    old_password = PasswordField('Old password', validators=[DataRequired()])
-    password = PasswordField('New Password', validators=[DataRequired(), Length(min=10, max=48)])
-    confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    old_password = PasswordField('旧密码', validators=[DataRequired()])
+    password = PasswordField('新密码', validators=[DataRequired(), Length(min=8, max=48, message='密码长度8-48位')])
+    confirm = PasswordField('确认密码', validators=[DataRequired(), EqualTo('password')])
 
 
 class ApplyAssetForm(FlaskForm):

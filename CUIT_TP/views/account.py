@@ -7,7 +7,7 @@ from CUIT_TP.forms.account import (
     ResetPasswordForm, ProfileForm, ChangePasswordForm,
     ApplyAssetForm, ForceResetPasswordForm, AdminProfileForm
 )
-from CUIT_TP.models import User, UserProfile, Asset, Team, Project, LabActivity, LabTask, File
+from CUIT_TP.models import User, UserProfile, Asset, Team, Project, LabActivity, LabTask, File, TeamActivity
 from CUIT_TP.utils import send_email
 from CUIT_TP import db, app, login
 
@@ -102,9 +102,9 @@ def change_password(stu_num):
                     db.session.commit()
                     return make_response('true', 200)
                 else:
-                    return make_response('false', 200)
+                    return make_response('-1', 200)
             else:
-                return render_template('account/change_password.html', form=form, user=current_user)
+                return make_response('-2', 200)
         else:
             return render_template('account/change_password.html', form=form, user=current_user)
     elif current_user.role == 'admin':
@@ -117,7 +117,7 @@ def change_password(stu_num):
                 db.session.commit()
                 return make_response('true', 200)
             else:
-                return make_response('false', 200)
+                return make_response('-2', 200)
         else:
             return render_template('account/change_password.html', form=form, user=user)
 
@@ -135,6 +135,9 @@ def forget_password():
             user = User.query.filter(User.stu_num == form.email_or_stu_num.data).first()
         if user:
             send_reset_password_email(user)
+        else:
+            flash('此学号或邮箱不存在关联账号')
+            return render_template('account/forget_password.html', form=form)
         return redirect(url_for('account.login'))
     return render_template('account/forget_password.html', form=form)
 
@@ -183,6 +186,7 @@ def manage():
 @bp.route('/dashboard/')
 @login_required
 def dashboard():
+    from datetime import datetime
     if current_user.role == 'admin':
         team_count = Team.query.count()
         student_count = User.query.count() - 1
@@ -196,10 +200,13 @@ def dashboard():
         if current_user.belong_team_id:
             projects = Project.query.filter(Project.belong_team_id == current_user.belong_team_id).order_by(
                 Project.status.asc()).all()
+            team_activities = TeamActivity.query.filter(TeamActivity.status == '0').order_by(
+                TeamActivity.start_time).all()
         else:
             projects = None
+            team_activities = None
         return render_template('account/dashboard/monitor_dashboard.html', tasks=tasks, activities=activities,
-                               projects=projects)
+                               projects=projects, now=datetime.now(), team_activities=team_activities)
     else:
         tasks = LabTask.query.filter(LabTask.status == '0', LabTask.executor == current_user).order_by(
             LabTask.execute_datetime).all()
@@ -207,10 +214,12 @@ def dashboard():
         if current_user.belong_team_id:
             projects = Project.query.filter(Project.belong_team_id == current_user.belong_team_id).order_by(
                 Project.status.asc()).all()
+            team_activities = TeamActivity.query.filter(TeamActivity.status == '0').order_by(TeamActivity.start_time).all()
         else:
             projects = None
+            team_activities = None
         return render_template('account/dashboard/dashboard.html', tasks=tasks, activities=activities,
-                               projects=projects)
+                               projects=projects, now=datetime.now(), team_activities=team_activities)
 
 
 # 个人信息
@@ -248,9 +257,9 @@ def change_admin_profile():
                 current_user.profile.wechat = form.wechat.data
                 current_user.profile.phone = form.phone.data
                 db.session.commit()
-                return redirect(url_for('account.profile', stu_num=current_user.stu_num))
+                return make_response('true', 200)
             else:
-                return render_template('account/change_profile.html', user=current_user, form=form)
+                return make_response('false', 200)
         return render_template('account/change_profile.html', user=current_user, form=form)
     else:
         abort(403)
@@ -282,9 +291,9 @@ def change_profile(stu_num):
                 user.profile.grade = form.grade.data
                 user.profile._class = form.c_lass.data
                 db.session.commit()
-                return redirect(url_for('account.profile', stu_num=user.stu_num))
+                return make_response('true', 200)
             else:
-                return render_template('account/change_profile.html', user=user, form=form)
+                return make_response('false', 200)
         return render_template('account/change_profile.html', user=user, form=form)
     else:
         abort(403)

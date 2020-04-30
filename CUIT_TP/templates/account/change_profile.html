@@ -16,12 +16,13 @@
             <p>学号： {{ user.stu_num }}</p>
         {% endif %}
         <br>
-        <form method="post"
-              action="{{ url_for('account.change_profile', stu_num=user.stu_num) if user.stu_num != '0000000000' else url_for('account.change_admin_profile') }}">
+        <form method="post" action="" id="form">
             {{ form.hidden_tag() }}
 
             <div class="form-group">
-                <label for="phone" class="form-control-label">电话</label>
+                <label for="phone" class="form-control-label">
+                    电话
+                </label>
                 {{ form.phone(class="form-control") }}
             </div>
             <div class="form-group">
@@ -38,21 +39,38 @@
                     {{ form.college(class="form-control") }}
                 </div>
                 <div class="form-group">
-                    <label for="grade" class="form-control-label">年级，如：2016</label>
+                    <label for="grade" class="form-control-label">年级 如:2016</label>
                     {{ form.grade(class="form-control") }}
                 </div>
                 <div class="form-group">
-                    <label for="c_lass" class="form-control-label">班级</label>
+                    <label for="c_lass" class="form-control-label">
+                        班级 如:2班
+                    </label>
                     {{ form.c_lass(class="form-control") }}
                 </div>
             {% endif %}
-            <button type="submit" class="btn btn-light float-right">修改</button>
+            <input type="button" class="btn btn-light float-right"
+                   onclick='submit_change_profile("{{ url_for('account.change_profile', stu_num=user.stu_num) if user.stu_num != '0000000000' else url_for('account.change_admin_profile') }}")'
+                   value="修改"/>
         </form>
     </div>
 </div>
 
 <script src="{{ url_for('static', filename='js/jquery-3.4.1.js') }}"></script>
 <script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script>
+<script>
+    var submit_change_profile = function (url) {
+        jQuery.post(url, jQuery('#form').serialize(), function (data) {
+            if (data === 'true') {
+                layer.msg('修改成功', {icon: 1});
+                layer.closeAll('page');
+                parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#manage_iframe').attr('src'));
+            } else if (data==='false') {
+                layer.msg('信息错误,请检查', {icon: 5});
+            }
+        })
+    }
+</script>
 </body>
 
 

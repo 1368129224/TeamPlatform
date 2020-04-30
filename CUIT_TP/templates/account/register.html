@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/cs-skin-elastic.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/style.css') }}">
+    <style>
+        .error {
+            color: red;
+        }
+    </style>
 </head>
 
 <body style="height: 100%">
@@ -30,23 +35,33 @@
                 <form method="post" action="">
                     {{ form.csrf_token }}
                     <div class="form-group">
-                        <label>姓名</label>
+                        <label>姓名(请使用真实姓名方便老师管理)</label>
                         {{ form.username }}
                     </div>
                     <div class="form-group">
-                        <label>学号</label>
+                        <label>学号(可作为账号用于登录)</label>
                         {{ form.stu_num }}
                     </div>
                     <div class="form-group">
-                        <label>邮箱</label>
+                        <label>
+                            邮箱(可作为账号用于登录)
+                            {% for message in form.email.errors %}
+                                <small class="error">{{ message }}</small><br>
+                            {% endfor %}
+                        </label>
                         {{ form.email }}
                     </div>
                     <div class="form-group">
-                        <label>密码</label>
+                        <label>
+                            密码(长度8-48位)
+                            {% for message in form.password.errors %}
+                                <small class="error">{{ message }}</small><br>
+                            {% endfor %}
+                        </label>
                         {{ form.password }}
                     </div>
                     <div class="form-group">
-                        <label>确认</label>
+                        <label>确认密码</label>
                         {{ form.confirm }}
                     </div>
                     <p style="margin-top: 10px;font-size: 0.9rem">

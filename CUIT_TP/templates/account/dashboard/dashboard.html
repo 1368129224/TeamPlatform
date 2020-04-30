@@ -16,7 +16,7 @@
                                 {% if tasks %}
                                     {% for task in tasks %}
                                         <li class="list-group-item">
-                                            <p style="margin-bottom: 0">
+                                            <p style="margin-bottom: 0; {% if task.execute_datetime < now %} color: red{% endif %}">
                                                 <a href="javascript:void (0);"
                                                    onclick="detail('lab_task', {{ task.id }})">
                                                     {{ task.task_name }}
@@ -38,10 +38,10 @@
                                 {% if activities %}
                                     {% for activity in activities %}
                                         <li class="list-group-item">
-                                            <p style="margin-bottom: 0;">
+                                            <p style="margin-bottom: 0;{% if activity.start_time < now %} color: red{% endif %}">
                                                 <a href="javascript:void (0);"
                                                    onclick="detail('lab_activity', {{ activity.id }})">
-                                                    {{ activity.activity_name }}{% if activity.status == '1' %}<strong>&nbsp;已结束</strong>{% endif %}
+                                                    {{ activity.activity_name }}
                                                 </a>
                                                 <span style="float: right">
                                                     {{ activity.start_time }}
@@ -61,13 +61,13 @@
                             <div class="card-body">
                                 <ul class="list-group">
                                     <li class="list-group-item list-group-item-dark">小组活动</li>
-                                    {% if current_user.belong_team.activities %}
-                                        {% for activity in current_user.belong_team.activities %}
+                                    {% if team_activities %}
+                                        {% for activity in team_activities %}
                                             <li class="list-group-item">
-                                                <p style="margin-bottom: 0;">
+                                                <p style="margin-bottom: 0; {% if activity.start_time < now %} color: red{% endif %}">
                                                     <a href="javascript:void (0);"
                                                        onclick="detail('team_activity', {{ activity.id }})">
-                                                        {{ activity.activity_name }}{% if activity.status == '1' %}<strong>&nbsp;已结束</strong>{% endif %}
+                                                        {{ activity.activity_name }}
                                                     </a>
                                                     <span style="float: right">
                                                         {{ activity.start_time }}
@@ -86,10 +86,13 @@
                                     {% if projects %}
                                         {% for project in projects %}
                                             <li class="list-group-item">
-                                                <p style="margin-bottom: 0;">
+                                                <p style="margin-bottom: 0; {% if project.end_time < now %} color: red{% endif %}">
                                                     <a href="javascript:void (0);"
-                                                       onclick="switch_project({{ project.id }}, '{{ project.project_name }}{% if project.status == "1" %}<strong>&nbsp;已结束</strong>{% endif %}')">
-                                                        {{ project.project_name }}{% if project.status == '1' %}<strong>&nbsp;已结束</strong>{% endif %}
+                                                       onclick="switch_project(
+                                                               {{ project.id }}, '{{ project.project_name }}{% if project.status == "1" %}<strong>&nbsp;已结束</strong>{% endif %}'
+                                                               )">
+                                                        {{ project.project_name }}{% if project.status == '1' %}
+                                                            <strong>&nbsp;已结束</strong>{% endif %}
                                                     </a>
                                                     <span style="float: right">
                                                         {{ project.end_time }}
@@ -110,7 +113,8 @@
                     <div class="card">
                         {% if projects %}
                             <div class="card-header" style="text-align: center;">
-                                <h1 id="project_name">{{ projects[0].project_name }}{% if projects[0].status == '1' %}<strong>&nbsp;已结束</strong>{% endif %}</h1>
+                                <h1 id="project_name">{{ projects[0].project_name }}{% if projects[0].status == '1' %}
+                                    <strong>&nbsp;已结束</strong>{% endif %}</h1>
                             </div>
                             <div class="card-body">
                                 <h2 style="text-align: center;margin: 10px 0;">需求</h2>
