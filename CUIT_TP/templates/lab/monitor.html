@@ -21,22 +21,22 @@
                         {% if user %}
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item" style="color: #878787;">
-                                    <p style="margin: 0;"><i class="fa fa-envelope"></i>{{ user.email }}</p>
+                                    <p style="margin: 0;"><i class="fa fa-envelope"></i>&nbsp;{{ user.email }}</p>
                                 </li>
                                 <li class="list-group-item" style="color: #878787;">
                                     <p style="margin: 0;"><i
-                                            class="fa fa-phone-square"></i>{{ '未设置' if user.profile.phone == '0' else user.profile.phone }}
+                                            class="fa fa-phone-square"></i>&nbsp;{{ '未设置' if user.profile.phone == '0' else user.profile.phone }}
                                     </p>
                                 </li>
                                 <li class="list-group-item" style="color: #878787;">
                                     <p style="margin: 0;"><i
-                                            class="fa fa-qq"></i>{{ '未设置' if not user.profile.QQ else user.profile.QQ }}
+                                            class="fa fa-qq"></i>&nbsp;{{ '未设置' if not user.profile.QQ else user.profile.QQ }}
                                     </p>
                                 </li>
                                 <li class="list-group-item"
                                     style="color: #878787;border-bottom: 2px solid #878787 !important;">
                                     <p style="margin: 0;"><i
-                                            class="fa fa-wechat"></i>{{ '未设置' if not user.profile.wechat else user.profile.wechat }}
+                                            class="fa fa-wechat"></i>&nbsp;{{ '未设置' if not user.profile.wechat else user.profile.wechat }}
                                     </p>
                                 </li>
                             </ul>

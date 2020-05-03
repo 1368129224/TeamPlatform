@@ -50,7 +50,7 @@
                     layer.closeAll('page');
                     flash_backlog({{ bug.belong_project_id }});
                 } else {
-                    layer.msg('修改失败', {icon: 5}, {time: 500});
+                    layer.msg('修改失败, 请检查输入是否合法', {icon: 5}, {time: 500});
                 }
             })
         }

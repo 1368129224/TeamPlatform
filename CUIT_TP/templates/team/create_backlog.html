@@ -43,7 +43,7 @@
                     layer.closeAll('page');
                     flash_backlog({{ project.id }});
                 } else {
-                    layer.msg('创建失败', {icon: 5}, {time: 500});
+                    layer.msg('创建失败, 请检查输入是否合法', {icon: 5}, {time: 500});
                 }
             })
         }

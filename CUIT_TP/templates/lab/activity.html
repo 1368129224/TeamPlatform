@@ -25,7 +25,7 @@
                                                 href="#"
                                                 onclick="activity_detail({{ activity.id }})">{{ activity.activity_name }}</a>
                                         </td>
-                                        <td style="vertical-align: middle;">{{ activity.start_time }}</td>
+                                        <td style="vertical-align: middle;{% if activity.start_time < now and activity.status=='0' %}color: red;{% endif %}">{{ activity.start_time }}</td>
                                         <td style="vertical-align: middle;">
                                             <span style="vertical-align: middle;">{{ '未开始' if activity.status=='0' else '已结束' }}</span>
                                             <button class="btn btn-light btn-sm" style="float: right;margin: 0 5px;"

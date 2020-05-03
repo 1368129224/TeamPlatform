@@ -48,6 +48,10 @@
                                     </div>
                                 </div>
                             {% endfor %}
+                            {% if not unset_users %}
+                                <div class="unset-set" id="0" ondrop="drop(event)" ondragover="allowDrop(event)">
+                                </div>
+                            {% endif %}
                             <hr>
                             {% for i in range(config.LAB_SET_NUM) %}
                                 <div class="set-label">

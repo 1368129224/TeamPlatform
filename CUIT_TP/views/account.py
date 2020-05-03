@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, make_response
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import current_user, login_user, logout_user, login_required
@@ -187,13 +188,7 @@ def manage():
 @login_required
 def dashboard():
     from datetime import datetime
-    if current_user.role == 'admin':
-        team_count = Team.query.count()
-        student_count = User.query.count() - 1
-        project_count = Project.query.count()
-        return render_template('account/dashboard/admin_dashboard.html', team_count=team_count,
-                               student_count=student_count, project_count=project_count)
-    elif current_user.role == 'monitor':
+    if current_user.role == 'monitor':
         tasks = LabTask.query.filter(LabTask.status == '0', LabTask.executor == current_user).order_by(
             LabTask.execute_datetime).all()
         activities = LabActivity.query.filter(LabActivity.status == '0').order_by(LabActivity.start_time).all()
@@ -322,7 +317,7 @@ def delete_account():
 @login_required
 def assets():
     assets = Asset.query.filter(Asset.user==current_user)
-    return render_template('account/assets.html', assets=assets)
+    return render_template('account/assets.html', assets=assets, now=datetime.now())
 
 
 # 资产详情

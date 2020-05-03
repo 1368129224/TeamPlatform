@@ -21,15 +21,15 @@
                                     {{ form.lab_name(class="form-control") }}
                                 </div>
                                 <div class="form-group">
-                                    <label for="lab_set_num" class="form-control-label">座位数</label>
+                                    <label for="lab_set_num" class="form-control-label">座位数 请确保当前所有学生座位号小于等于座位数</label>
                                     {{ form.lab_set_num(class="form-control") }}
                                 </div>
                                 <div class="form-group">
-                                    <label for="mail_server" class="form-control-label">服务器地址</label>
+                                    <label for="mail_server" class="form-control-label">邮件服务器地址</label>
                                     {{ form.mail_server(class="form-control") }}
                                 </div>
                                 <div class="form-group">
-                                    <label for="mail_port" class="form-control-label">端口号</label>
+                                    <label for="mail_port" class="form-control-label">邮件服务器端口号</label>
                                     {{ form.mail_port(class="form-control") }}
                                 </div>
                                 <div class="form-check" style="text-align: center">
@@ -83,7 +83,7 @@
                         layer.msg('修改成功', {icon: 1});
                         window.location.reload();
                     } else {
-                        layer.msg('修改失败', {icon: 5});
+                        layer.msg('修改失败, 请检查输入是否合法', {icon: 5});
                     }
                 })
             });

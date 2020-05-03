@@ -6,8 +6,6 @@
 
 {% block left_panel %}
     <ul class="nav navbar-nav" id="left_panel">
-        <li class="active"><a href="#" onclick="remove_class(this, '{{ url_for('account.dashboard') }}');"><i
-                class="menu-icon fa fa-tachometer"></i>Dashboard</a></li>
         <li class="menu-title">个人信息</li>
         <li>
             <a href="#" onclick="remove_class(this, '{{ url_for('account.profile', stu_num=current_user.stu_num) }}');">
@@ -20,7 +18,7 @@
             </a>
         </li>
         <li class="menu-title">实验室</li>
-        <li>
+        <li class="active">
             <a href="#" onclick="remove_class(this, '{{ url_for('lab.member') }}');">
                 <i class="fa fa-user-circle-o"></i>人员管理
             </a>
@@ -65,7 +63,7 @@
 
 
 {% block content %}
-    <iframe id="manage_iframe" src="{{ url_for('account.dashboard') }}" frameborder="0"
+    <iframe id="manage_iframe" src="{{ url_for('lab.member') }}" frameborder="0"
             style="width:100%;min-height: 100vh;"></iframe>
 {% endblock %}
 

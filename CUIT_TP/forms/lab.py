@@ -49,6 +49,14 @@ class CreateTeamForm(FlaskForm):
         'class': 'form-control',
     })
 
+class ChangeTeamInfoForm(FlaskForm):
+    team_name = StringField('Team name', validators=[DataRequired(), Length(max=32)], render_kw={
+        'class': 'form-control',
+    })
+    desc = TextAreaField('Team description', validators=[DataRequired(), Length(max=256)], render_kw={
+        'style': "resize:none;"
+    })
+
 class CreateLabActivityForm(FlaskForm):
     activity_name = StringField('活动名', validators=[DataRequired(), Length(max=64)])
     desc = TextAreaField('活动详情', validators=[DataRequired(), Length(max=256)])

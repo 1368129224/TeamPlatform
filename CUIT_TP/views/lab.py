@@ -5,7 +5,7 @@ from flask_login import current_user, login_required
 from CUIT_TP.forms.lab import (
     CreateLabTaskForm, CreateTeamForm, CreateLabActivityForm,
     ChangeLabActivityForm, ChangeLabTaskForm, MonitorForm,
-    ChangeLabSettingsForm, get_ChangeLeaderForm
+    ChangeLabSettingsForm, get_ChangeLeaderForm, ChangeTeamInfoForm
 )
 from CUIT_TP.models import db, User, LabTask, Asset, Team, LabActivity, Monitor
 from CUIT_TP import login, app
@@ -87,7 +87,7 @@ def task(page=1):
     if (
             current_user.role == 'monitor' and current_user.monitor_permission.manage_lab_task) or current_user.role == 'admin':
         tasks = LabTask.query.order_by(LabTask.status.asc(), LabTask.execute_datetime).paginate(page, 5, False)
-        return render_template('lab/task.html', tasks=tasks)
+        return render_template('lab/task.html', tasks=tasks, now=datetime.now())
     else:
         abort(403)
 
@@ -332,6 +332,31 @@ def create_team():
                 return make_response('false', 200)
         else:
             return render_template('lab/create_team.html', form=form)
+    else:
+        abort(403)
+
+
+# 修改小组信息
+@bp.route('/change_team_info/', methods=('GET', 'POST'))
+@login_required
+def change_team_info():
+    if current_user.manage_team_id:
+        team = Team.query.filter(Team.id==current_user.manage_team_id).first_or_404()
+        if request.method == 'POST':
+            form = ChangeTeamInfoForm()
+            if form.validate_on_submit():
+                team.team_name = form.team_name.data
+                team.desc = form.desc.data
+                db.session.commit()
+                return make_response('true', 200)
+            else:
+                return make_response('false', 200)
+        else:
+            form = ChangeTeamInfoForm(
+                team_name=team.team_name,
+                desc=team.desc
+            )
+            return render_template('lab/change_team_info.html', form=form)
     else:
         abort(403)
 

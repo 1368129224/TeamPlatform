@@ -24,7 +24,7 @@
                                     <tr>
                                         <td style="vertical-align: middle;">{{ asset.asset_name }}</td>
                                         <td style="vertical-align: middle;">{{ asset.start_time }}</td>
-                                        <td style="vertical-align: middle;">{{ asset.end_time }}</td>
+                                        <td style="vertical-align: middle;{% if asset.end_time < now and asset.status=='1' %}color: red;{% endif %}">{{ asset.end_time }}</td>
                                         <td style="vertical-align: middle;">
                                             {% if asset.status == '0' %}待审批
                                             {% elif asset.status == '1' %}使用中

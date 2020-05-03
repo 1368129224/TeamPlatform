@@ -59,7 +59,9 @@
                                         onclick="add_teammate({{ team.id }})">
                                     添加成员
                                 </button>
-                                <button class="btn btn-light" style="float: right;margin: 0 5px;">修改信息</button>
+                                <button class="btn btn-light" style="float: right;margin: 0 5px;"
+                                        onclick="change_team_info()">修改信息
+                                </button>
                             {% endif %}
                         </div>
                     </div>
@@ -82,7 +84,7 @@
                                    onclick="activity_detail({{ activity.id }})">{{ activity.activity_name }}
                                     {% if activity.status == '1' %}<strong>&nbsp;已结束</strong>{% endif %}</a>
                             </span>
-                            <p style="float: right;margin-bottom: 0">{{ activity.start_time }}</p>
+                            <p style="float: right;margin-bottom: 0;{% if activity.start_time < now and activity.status=='0' %}color: red;{% endif %}">{{ activity.start_time }}</p>
                         </div>
                         <div class="card-body">
                             <p class="card-text">{{ activity.desc }}</p>
@@ -122,7 +124,7 @@
                                    onclick="go_project_detail({{ project.id }})">{{ project.project_name }}
                                     {% if project.status == '1' %}<strong>&nbsp;已结束</strong>{% endif %}</a>
                             </span>
-                            <p style="float: right;margin-bottom: 0">{{ project.end_time }}</p>
+                            <p style="float: right;margin-bottom: 0;{% if project.end_time < now and project.status=='0' %}color: red;{% endif %}">{{ project.end_time }}</p>
                         </div>
                         <div class="card-body">
                             <p class="card-text">{{ project.desc }}</p>
@@ -294,5 +296,16 @@
         var go_project_detail = function (project_id) {
             parent.jQuery('#manage_iframe').attr('src', Flask.url_for('team.project_detail', {'project_id': project_id}));
         };
+        var change_team_info = function () {
+            jQuery.get(Flask.url_for('lab.change_team_info'), {}, function (data) {
+                layer.open({
+                    type: 1,
+                    title: '修改小组信息',
+                    area: '500px',
+                    skin: 'layui-layer-rim',
+                    content: data
+                })
+            })
+        }
     </script>
 {% endblock %}

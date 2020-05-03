@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, make_response
 from flask_login import current_user, login_user, logout_user, login_required
 from CUIT_TP.forms.team import (
@@ -25,7 +26,7 @@ def home(team_id):
     teammates = team.teammates
     projects = Project.query.filter(Project.belong_team==team).order_by(Project.status, Project.end_time).all()
     activities = TeamActivity.query.filter(TeamActivity.belong_team_id==team_id).order_by(TeamActivity.status, TeamActivity.start_time).all()
-    return render_template('team/home.html', team=team, teammates=teammates, projects=projects, activities=activities)
+    return render_template('team/home.html', team=team, teammates=teammates, projects=projects, activities=activities, now=datetime.now())
 
 
 # 删除成员
@@ -80,12 +81,35 @@ def create_project():
                 db.session.commit()
                 return make_response('true', 200)
             else:
-                print(form.desc.errors)
-                print(form.end_time.errors)
-                print(form.project_name.errors)
                 return make_response('false', 200)
         else:
             return render_template('team/create_project.html', form=form, is_create=True)
+    else:
+        abort(403)
+
+# 修改项目信息
+@bp.route('/change_project/<int:project_id>', methods=('GET', 'POST'))
+@login_required
+def change_project(project_id):
+    project = Project.query.filter(Project.id==project_id).first_or_404()
+    if project in current_user.manage_team.projects:
+        if request.method == 'POST':
+            form = ChangeProjectForm()
+            if form.validate_on_submit():
+                project.project_name = form.project_name.data
+                project.desc = form.desc.data
+                project.end_time = form.end_time.data
+                db.session.commit()
+                return make_response('true', 200)
+            else:
+                return make_response('false', 200)
+        else:
+            form = ChangeProjectForm(
+                project_name=project.project_name,
+                desc=project.desc,
+                end_time=project.end_time
+            )
+            return render_template('team/create_project.html', form=form, project_id=project_id, is_create=False)
     else:
         abort(403)
 
@@ -147,31 +171,6 @@ def project_bug(project_id, page=1):
     bugs = Bug.query.filter(Bug.belong_project_id==project_id).order_by(Bug.status.asc(), Bug.priority.desc()).paginate(page, 5, False)
     return render_template('team/project_bug.html', bugs=bugs, project=project)
 
-# 修改项目信息
-@bp.route('/change_project/<int:project_id>', methods=('GET', 'POST'))
-@login_required
-def change_project(project_id):
-    project = Project.query.filter(Project.id==project_id).first_or_404()
-    if project in current_user.manage_team.projects:
-        if request.method == 'POST':
-            form = ChangeProjectForm()
-            if form.validate_on_submit():
-                project.project_name = form.project_name.data
-                project.desc = form.desc.data
-                project.end_time = form.end_time.data
-                db.session.commit()
-                return make_response('true', 200)
-            else:
-                return make_response('false', 200)
-        else:
-            form = ChangeProjectForm(
-                project_name=project.project_name,
-                desc=project.desc,
-                end_time=project.end_time
-            )
-            return render_template('team/create_project.html', form=form, project_id=project_id, is_create=False)
-    else:
-        abort(403)
 
 # 新增需求
 @bp.route('/create_backlog/<int:project_id>', methods=('POST', 'GET'))

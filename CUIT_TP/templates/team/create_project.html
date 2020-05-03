@@ -44,17 +44,17 @@
                 layer.closeAll('page');
                 parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#manage_iframe').attr('src'));
             } else {
-                layer.msg('创建失败', {icon: 5});
+                layer.msg('创建失败, 请检查输入是否合法', {icon: 5});
             }
         })
     };
     var change_form = function (project_id) {
         jQuery.post(Flask.url_for("team.change_project", {"project_id": project_id}), jQuery('#form').serialize(), function (data) {
             if (data === 'true') {
-                layer.msg('创建成功', {icon: 1});
+                layer.msg('修改成功', {icon: 1});
                 parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#manage_iframe').attr('src'));
             } else {
-                layer.msg('创建失败', {icon: 5});
+                layer.msg('修改失败, 请检查输入是否合法', {icon: 5});
             }
         })
     };

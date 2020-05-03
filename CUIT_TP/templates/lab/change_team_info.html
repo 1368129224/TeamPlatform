@@ -16,11 +16,7 @@
                 <label for="desc" class="form-control-label">小组简介</label>
                 {{ form.desc(class="form-control") }}
             </div>
-            <div class="form-group" style="width: 70%;">
-                <label for="leader" class="form-control-label">小组组长</label>
-                {{ form.leader(class="form-control") }}
-            </div>
-            <input class="btn btn-light" type="button" value="创建" onclick="commit_form()"/>
+            <input class="btn btn-light" type="button" value="修改" onclick="commit_form()"/>
         </form>
     </div>
 </div>
@@ -29,13 +25,13 @@
 <script src="{{ url_for('static', filename='layer/layer.js') }}"></script>
 <script>
     var commit_form = function () {
-        jQuery.post("{{ url_for('lab.create_team') }}", jQuery('#form').serialize(), function (data) {
+        jQuery.post("{{ url_for('lab.change_team_info') }}", jQuery('#form').serialize(), function (data) {
             if (data === 'true') {
-                layer.msg('创建成功', {icon: 1}, {time: 400});
+                layer.msg('修改成功', {icon: 1}, {time: 400});
                 layer.closeAll('page');
                 parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#manage_iframe').attr('src'));
             } else {
-                layer.msg('创建失败, 请检查输入是否合法', {icon: 5}, {time: 400});
+                layer.msg('修改失败, 请检查输入是否合法', {icon: 5}, {time: 400});
             }
         })
     }

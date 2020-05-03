@@ -1,7 +1,6 @@
 import json
-from flask import Blueprint, render_template, request, url_for, abort, make_response, send_from_directory, send_file
-from flask_login import current_user, login_user, logout_user, login_required
-from werkzeug.datastructures import CombinedMultiDict
+from flask import Blueprint, render_template, request, url_for, abort, make_response, send_file
+from flask_login import current_user, login_required
 from CUIT_TP.models import User, File
 from CUIT_TP import db, app, login
 
@@ -24,6 +23,8 @@ def upload():
             file = request.files.get('file')
             origin_filename = file.filename
             ext = path.splitext(origin_filename)[1]
+            if ext not in {'.doc', '.docx', '.xls', '.xlsx', '.pdf', '.ppt', 'pptx', '.md', '.txt'}:
+                return make_response('-1', 200)
             uuid = uuid4().hex
             new_filename = uuid + ext
             filepath = path.join(path.join(app.config['BASEDIR'], 'upload'), new_filename)
@@ -44,8 +45,6 @@ def upload():
             db.session.commit()
             return make_response('true', 200)
         else:
-            print(request.form.get('is_team_file'))
-            print(request.files.get('file'))
             return make_response('false', 200)
     else:
         return render_template('file/upload.html')

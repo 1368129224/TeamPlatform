@@ -28,7 +28,7 @@
                                             </a>
                                         </td>
                                         <td style="vertical-align: middle;">{{ task.executor.username }}</td>
-                                        <td style="vertical-align: middle;">{{ task.execute_datetime }}</td>
+                                        <td style="vertical-align: middle;{% if task.execute_datetime < now and task.status=='0' %}color: red;{% endif %}">{{ task.execute_datetime }}</td>
                                         <td style="vertical-align: middle;"><span
                                                 style="vertical-align: middle;">{{ '未完成' if task.status=='0' else '已完成' }}</span>
                                             <button class="btn btn-light btn-sm" style="float: right;margin: 0 5px;"

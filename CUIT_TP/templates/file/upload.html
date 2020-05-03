@@ -28,6 +28,8 @@
                     layer.msg('上传成功', {icon: 1});
                     layer.closeAll('page');
                     parent.jQuery('#manage_iframe').attr('src', parent.jQuery('#manage_iframe').attr('src'));
+                } else if (data==='-1') {
+                    layer.msg('不允许的文件格式', {icon: 5});
                 } else {
                     layer.msg('上传失败', {icon: 5});
                 }
