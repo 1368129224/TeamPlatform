@@ -50,8 +50,6 @@ class User(UserMixin, db.Model):
     profile = relationship("UserProfile", back_populates='user', uselist=False, cascade="all, delete-orphan", single_parent=True)
     project_backlog = relationship('Backlog', back_populates='executor', cascade="all, delete-orphan", single_parent=True)
     project_bug = relationship('Bug', back_populates='executor', cascade="all, delete-orphan", single_parent=True)
-    backlog_notes = relationship('BacklogNote', back_populates='writer', cascade="all, delete-orphan", single_parent=True)
-    bug_notes = relationship('BugNote', back_populates='writer', cascade="all, delete-orphan", single_parent=True)
     assets = relationship('Asset', back_populates='user', cascade="all, delete-orphan", single_parent=True)
     monitor_permission = relationship('Monitor', back_populates='user', uselist=False)
 
@@ -128,7 +126,6 @@ class Backlog(db.Model):
     belong_project = relationship('Project', back_populates='backlogs')
     executor_id = db.Column(db.Integer, db.ForeignKey('User.id', ondelete='CASCADE'))
     executor = relationship('User', back_populates='project_backlog', foreign_keys=[executor_id])
-    backlog_notes = relationship('BacklogNote', back_populates='backlog', cascade="all, delete-orphan", single_parent=True)
 
     def __repr__(self):
         return '<Backlog {}>'.format(self.id)
@@ -146,38 +143,9 @@ class Bug(db.Model):
     belong_project = relationship('Project', back_populates='bugs')
     executor_id = db.Column(db.Integer, db.ForeignKey('User.id', ondelete='CASCADE'))
     executor = relationship('User', back_populates='project_bug', foreign_keys=[executor_id])
-    bug_notes = relationship('BugNote', back_populates='bug', cascade="all, delete-orphan", single_parent=True)
 
     def __repr__(self):
         return '<Bug {}>'.format(self.id)
-
-# 需求记录表
-class BacklogNote(db.Model):
-    __tablename__ = 'BacklogNote'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='记录ID')
-    content = db.Column(db.String(256), unique=False, comment='记录内容')
-    create_datetime = db.Column(db.DateTime, default=datetime.now(), comment='创建时间')
-    backlog_id = db.Column(db.Integer, db.ForeignKey('Backlog.id', ondelete='CASCADE'))
-    backlog = relationship('Backlog', back_populates='backlog_notes', foreign_keys=[backlog_id])
-    writer_id = db.Column(db.Integer, db.ForeignKey('User.id', ondelete='CASCADE'))
-    writer = relationship('User', back_populates='backlog_notes', foreign_keys=[writer_id])
-
-    def __repr__(self):
-        return '<Note {}>'.format(self.id)
-
-# 缺陷记录表
-class BugNote(db.Model):
-    __tablename__ = 'BugNote'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True, comment='记录ID')
-    content = db.Column(db.String(256), unique=False, comment='记录内容')
-    create_datetime = db.Column(db.DateTime, default=datetime.now(), comment='创建时间')
-    bug_id = db.Column(db.Integer, db.ForeignKey('Bug.id', ondelete='CASCADE'))
-    bug = relationship('Bug', back_populates='bug_notes', foreign_keys=[bug_id])
-    writer_id = db.Column(db.Integer, db.ForeignKey('User.id', ondelete='CASCADE'))
-    writer = relationship('User', back_populates='bug_notes', foreign_keys=[writer_id])
-
-    def __repr__(self):
-        return '<Note {}>'.format(self.id)
 
 # 项目表
 class Project(db.Model):

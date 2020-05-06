@@ -123,56 +123,58 @@
         {% endfor %}
     </div>
 
-    <div class="dataTables_paginate paging_simple_numbers" id="bootstrap-data-table_paginate"
-         style="margin-bottom: 10px;">
-        <ul class="pagination justify-content-center">
+    {% if not users %}
+        <div class="dataTables_paginate paging_simple_numbers" id="bootstrap-data-table_paginate"
+             style="margin-bottom: 10px;">
+            <ul class="pagination justify-content-center">
 
-            {% if users.has_prev %}
-                <li class="paginate_button page-item previous" id="bootstrap-data-table_previous">
-                    <a class="page-link" href="{{ url_for('lab.member', page=users.prev_num) }}"
-                       aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-            {% else %}
-                <li class="paginate_button page-item previous disabled" id="bootstrap-data-table_previous">
-                    <a class="page-link" href="#" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-            {% endif %}
-            {% for page in users.iter_pages(1,1,3,1) %}
-                {% if page %}
-                    <li class="paginate_button page-item {% if page == users.page %}active{% endif %}"
-                        id="bootstrap-data-table_previous">
-                        <a class="page-link" href="{{ url_for('lab.member', page=page) }}" aria-label="Previous">
-                            <span aria-hidden="true">{{ page }}</span>
+                {% if users.has_prev %}
+                    <li class="paginate_button page-item previous" id="bootstrap-data-table_previous">
+                        <a class="page-link" href="{{ url_for('lab.member', page=users.prev_num) }}"
+                           aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
                 {% else %}
-                    <li class="paginate_button page-item disabled"
-                        id="bootstrap-data-table_previous">
-                        <a class="page-link" href="{{ url_for('lab.member', page=page) }}" aria-label="Previous">
-                            <span aria-hidden="true">&hellip;</span>
+                    <li class="paginate_button page-item previous disabled" id="bootstrap-data-table_previous">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
                         </a>
                     </li>
                 {% endif %}
-            {% endfor %}
-            {% if users.has_next %}
-                <li class="paginate_button page-item next">
-                    <a class="page-link" href="{{ url_for('lab.member', page=users.next_num) }}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            {% else %}
-                <li class="paginate_button page-item next disabled">
-                    <a class="page-link" href="#" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            {% endif %}
-        </ul>
-    </div>
+                {% for page in users.iter_pages(1,1,3,1) %}
+                    {% if page %}
+                        <li class="paginate_button page-item {% if page == users.page %}active{% endif %}"
+                            id="bootstrap-data-table_previous">
+                            <a class="page-link" href="{{ url_for('lab.member', page=page) }}" aria-label="Previous">
+                                <span aria-hidden="true">{{ page }}</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="paginate_button page-item disabled"
+                            id="bootstrap-data-table_previous">
+                            <a class="page-link" href="{{ url_for('lab.member', page=page) }}" aria-label="Previous">
+                                <span aria-hidden="true">&hellip;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                {% if users.has_next %}
+                    <li class="paginate_button page-item next">
+                        <a class="page-link" href="{{ url_for('lab.member', page=users.next_num) }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="paginate_button page-item next disabled">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    {% endif %}
 </div>
 <script src="{{ url_for('static', filename='js/jquery-3.4.1.js') }}"></script>
 <script src="{{ url_for('static', filename='js/bootstrap.bundle.js') }}"></script>
