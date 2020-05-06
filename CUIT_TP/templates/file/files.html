@@ -9,6 +9,9 @@
             <button class="btn btn-light" style="margin: 0 10px" onclick="flash_team()">小组文件</button>
             <button class="btn btn-light" style="margin: 0 10px" onclick="flash_lab()">实验室文件</button>
             <button class="btn btn-light" style="margin: 0 10px" onclick="flash_my_files()">我的文件</button>
+            {% if current_user.role == 'admin' %}
+                <button class="btn btn-light" style="margin: 0 10px" onclick="flash_all_files()">所有文件</button>
+            {% endif %}
         </div>
         <div class="row">
             <div class="col-12" id="file_list">
@@ -26,18 +29,23 @@
                 jQuery('#file_list').append(data)
             })
         };
-        var flash_team = function (page=1) {
+        var flash_team = function (page = 1) {
             jQuery.get(Flask.url_for('file.team_files', {'page': page}), {}, function (data) {
                 jQuery('#file_list').html(data);
             })
         };
-        var flash_lab = function (page=1) {
+        var flash_lab = function (page = 1) {
             jQuery.get(Flask.url_for('file.lab_files', {'page': page}), {}, function (data) {
                 jQuery('#file_list').html(data);
             })
         };
-        var flash_my_files = function (page=1) {
+        var flash_my_files = function (page = 1) {
             jQuery.get(Flask.url_for('file.my_files', {'page': page}), {}, function (data) {
+                jQuery('#file_list').html(data);
+            })
+        };
+        var flash_all_files = function (page=1) {
+            jQuery.get(Flask.url_for('file.all_files', {'page': page}), {}, function (data) {
                 jQuery('#file_list').html(data);
             })
         }

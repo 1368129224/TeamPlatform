@@ -16,7 +16,7 @@
                         {{ file.file_origin_name }}
                     </a>
                 </td>
-                <td style="vertical-align: middle;">{{ '实验室' if file.is_lab_file else '小组'}}</td>
+                <td style="vertical-align: middle;">{{ '实验室' if file.is_lab_file else '小组' }}</td>
                 <td style="vertical-align: middle;">{{ file.upload_datetime }}</td>
                 <td style="text-align: center">
                     <button class="btn btn-light btn-sm" onclick="delete_file({{ file.id }})">
@@ -87,8 +87,8 @@
                     </a>
                 </li>
             {% endif %}
-            </ul>
         {% endif %}
+    </ul>
     <div class="row justify-content-center"
          style="width: inherit;margin-left: 0;margin-right: 0;margin-bottom: 10px;">
         <button class="btn btn-light"

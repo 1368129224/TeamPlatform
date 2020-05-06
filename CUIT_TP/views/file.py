@@ -82,13 +82,20 @@ def my_files(page=1):
     files = File.query.filter(File.uploader==current_user).order_by(File.upload_datetime.desc()).paginate(page, 5, False)
     return render_template('file/my_files.html', files=files)
 
+# 所有文件
+@bp.route('/all_files/<int:page>/')
+@login_required
+def all_files(page=1):
+    files = File.query.order_by(File.upload_datetime.desc()).paginate(page, 5, False)
+    return render_template('file/all_files.html', files=files)
+
 # 删除文件
 @bp.route('/delete/', methods=('POST', 'GET'))
 @login_required
 def delete():
     file_id = json.loads(request.get_data().decode(encoding='utf-8')).get('file_id')
     file = File.query.filter(File.id==file_id).first_or_404()
-    if file.uploader == current_user:
+    if file.uploader == current_user or current_user.role == 'admin':
         db.session.delete(file)
         import os
         os.remove(file.file_path)
