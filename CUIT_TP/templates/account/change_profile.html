@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title></title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <style>
+        .red {
+            color: red;
+        }
+    </style>
 </head>
 <body>
 
@@ -21,7 +26,7 @@
 
             <div class="form-group">
                 <label for="phone" class="form-control-label">
-                    电话
+                    电话&nbsp;<span class="red">*</span>
                 </label>
                 {{ form.phone(class="form-control") }}
             </div>
@@ -35,16 +40,16 @@
             </div>
             {% if user.role != 'admin' %}
                 <div class="form-group">
-                    <label for="college" class="form-control-label">专业</label>
+                    <label for="college" class="form-control-label">专业&nbsp;<span class="red">*</span></label>
                     {{ form.college(class="form-control") }}
                 </div>
                 <div class="form-group">
-                    <label for="grade" class="form-control-label">年级 如:2016</label>
+                    <label for="grade" class="form-control-label">年级&nbsp;<span class="red">*</span>&nbsp;如:2016</label>
                     {{ form.grade(class="form-control") }}
                 </div>
                 <div class="form-group">
                     <label for="c_lass" class="form-control-label">
-                        班级 如:2班
+                        班级&nbsp;<span class="red">*</span>&nbsp;如:2班
                     </label>
                     {{ form.c_lass(class="form-control") }}
                 </div>

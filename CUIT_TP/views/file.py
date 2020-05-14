@@ -17,29 +17,33 @@ def load_user(id):
 @login_required
 def upload():
     from uuid import uuid4
-    from os import path
+    import os
     if request.method == 'POST':
         if request.files.get('file'):
             file = request.files.get('file')
             origin_filename = file.filename
-            ext = path.splitext(origin_filename)[1]
+            ext = os.path.splitext(origin_filename)[1]
             if ext not in {'.doc', '.docx', '.xls', '.xlsx', '.pdf', '.ppt', 'pptx', '.md', '.txt'}:
                 return make_response('-1', 200)
             uuid = uuid4().hex
             new_filename = uuid + ext
-            filepath = path.join(path.join(app.config['BASEDIR'], 'upload'), new_filename)
+            filepath = os.path.join(os.path.join(app.config['BASEDIR'], 'upload'), new_filename)
             new_file = File()
             is_team_file = request.form.get('is_team_file')
             if is_team_file == '0':
                 new_file.is_lab_file = True
             else:
                 new_file.is_lab_file = False
+            if current_user.role == 'admin':
+                new_file.is_lab_file = True
             new_file.file_origin_name = origin_filename
             new_file.file_uuid = uuid
             new_file.file_new_name = new_filename
             new_file.file_path = filepath
             new_file.uploader = current_user
             current_user.files.append(new_file)
+            if not os.path.exists(os.path.join(app.config['BASEDIR'], 'upload')):
+                os.mkdir(os.path.join(app.config['BASEDIR'], 'upload'))
             file.save(filepath)
             db.session.add(new_file)
             db.session.commit()

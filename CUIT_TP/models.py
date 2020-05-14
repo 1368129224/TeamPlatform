@@ -10,12 +10,12 @@ class File(db.Model):
     __tablename__ = 'File'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     uid = db.Column(db.Integer, db.ForeignKey('User.id', ondelete='CASCADE'))
-    file_origin_name = db.Column(db.String(64), comment='文件原名称')
+    file_origin_name = db.Column(db.String(64), comment='原文件名')
     file_uuid = db.Column(db.String(128), comment='uuid')
-    file_new_name = db.Column(db.String(136), comment='uuid')
+    file_new_name = db.Column(db.String(136), comment='新文件名')
     file_path = db.Column(db.String(256), comment='路径')
     upload_datetime = db.Column(db.DateTime, default=datetime.now(), comment='上传时间')
-    is_lab_file = db.Column(db.Boolean, comment='是否是小组内分享')
+    is_lab_file = db.Column(db.Boolean, comment='是否是实验室分享')
     uploader = relationship('User', back_populates='files')
 
     def __repr__(self):
@@ -118,7 +118,7 @@ class Backlog(db.Model):
     __tablename__ = 'Backlog'
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     backlog_name = db.Column(db.String(16), comment='需求')
-    desc = db.Column(db.String(256), comment='描述')
+    desc = db.Column(db.String(256), comment='详情')
     create_time = db.Column(db.DateTime, default=datetime.now(),comment='创建时间')
     status = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='状态')
     priority = db.Column(db.Enum('0', '1', '2', '3'), server_default='1', nullable=False, comment='优先级')
@@ -135,7 +135,7 @@ class Bug(db.Model):
     __tablename__ = 'Bug'
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     bug_name = db.Column(db.String(16), comment='缺陷')
-    desc = db.Column(db.String(256), comment='描述')
+    desc = db.Column(db.String(256), comment='详情')
     create_time = db.Column(db.DateTime, default=datetime.now(), comment='创建时间')
     status = db.Column(db.Enum('0', '1', '2', '3'), server_default='0', nullable=False, comment='状态')
     priority = db.Column(db.Enum('0', '1', '2', '3'), server_default='1', nullable=False, comment='优先级')

@@ -326,7 +326,7 @@ def create_activity():
                 db.session.commit()
                 teammates = User.query.filter(User.belong_team == current_user.manage_team).all()
                 for teammate in teammates:
-                    send_email('新的实验室活动',
+                    send_email('新的小组活动',
                                sender=app.config['MAIL_USERNAME'],
                                recipients=[teammate.email],
                                text_body=render_template('email/new_team_activity.txt',
