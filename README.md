@@ -2,25 +2,16 @@
 
 实验室管理协作平台，实现对实验室的管理及学生团队内部的协作。
 
-后端：Flask、MySql
+后端：Flask、MySQL
 
-前端：Bootstrap4、jQuery
+前端：Bootstrap4、jQuery、Layer
 
 ---
 
-- [ ] 用户系统
-- [x] 团队管理
-- [x] 实验室日常事务管理，如：扫除、值日等任务
+部署步骤：
 
-- [x] 人员信息管理
-- [x] 资产管理
-- [x] 座位安排
-- [ ] ...
-- [x] 学生团队管理
-- [ ] 团队协作
-- [ ] ...
-- [ ] 文档共享
-- [ ] Markdown在线编辑
-- [ ] 文件导出为不同格式
-- [ ] ...
+* 安装Nginx，建立virtualenv，并在虚拟环境中安装uWSGI.
+* 还原环境`pip install -r requirements.txt`.
+* 根据实际情况修改uwsgi.ini，并启动uwsgi，创建socket文件.
+* 建立软连接nginx.conf到/etc/nginx/sites-enabled/，根据实际情况修改nginx.conf，检查配置文件`/usr/sbin/nginx -t`，重新加载配置文件`/usr/sbin/nginx -s reload`.
 
