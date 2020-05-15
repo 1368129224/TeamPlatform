@@ -9,7 +9,7 @@ class RegisterForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired('请输入姓名'), Length(min=2, max=16)], render_kw={
         'class': 'form-control',
     })
-    stu_num = IntegerField('Stu_num', validators=[DataRequired('请输入学号'), Length(min=10, max=10)], render_kw={
+    stu_num = StringField('Stu_num', validators=[DataRequired('请输入学号'), Length(min=10, max=10)], render_kw={
         'class': 'form-control',
     })
     email = StringField('Email', validators=[DataRequired('请输入邮箱'), Email('邮箱格式错误')], render_kw={
@@ -70,7 +70,7 @@ class ForceResetPasswordForm(ResetPasswordForm):
 class AdminProfileForm(FlaskForm):
     QQ = StringField('QQ', validators=[Length(max=11)])
     wechat = StringField('wechat', validators=[Length(max=64)])
-    phone = IntegerField('Phone', validators=[DataRequired(), Length(min=11, max=11, message='号码格式错误')])
+    phone = StringField('Phone', validators=[DataRequired(), Length(min=11, max=11, message='号码格式错误')])
 
 class ProfileForm(AdminProfileForm):
     college = StringField('专业', validators=[DataRequired(), Length(max=32)])
